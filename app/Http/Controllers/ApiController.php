@@ -21,8 +21,13 @@ class ApiController extends Controller {
         $this->currentUser = null;
 
         if( ( null !== $authorizer->getChecker()->getAccessToken()) ){
-            $uid = $this->authorizer->getResourceOwnerId();
-            $this->currentUser = User::find($uid);
+            if($this->authorizer->getResourceOwnerType() == "user"){
+                $uid = $this->authorizer->getResourceOwnerId();
+                $this->currentUser = User::find($uid);
+                return;
+            }else if($this->authorizer->getResourceOwnerType() == "client"){
+                return;
+            }
         }
     }
 
