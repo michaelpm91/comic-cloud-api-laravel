@@ -4,6 +4,8 @@
     </IfModule>
 
     RewriteEngine On
+	
+    RewriteBase /Comic-Cloud-API
 
     # Redirect Trailing Slashes...
     RewriteRule ^(.*)/$ /$1 [L,R=301]
