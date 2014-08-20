@@ -1,0 +1,1 @@
+/var/www/dev/Comic-Cloud-API/app/views/series/edit.blade.php
