@@ -11,13 +11,14 @@
 |
 */
 
-/*Route::get('/', function()
+Route::get('/', function()
 {
 	return View::make('hello');
-});*/
+});
 
-Route::group(array('prefix' => 'api/v1'), function(){
+Route::group(array('prefix' => 'api/v1', 'before' => 'auth.basic'), function(){
 	Route::resource('series','SeriesController');
 	Route::resource('comic','ComicsController');
+    Route::resource('upload','UploadsController');
 });
 
