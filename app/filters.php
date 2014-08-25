@@ -54,6 +54,12 @@ Route::filter('auth.basic', function()
 	return Auth::basic();
 });
 
+Route::filter('auth.basic.once', function()
+{
+    Config::set('session.driver', 'array');//Laravel bug. It sends sessions stuff still. This allows true stateless basic auth
+    return Auth::onceBasic();
+});
+
 /*
 |--------------------------------------------------------------------------
 | Guest Filter

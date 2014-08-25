@@ -5,7 +5,8 @@
 	"license": "MIT",
 	"require": {
 		"laravel/framework": "4.2.*",
-        "aws/aws-sdk-php-laravel": "1.*"
+        "aws/aws-sdk-php-laravel": "1.*",
+        "aws/aws-sdk-php": "2.6.15"
 	},
 	"require-dev": {
 		"way/generators": "2.*"

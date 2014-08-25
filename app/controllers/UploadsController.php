@@ -11,7 +11,9 @@ class UploadsController extends \BaseController {
 	{
 		$uploads = Upload::all();
 
-		return View::make('uploads.index', compact('uploads'));
+		//return View::make('uploads.index', compact('uploads'));
+        //return $uploads;
+        return Auth::user();
 	}
 
 	/**
@@ -31,42 +33,35 @@ class UploadsController extends \BaseController {
 	 */
 	public function store()
 	{
-		/*$validator = Validator::make($data = Input::all(), Upload::$rules);
 
-		if ($validator->fails())
-		{
-			return Redirect::back()->withErrors($validator)->withInput();
-		}
-
-		Upload::create($data);
-
-		return Redirect::route('uploads.index');*/
 
         $upload = new Upload;
-        //dd(Input::file('thumbnail'));
+
         if(Input::hasFile('file')){
 
             $file = Input::file('file');
-            //$file = $file->move(public_path() . '/images', time() . '-' . $file->getClientOriginalName());
             $upload->file_original_name = $file->getClientOriginalName();
-            //$file->getClientOriginalExtension();
             $upload->file_size = $file->getSize();
-            $newFileName = $upload->file_upload_name = str_random(40);
+            $upload->file_upload_name = $newFileName = str_random(40).$file->getClientOriginalExtension();
+            $upload->user_id = Auth::user()->id;
+            $upload->save();
+
+            $tempPath = $file->getRealPath();
+            $s3 = AWS::get('s3');
+            $s3->putObject(array(
+                'Bucket'     => 'comicclouduploads',
+                'Key'        => $newFileName,
+                'SourceFile' => $tempPath,
+            ));
+
+            Queue::push('CreateCollection', array('upload_id' => $upload->id, 'time' => time()));
+
+        }else{
+            //return failed upload error
         }
 
-        $upload->save();
 
-        $path = $file->getRealPath();
-
-        $s3 = AWS::get('s3');
-        $s3->putObject(array(
-            'Bucket'     => 'comiccloud',
-            'Key'        => $newFileName,
-            'SourceFile' => $path,
-        ));
-
-
-        return $path;
+        return Auth::user();
 	}
 
 	/**
