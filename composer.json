@@ -6,10 +6,12 @@
 	"require": {
 		"laravel/framework": "4.2.*",
         "aws/aws-sdk-php-laravel": "1.*",
-        "aws/aws-sdk-php": "2.6.15"
+        "aws/aws-sdk-php": "2.6.15",
+        "Chumper/Zipper": "dev-master"
 	},
 	"require-dev": {
-		"way/generators": "2.*"
+		"way/generators": "2.*",
+        "fzaninotto/faker": "1.4.0"
 	},	
 	"autoload": {
 		"classmap": [

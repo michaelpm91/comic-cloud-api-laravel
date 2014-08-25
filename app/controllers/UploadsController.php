@@ -17,16 +17,6 @@ class UploadsController extends \BaseController {
 	}
 
 	/**
-	 * Show the form for creating a new upload
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		return View::make('uploads.create');
-	}
-
-	/**
 	 * Store a newly created upload in storage.
 	 *
 	 * @return Response
@@ -35,33 +25,39 @@ class UploadsController extends \BaseController {
 	{
 
 
-        $upload = new Upload;
-
         if(Input::hasFile('file')){
 
             $file = Input::file('file');
-            $upload->file_original_name = $file->getClientOriginalName();
-            $upload->file_size = $file->getSize();
-            $upload->file_upload_name = $newFileName = str_random(40).$file->getClientOriginalExtension();
-            $upload->user_id = Auth::user()->id;
-            $upload->save();
+            $acceptedMimetypes = array ('application/zip','application/rar','application/x-zip-compressed', 'multipart/x-zip','application/x-compressed','application/octet-stream','application/x-rar-compressed','compressed/rar','application/x-rar');
+            $acceptedExtensionTypes = array ('zip', 'rar', 'cbz', 'cbr');
 
-            $tempPath = $file->getRealPath();
-            $s3 = AWS::get('s3');
-            $s3->putObject(array(
-                'Bucket'     => 'comicclouduploads',
-                'Key'        => $newFileName,
-                'SourceFile' => $tempPath,
-            ));
+            if(in_array($file->getMimeType(),$acceptedMimetypes ) && in_array($file->getClientOriginalExtension(),$acceptedExtensionTypes)){//Make sure we're only accepting CBAs
+                $upload = new Upload;
+                $upload->file_original_name = $file->getClientOriginalName();
+                $upload->file_size = $file->getSize();
+                $upload->file_upload_name = $newFileName = str_random(40).'.'.$file->getClientOriginalExtension();
+                $upload->user_id = Auth::user()->id;
+                $upload->save();
 
-            Queue::push('CreateCollection', array('upload_id' => $upload->id, 'time' => time()));
+                $tempPath = $file->getRealPath();
+                $fileHash = hash_file('md5', $tempPath);
+                $s3 = AWS::get('s3');
+                $s3->putObject(array(
+                    'Bucket'     => 'comicclouduploads',
+                    'Key'        => $newFileName,
+                    'SourceFile' => $tempPath,
+                ));
 
+                Queue::push('CollectionsController', array('upload_id' => $upload->id,'hash'=> $fileHash,'newFileName' => $newFileName,'time' => time()));
+            }else{
+                return $file->getMimeType().' '.$file->getClientOriginalName().' wrong file type';
+            }
         }else{
-            //return failed upload error
+            return 'no file';
         }
 
 
-        return Auth::user();
+        //return Auth::user();
 	}
 
 	/**
@@ -75,19 +71,6 @@ class UploadsController extends \BaseController {
 		$upload = Upload::findOrFail($id);
 
 		return View::make('uploads.show', compact('upload'));
-	}
-
-	/**
-	 * Show the form for editing the specified upload.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		$upload = Upload::find($id);
-
-		return View::make('uploads.edit', compact('upload'));
 	}
 
 	/**

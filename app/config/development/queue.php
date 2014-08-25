@@ -34,7 +34,7 @@ return array(
 			'driver' => 'sqs',
 			'key'    => getenv('AWS_Key'),
 			'secret' => getenv('AWS_Secret'),
-			'queue'  => 'https://sqs.us-west-2.amazonaws.com/343647447635/comiccludtest',
+			'queue'  => 'https://sqs.us-west-2.amazonaws.com/343647447635/comiccloudtest',
 			'region' => 'us-west-2',
 		),
 	),

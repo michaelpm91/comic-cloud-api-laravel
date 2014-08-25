@@ -122,7 +122,8 @@ return array(
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
 		'Way\Generators\GeneratorsServiceProvider',
-        'Aws\Laravel\AwsServiceProvider'
+        'Aws\Laravel\AwsServiceProvider',
+        'Chumper\Zipper\ZipperServiceProvider'
 
 	),
 
@@ -191,6 +192,7 @@ return array(
 		'Validator'       => 'Illuminate\Support\Facades\Validator',
 		'View'            => 'Illuminate\Support\Facades\View',
         'AWS'             => 'Aws\Laravel\AwsFacade',
+        'Zipper'          => 'Chumper\Zipper\Zipper'
 
 	),
 

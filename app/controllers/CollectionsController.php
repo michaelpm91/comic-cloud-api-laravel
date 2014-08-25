@@ -31,7 +31,7 @@ class CollectionsController extends \BaseController {
 	 */
 	public function store()
 	{
-		$validator = Validator::make($data = Input::all(), Collection::$rules);
+		/*$validator = Validator::make($data = Input::all(), Collection::$rules);
 
 		if ($validator->fails())
 		{
@@ -40,7 +40,7 @@ class CollectionsController extends \BaseController {
 
 		Collection::create($data);
 
-		return Redirect::route('collections.index');
+		return Redirect::route('collections.index');*/
 	}
 
 	/**
@@ -103,5 +103,32 @@ class CollectionsController extends \BaseController {
 
 		return Redirect::route('collections.index');
 	}
+
+    public function fire ($job, $data){
+
+        //$obj = $s3->get_object('my_bucket', 'test.jpg');
+
+        $duplicate = Collection::where('collection_hash', '=', $data['hash'])->first();
+
+        if(!$duplicate){
+            $s3 = AWS::get('s3');
+            //$s3->get_object('comicclouduploads', $data['newFileName']);
+            // Save object to a file.
+            $result = $s3->getObject(array(
+                'Bucket' => 'comicclouduploads',
+                'Key'    => $data['newFileName'],
+                'SaveAs' => base_path().'/processingPath/'.$data['newFileName']
+            ));
+
+
+            $collection = new Collection;
+            $collection->upload_id = $data['upload_id'];
+            $collection->collection_hash = $data['hash'];
+            $collection->save();
+        }
+
+        $job->delete();
+
+    }
 
 }
