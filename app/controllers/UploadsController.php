@@ -1,6 +1,6 @@
 <?php
 
-class UploadsController extends \BaseController {
+class UploadsController extends ApiController {
 
 	/**
 	 * Display a listing of uploads
@@ -35,7 +35,8 @@ class UploadsController extends \BaseController {
                 $upload = new Upload;
                 $upload->file_original_name = $file->getClientOriginalName();
                 $upload->file_size = $file->getSize();
-                $upload->file_upload_name = $newFileName = str_random(40).'.'.$file->getClientOriginalExtension();
+                $newFileNameNoExt = str_random(40);
+                $upload->file_upload_name = $newFileName = $newFileNameNoExt.'.'.$file->getClientOriginalExtension();
                 $upload->user_id = Auth::user()->id;
                 $upload->save();
 
@@ -48,12 +49,15 @@ class UploadsController extends \BaseController {
                     'SourceFile' => $tempPath,
                 ));
 
-                Queue::push('CollectionsController', array('upload_id' => $upload->id,'hash'=> $fileHash,'newFileName' => $newFileName,'time' => time()));
+                Queue::push('CollectionsController', array('upload_id' => $upload->id,'hash'=> $fileHash, 'newFileName' => $newFileName,'newFileNameNoExt' => $newFileNameNoExt, 'fileExt' => $file->getClientOriginalExtension(),'time' => time()));
+
+                return $this->respondCreated('Upload Successful');
+
             }else{
-                return $file->getMimeType().' '.$file->getClientOriginalName().' wrong file type';
+                return $this->respondBadRequest('Invalid File');
             }
         }else{
-            return 'no file';
+            return $this->respondBadRequest('No File Uploaded');
         }
 
 
@@ -107,5 +111,6 @@ class UploadsController extends \BaseController {
 
 		return Redirect::route('uploads.index');
 	}
+
 
 }

@@ -13,7 +13,10 @@
 
 Route::get('/', function()
 {
-
+    /*$user = new User;
+    $user->email = 'michaelpm91@googlemail.com';
+    $user->password = Hash::make('1234');
+    $user->save();*/
 	return View::make('hello');
 });
 

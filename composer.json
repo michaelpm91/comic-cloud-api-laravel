@@ -7,7 +7,9 @@
 		"laravel/framework": "4.2.*",
         "aws/aws-sdk-php-laravel": "1.*",
         "aws/aws-sdk-php": "2.6.15",
-        "Chumper/Zipper": "dev-master"
+        "Chumper/Zipper": "dev-master",
+        "intervention/image": "2.0.8",
+        "intervention/imagecache": "2.0.3"
 	},
 	"require-dev": {
 		"way/generators": "2.*",

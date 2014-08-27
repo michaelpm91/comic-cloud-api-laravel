@@ -1,6 +1,6 @@
 <?php
 
-class SeriesController extends \BaseController {
+class SeriesController extends ApiController {
 
 	/**
 	 * Display a listing of series

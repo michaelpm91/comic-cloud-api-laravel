@@ -33,6 +33,7 @@ class AddUserIdToUploadsTable extends Migration {
 	{
 		Schema::table('uploads', function(Blueprint $table)
 		{
+            $table->dropForeign('uploads_user_id_foreign');
             $table->dropColumn('user_id');
             //$table->dropForeign('uploads_user_id_foreign');
 		});

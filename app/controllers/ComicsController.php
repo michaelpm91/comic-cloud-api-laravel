@@ -1,6 +1,6 @@
 <?php
 
-class ComicsController extends \BaseController {
+class ComicsController extends ApiController {
 
 	/**
 	 * Display a listing of comics
@@ -11,7 +11,9 @@ class ComicsController extends \BaseController {
 	{
 		$comics = Comic::all();
 
-		return View::make('comics.index', compact('comics'));
+        //$newComic = new Comic; $newComic->comic_issue = 1; $newComic->comic_writer = 'ME'; $newComic->user_id = 1; $newComic->collection_id = 1; $newComic->save();
+		//return View::make('comics.index', compact('comics'));
+        return $comics;
 	}
 
 	/**
@@ -51,9 +53,17 @@ class ComicsController extends \BaseController {
 	 */
 	public function show($id)
 	{
-		$comic = Comic::findOrFail($id);
+		//$comic = Comic::findOrFail($id);
+        $comic = Comic::find($id);
 
-		return View::make('comics.show', compact('comic'));
+		//return View::make('comics.show', compact('comic'));
+        if(!$comic){
+            return $this->respondNotFound('Comic Not Found');
+        }
+
+        return $this->respond([
+            'data' => $comic
+        ]);
 	}
 
 	/**

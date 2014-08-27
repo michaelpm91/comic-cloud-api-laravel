@@ -1,6 +1,6 @@
 <?php
 
-class CollectionsController extends \BaseController {
+class CollectionsController extends ApiController {
 
 	/**
 	 * Display a listing of collections
@@ -111,15 +111,19 @@ class CollectionsController extends \BaseController {
         $duplicate = Collection::where('collection_hash', '=', $data['hash'])->first();
 
         if(!$duplicate){
-            $s3 = AWS::get('s3');
+            //$s3 = AWS::get('s3');
             //$s3->get_object('comicclouduploads', $data['newFileName']);
             // Save object to a file.
-            $result = $s3->getObject(array(
+            /*$result = $s3->getObject(array(
                 'Bucket' => 'comicclouduploads',
                 'Key'    => $data['newFileName'],
                 'SaveAs' => base_path().'/processingPath/'.$data['newFileName']
-            ));
+            ));*/
 
+            $collectionFile = base_path().'/processingPath/'.$data['newFileName'];
+            //mkdir(base_path().'/processingPath/'.$data['newFileNameNoExt']);
+            //Zipper::make($collectionFile)->extractTo(base_path().'/processingPath/'.$data['newFileNameNoExt'].'/');
+            //Zipper::make($collectionFile)->extractTo(base_path().'/processingPath/');
 
             $collection = new Collection;
             $collection->upload_id = $data['upload_id'];
