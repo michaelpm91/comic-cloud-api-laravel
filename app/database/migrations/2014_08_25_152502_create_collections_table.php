@@ -17,7 +17,7 @@ class CreateCollectionsTable extends Migration {
 			$table->increments('id');
             $table->integer('upload_id')->length(10)->unsigned();
             $table->foreign('upload_id')->references('id')->on('uploads');
-            $table->string('collection_contents');
+            $table->text('collection_contents');
             $table->string('collection_hash');
 			$table->timestamps();
 		});

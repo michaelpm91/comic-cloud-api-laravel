@@ -17,7 +17,7 @@ class CreateComicsTable extends Migration {
 			$table->increments('id');
             $table->integer('comic_issue');
             $table->string('comic_writer');
-            $table->string('comic_collection');
+            $table->text('comic_collection');
 			$table->timestamps();
 		});
 	}

@@ -9,19 +9,15 @@ class SeriesController extends ApiController {
 	 */
 	public function index()
 	{
-		$series = Series::all();
 
-		return View::make('series.index', compact('series'));
-	}
+        $series = Auth::user()->series()->with('comics')->get();
+        if(!$series){
+            return $this->respondNotFound('No Series Found');
+        }
 
-	/**
-	 * Show the form for creating a new series
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		return View::make('series.create');
+        return $this->respond([
+            'series' => $series
+        ]);
 	}
 
 	/**
@@ -51,22 +47,15 @@ class SeriesController extends ApiController {
 	 */
 	public function show($id)
 	{
-		$series = Series::findOrFail($id);
+        $series = Auth::user()->series()->with('comics')->find($id);
 
-		return View::make('series.show', compact('series'));
-	}
+        if(!$series){
+            return $this->respondNotFound('Series Not Found');
+        }
 
-	/**
-	 * Show the form for editing the specified series.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		$series = Series::find($id);
-
-		return View::make('series.edit', compact('series'));
+        return $this->respond([
+            'series' => $series
+        ]);
 	}
 
 	/**
@@ -99,9 +88,12 @@ class SeriesController extends ApiController {
 	 */
 	public function destroy($id)
 	{
-		Series::destroy($id);
-
-		return Redirect::route('series.index');
+		//Series::destroy($id);
+        if(Auth::user()->series()->find($id)->delete()){
+            return $this->respondSuccessful('Comic Deleted');
+        }
+        //else response code
+        //return Redirect::route('comics.index');
 	}
 
 }

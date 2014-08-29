@@ -10,8 +10,12 @@ class DatabaseSeeder extends Seeder {
 	public function run()
 	{
 		Eloquent::unguard();
-
-		// $this->call('UserTableSeeder');
+		//Upload::truncate();
+		$this->call('UsersTableSeeder');
+		$this->call('UploadsTableSeeder');
+		$this->call('CollectionsTableSeeder');
+		$this->call('SeriesTableSeeder');
+		$this->call('ComicsTableSeeder');
 	}
 
 }

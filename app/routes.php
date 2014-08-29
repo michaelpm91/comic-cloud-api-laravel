@@ -13,17 +13,13 @@
 
 Route::get('/', function()
 {
-    /*$user = new User;
-    $user->email = 'michaelpm91@googlemail.com';
-    $user->password = Hash::make('1234');
-    $user->save();*/
-	return View::make('hello');
+    /*return View::make('hello');*/
 });
 
 Route::group(array('prefix' => 'api/v1', 'before' => /*'auth.basic'*/'auth.basic.once'), function(){
-	Route::resource('series','SeriesController');
-	Route::resource('comic','ComicsController');
-    Route::resource('upload','UploadsController');
+	Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
+	Route::resource('comic','ComicsController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
+    Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show', 'destroy')));
 });
 
 

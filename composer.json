@@ -9,7 +9,8 @@
         "aws/aws-sdk-php": "2.6.15",
         "Chumper/Zipper": "dev-master",
         "intervention/image": "2.0.8",
-        "intervention/imagecache": "2.0.3"
+        "intervention/imagecache": "2.0.3",
+        "barryvdh/laravel-cors": "0.2.x"
 	},
 	"require-dev": {
 		"way/generators": "2.*",

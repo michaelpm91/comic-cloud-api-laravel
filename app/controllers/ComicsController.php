@@ -9,40 +9,14 @@ class ComicsController extends ApiController {
 	 */
 	public function index()
 	{
-		$comics = Comic::all();
+        $comics = Auth::user()->comics()->with('series')->get();
+        if(!$comics){
+            return $this->respondNotFound('No Comic Found');
+        }
 
-        //$newComic = new Comic; $newComic->comic_issue = 1; $newComic->comic_writer = 'ME'; $newComic->user_id = 1; $newComic->collection_id = 1; $newComic->save();
-		//return View::make('comics.index', compact('comics'));
-        return $comics;
-	}
-
-	/**
-	 * Show the form for creating a new comic
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		return View::make('comics.create');
-	}
-
-	/**
-	 * Store a newly created comic in storage.
-	 *
-	 * @return Response
-	 */
-	public function store()
-	{
-		$validator = Validator::make($data = Input::all(), Comic::$rules);
-
-		if ($validator->fails())
-		{
-			return Redirect::back()->withErrors($validator)->withInput();
-		}
-
-		Comic::create($data);
-
-		return Redirect::route('comics.index');
+        return $this->respond([
+            'comics' => $comics
+        ]);
 	}
 
 	/**
@@ -53,30 +27,15 @@ class ComicsController extends ApiController {
 	 */
 	public function show($id)
 	{
-		//$comic = Comic::findOrFail($id);
-        $comic = Comic::find($id);
+        $comic = Auth::user()->comics()->with('series')->find($id);
 
-		//return View::make('comics.show', compact('comic'));
         if(!$comic){
             return $this->respondNotFound('Comic Not Found');
         }
 
         return $this->respond([
-            'data' => $comic
+            'comic' => $comic
         ]);
-	}
-
-	/**
-	 * Show the form for editing the specified comic.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		$comic = Comic::find($id);
-
-		return View::make('comics.edit', compact('comic'));
 	}
 
 	/**
@@ -109,9 +68,12 @@ class ComicsController extends ApiController {
 	 */
 	public function destroy($id)
 	{
-		Comic::destroy($id);
-
-		return Redirect::route('comics.index');
+		//Comic::destroy($id);
+        if(Auth::user()->comics()->find($id)->delete()){
+            return $this->respondSuccessful('Comic Deleted');
+        }
+        //else response code
+		//return Redirect::route('comics.index');
 	}
 
 }

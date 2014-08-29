@@ -8,11 +8,16 @@ class SeriesTableSeeder extends Seeder {
 	public function run()
 	{
 		$faker = Faker::create();
+		
+		$userIDs = User::lists('id');
 
-		foreach(range(1, 10) as $index)
+		foreach(range(1, 50) as $index)
 		{
 			Series::create([
-
+				'series_title' => $faker->sentence(rand(3,6)),
+				'series_start_year' => $faker->year(),
+				'series_publisher' => $faker->word(),
+				'user_id' => $faker->randomElement($userIDs)
 			]);
 		}
 	}

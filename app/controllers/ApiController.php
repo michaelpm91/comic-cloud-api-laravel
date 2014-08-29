@@ -58,9 +58,20 @@ class ApiController extends BaseController{
      * @param $message
      * @return mixed
      */
+    protected function respondSuccessful($message)
+    {
+        return $this->setStatusCode(IlluminateResponse::HTTP_OK)->respond([
+            'message' => $message
+        ]);
+    }
+
+    /**
+     * @param $message
+     * @return mixed
+     */
     protected function respondCreated($message)
     {
-        return $this->setStatusCode(201)->respond([
+        return $this->setStatusCode(IlluminateResponse::HTTP_CREATED)->respond([
             'message' => $message
         ]);
     }

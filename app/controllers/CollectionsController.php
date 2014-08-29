@@ -106,8 +106,6 @@ class CollectionsController extends ApiController {
 
     public function fire ($job, $data){
 
-        //$obj = $s3->get_object('my_bucket', 'test.jpg');
-
         $duplicate = Collection::where('collection_hash', '=', $data['hash'])->first();
 
         if(!$duplicate){

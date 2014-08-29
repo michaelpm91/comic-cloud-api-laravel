@@ -124,7 +124,8 @@ return array(
 		'Way\Generators\GeneratorsServiceProvider',
         'Aws\Laravel\AwsServiceProvider',
         'Chumper\Zipper\ZipperServiceProvider',
-        'Intervention\Image\ImageServiceProvider'
+        'Intervention\Image\ImageServiceProvider',
+        'Barryvdh\Cors\CorsServiceProvider',
 
 	),
 
