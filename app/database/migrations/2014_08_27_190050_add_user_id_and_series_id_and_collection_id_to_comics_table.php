@@ -13,12 +13,12 @@ class AddUserIdAndSeriesIdAndCollectionIdToComicsTable extends Migration{
 	{
 		Schema::table('comics', function(Blueprint $table)
 		{
-            $table->integer('user_id')->length(10)->unsigned();
-            $table->foreign('user_id')->references('id')->on('users');
-            $table->integer('series_id')->length(10)->unsigned();
-            $table->foreign('series_id')->references('id')->on('series');
-            $table->integer('collection_id')->length(10)->unsigned();
-            $table->foreign('collection_id')->references('id')->on('collections');
+            $table->integer('user_id')->length(10)->unsigned()->after('comic_collection');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->integer('series_id')->length(10)->unsigned()->after('user_id');
+            $table->foreign('series_id')->references('id')->on('series')->onDelete('cascade');
+            $table->integer('collection_id')->length(10)->unsigned()->after('series_id');
+            $table->foreign('collection_id')->references('id')->on('collections')->onDelete('cascade');
 		});
 	}
 

@@ -90,7 +90,7 @@ class SeriesController extends ApiController {
 	{
 		//Series::destroy($id);
         if(Auth::user()->series()->find($id)->delete()){
-            return $this->respondSuccessful('Comic Deleted');
+            return $this->respondSuccessful('Series Deleted');
         }
         //else response code
         //return Redirect::route('comics.index');

@@ -14,7 +14,7 @@ class AddUserIdToUploadsTable extends Migration {
 	{
 		Schema::table('uploads', function(Blueprint $table)
 		{
-            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             /*$table->integer('user_id')->length(10)->unsigned()
                 ->after('id')
                 ->foreign('user_id')

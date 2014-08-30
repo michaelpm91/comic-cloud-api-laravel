@@ -195,7 +195,7 @@ return array(
 		'View'            => 'Illuminate\Support\Facades\View',
         'AWS'             => 'Aws\Laravel\AwsFacade',
         'Zipper'          => 'Chumper\Zipper\Zipper',
-        'Image'           => 'Intervention\Image\Fascades\Image'
+        'Image'           => 'Intervention\Image\Facades\Image'
 
 	),
 

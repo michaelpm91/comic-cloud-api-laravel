@@ -24,7 +24,7 @@ return array(
 			'driver'    => 'mysql',
 			'host'      => 'localhost',
 			'database'  => 'development',
-			'username'  => 'root',
+			'username'  => 'michael',
 			'password'  => getenv('mysql_pass'),
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',

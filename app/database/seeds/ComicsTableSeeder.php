@@ -16,8 +16,8 @@ class ComicsTableSeeder extends Seeder {
 			$collection = Collection::find($faker->randomElement($collectionIDs));
 
 			$userid = $collection->upload()->first()->user()->first()->id;
-			$userSeries = $collection->upload()->first()->user()->first()->series()->lists('id'); 
-
+			$userSeries = $collection->upload()->first()->user()->first()->series()->lists('id');
+            //$this->command->info('Collection: ' . $collection);
 			Comic::create([
 				'comic_issue' => rand(1,100),
 				'comic_writer' => $faker->firstName." ".$faker->lastName,

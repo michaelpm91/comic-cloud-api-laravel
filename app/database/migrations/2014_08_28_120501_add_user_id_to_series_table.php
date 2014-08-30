@@ -14,8 +14,8 @@ class AddUserIdToSeriesTable extends Migration {
 	{
 		Schema::table('series', function(Blueprint $table)
 		{
-			 $table->integer('user_id')->length(10)->unsigned();
-			 $table->foreign('user_id')->references('id')->on('users');
+			 $table->integer('user_id')->length(10)->unsigned()->after('series_publisher');
+			 $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 		});
 	}
 

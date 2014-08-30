@@ -14,6 +14,9 @@ class Collection extends \Eloquent {
     {
         return $this->belongsTo('Upload');
     }
+    public function comicimages(){
+        return $this->hasMany('ComicImage');
+    }
 
 
 }
