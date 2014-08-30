@@ -24,7 +24,8 @@ class ComicsTableSeeder extends Seeder {
 				'comic_collection' => $collection->collection_contents,
 				'user_id' => $userid,
 				'series_id' => $faker->randomElement($userSeries),
-				'collection_id' => $collection->id
+				'collection_id' => $collection->id,
+                'comic_status' => 1
 			]);
 		}
 	}

@@ -51,6 +51,11 @@ App::error(function(Exception $exception, $code)
 	Log::error($exception);
 });
 
+App::missing(function($exception)
+{
+    //return 'lotwut';
+});
+
 /*
 |--------------------------------------------------------------------------
 | Maintenance Mode Handler

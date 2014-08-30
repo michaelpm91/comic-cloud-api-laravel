@@ -19,6 +19,7 @@ class CreateCollectionsTable extends Migration {
             $table->foreign('upload_id')->references('id')->on('uploads');
             $table->text('collection_contents');
             $table->string('collection_hash');
+            $table->integer('collection_status');
 			$table->timestamps();
 		});
 	}

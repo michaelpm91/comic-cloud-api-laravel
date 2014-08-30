@@ -22,6 +22,7 @@ class CollectionsTableSeeder extends Seeder {
 				'upload_id' => $index,
 				//'collection_contents' => json_encode($collectionArray),
 				'collection_hash' => $faker->md5(),
+                'collection_status' => 1
 			]);
 		}
 	}
