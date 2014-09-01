@@ -51,6 +51,8 @@ class CollectionsController extends ApiController {
 
         $comicInfo = ['issue' => 1, 'comic_writer' => 'Unknown','series_title' => 'Unknown'];
 
+
+
         return $comicInfo;
     }
 
@@ -95,8 +97,9 @@ class CollectionsController extends ApiController {
 
                     $zip->extractTo($this->extractLocation.$fileNoExt, array($entry));
 
-                    $image_set_key = $this->processImage($this->extractLocation.$fileNoExt."/".basename($entry));
-                    $pages[$image_set_key] = basename($entry);
+                    $image_slug = $this->processImage($this->extractLocation.$fileNoExt."/".basename($entry));
+                    $pages[$image_slug] = basename($entry);
+
                 }
                 $zip->close();
 
@@ -126,31 +129,93 @@ class CollectionsController extends ApiController {
 
         }else if(in_array($fileExtension, array('rar', 'cbr'))){
 
+            $x = rar_open($file);
+
+            if($x == true){
+
+                mkdir($this->extractLocation.$fileNoExt);
+                $pages = [];
+
+                $entries = rar_list($x);
+
+                foreach ($entries as $key => $entry) {
+
+                    if ( substr( $entry, -1 ) == '/' ) continue; // skip directories
+
+                    $entryExt = strtolower(pathinfo(basename($entry->getName()), PATHINFO_EXTENSION));
+                    $acceptedExtensions = ['jpg', 'jpeg'];
+
+                    if (!in_array($entryExt, $acceptedExtensions)) continue; //skip non-jpegs
+
+                    $file = basename($entry->getName());
+
+                    if (!in_array($entryExt, $acceptedExtensions)) continue; //skip non-jpegs
+
+                    $entry->extract( false , $this->extractLocation.$fileNoExt.'/'.$file);
+
+                    $image_slug = $this->processImage($this->extractLocation.$fileNoExt."/".$file);
+                    $pages[$image_slug] = $file;
+
+                }
+
+                rar_close($x);
+
+                natsort($pages);
+                $pages = array_flip($pages);
+                $pages = array_values($pages);
+
+                array_unshift($pages, 'presentation_value');
+                unset($pages[0]);//Add and remove value at zero to shift array to 1. Just for presentation.
+
+                //json_encode($pages);
+
+                $collection = Collection::find($this->collection_id);
+
+                $collection->collection_contents = json_encode($pages, JSON_FORCE_OBJECT);
+
+                $collection->save();
+
+                $comic = Comic::find($this->comic_id);
+
+                $comic->comic_collection = json_encode($pages, JSON_FORCE_OBJECT);
+
+                $comic->save();
+
+            }
         }
     }
 
     public function processImage($image){
 
-        $imageExt = strtolower(pathinfo($image, PATHINFO_EXTENSION));
-        Log::info('Image Process');
-        $s3 = AWS::get('s3');
-        $result = $s3->putObject(array(
-            'Bucket'     => 'comiccloudimages',
-            'Key'        => str_random(40).".".$imageExt,
-            'SourceFile' => $image,
-            'ACL'        => 'public-read',
-        ));
+        $fileHash = hash_file('md5', $image);
 
-        $imageentry = new ComicImage;
+        $imageentry = ComicImage::where('image_hash', '=', $fileHash)->first();
 
-        $imageentry->image_set_key = $image_set_key = str_random(5);
-        $imageentry->image_size = 'medium';
-        $imageentry->image_hash = hash_file('md5', $image);
-        $imageentry->image_url = $result['ObjectURL'];
-        $imageentry->collection_id = $this->collection_id;
-        $imageentry->save();
 
-        return $image_set_key;
+        if(!$imageentry){
+
+            $imageExt = strtolower(pathinfo($image, PATHINFO_EXTENSION));
+
+            Log::info('Image Process');
+
+            $s3 = AWS::get('s3');
+            $result = $s3->putObject(array(
+                'Bucket'     => 'comiccloudimages',
+                'Key'        => str_random(40).".".$imageExt,
+                'SourceFile' => $image,
+                'ACL'        => 'public-read',
+            ));
+
+            $imageentry = new ComicImage;
+
+            $imageentry->image_slug = $image_slug = str_random(10);
+            $imageentry->image_hash = $fileHash;
+            $imageentry->image_size = filesize($image);
+            $imageentry->save();
+        }
+        $imageentry->collections()->attach($this->collection_id);
+
+        return $imageentry->image_slug;
     }
 
     public function fire($job, $data){

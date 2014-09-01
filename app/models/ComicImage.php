@@ -10,8 +10,9 @@ class ComicImage extends \Eloquent {
 	// Don't forget to fill this array
 	protected $fillable = [];
 
-    public function collection(){
-        return $this->belongsTo('Collection');
+    public function collections(){
+        //return $this->belongsTo('Collection');
+        return $this->belongsToMany('Collection');
     }
 
 }
