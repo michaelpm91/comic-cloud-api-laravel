@@ -76,4 +76,17 @@ class ComicsController extends ApiController {
 		//return Redirect::route('comics.index');
 	}
 
+    /**
+     *
+     * Get comic meta information from Comic Vine API
+     * @param $id
+     */
+    public function getMeta($id){
+        //todo-mike Implement call to Comic Vine API
+        $client = new \GuzzleHttp\Client();
+
+        $response = $client->get('');
+
+        dd($response->getBody());
+	}
 }

@@ -14,6 +14,7 @@
 Route::get('/', function()
 {
     /*return View::make('hello');*/
+
 });
 
 Route::group(array('prefix' => 'api/v1', 'before' => /*'auth.basic'*/'auth.basic.once'), function(){
@@ -22,7 +23,8 @@ Route::group(array('prefix' => 'api/v1', 'before' => /*'auth.basic'*/'auth.basic
     Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show', 'destroy')));
     //Route::resource('image','ComicImagesController');
     //Route::get('/image/{image_set_key}/{size?}', array(/*'as' => 'name.stuff.here',*/ 'uses' => 'ComicImagesController@show'));
-    Route::get('/image/{image_set_key}/{size?}', 'ComicImagesController@show');
+	Route::get('/image/{image_set_key}/{size?}', 'ComicImagesController@show');
+	Route::get('comic/{comic_id}/meta', 'ComicsController@getMeta');
 });
 
 

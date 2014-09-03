@@ -16,16 +16,14 @@ class ComicImagesController extends ApiController {
 
         $comicCollectionIDs = $comicImage->collections()->lists('collection_id');
 
-        //return $userCollectionIDs;
-        return $userCollectionIDs;
-        if(in_array($comicCollectionIDs, $userCollectionIDs)) return 'yow';
-        /*if(!$comicImage || !in_array($comicImage->collection_id, $userCollectionIDs)){
-            return $this->respondNotFound('No Image Found');
-        }
+		foreach($comicCollectionIDs as $comicCollectionID){
+	        if(!in_array($comicCollectionID, $userCollectionIDs)) return $this->respondNotFound('No Image Found');
+		}
 
-        $image = Image::make($comicImage->image_url);
+		$imageUrl = getenv('AWS_Comic_Cloud_Images_URL').$comic_slug.'_'.strtolower($size).'.jpg';
+        $image = Image::make($imageUrl);
 
-        return $image->response();*/
+        return $image->response();
 	}
 
 }

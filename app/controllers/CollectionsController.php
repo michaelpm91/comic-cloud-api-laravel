@@ -4,6 +4,8 @@ class CollectionsController extends ApiController {
 
     protected $extractLocation = '/var/www/dev/processingPath/';
 
+    protected $resizeLocation = '/var/www/dev/resizePath/';
+
     protected $user_id;
 
     protected $collection_id;
@@ -196,22 +198,40 @@ class CollectionsController extends ApiController {
 
             $imageExt = strtolower(pathinfo($image, PATHINFO_EXTENSION));
 
-            Log::info('Image Process');
+			Log::info('Image Process');
 
-            $s3 = AWS::get('s3');
-            $result = $s3->putObject(array(
-                'Bucket'     => 'comiccloudimages',
-                'Key'        => str_random(40).".".$imageExt,
-                'SourceFile' => $image,
-                'ACL'        => 'public-read',
-            ));
+			$image_slug = str_random(40);
+
+            $sizes = [
+                'medium' => [
+                    'width' => 673, 'height' => 1037
+                ],
+                'thumbnail' => [
+                    'width' => 111, 'height' => 170
+                ]
+            ];
+
+            foreach ($sizes as $size => $dimensions){
+
+                $tempLoc = $this->resizeLocation.str_random(80);
+                $img = Image::make($image)->resize(null, $dimensions['height'], function ($constraint) { $constraint->aspectRatio(); })->save($tempLoc);
+
+                $s3 = AWS::get('s3');
+                $result = $s3->putObject(array(
+                    'Bucket'     => 'comiccloudimages',
+                    'Key'        => $image_slug."_".$size.".".$imageExt,
+                    'SourceFile' => $tempLoc,
+                    'ACL'        => 'public-read',
+                ));
+            }
 
             $imageentry = new ComicImage;
 
-            $imageentry->image_slug = $image_slug = str_random(10);
+            $imageentry->image_slug = $image_slug;// = str_random(10);
             $imageentry->image_hash = $fileHash;
             $imageentry->image_size = filesize($image);
             $imageentry->save();
+
         }
         $imageentry->collections()->attach($this->collection_id);
 
