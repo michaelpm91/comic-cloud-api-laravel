@@ -22,9 +22,9 @@ return array(
 
 		'mysql' => array(
 			'driver'    => 'mysql',
-			'host'      => 'localhost',
-			'database'  => 'development',
-			'username'  => 'michael',
+			'host'      => getenv('db_host'),
+			'database'  => getenv('db_name'),
+			'username'  => getenv('mysql_user'),
 			'password'  => getenv('mysql_pass'),
 			'charset'   => 'utf8',
 			'collation' => 'utf8_unicode_ci',
