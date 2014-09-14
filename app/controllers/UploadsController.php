@@ -49,7 +49,7 @@ class UploadsController extends ApiController {
                     'SourceFile' => $tempPath,
                 ));
 
-                Queue::push('CollectionsController', array('upload_id' => $upload->id,'user_id'=> Auth::user()->id, 'hash'=> $fileHash, 'newFileName' => $newFileName,'newFileNameNoExt' => $newFileNameNoExt, 'fileExt' => $file->getClientOriginalExtension(),'time' => time()));
+                Queue::push('CollectionsController', array('upload_id' => $upload->id,'user_id'=> Auth::user()->id, 'hash'=> $fileHash, 'newFileName' => $newFileName,'newFileNameNoExt' => $newFileNameNoExt, 'fileExt' => $file->getClientOriginalExtension(),'originalFileName' => $file->getClientOriginalName(),'time' => time()));
 
                 return $this->respondCreated('Upload Successful');
 

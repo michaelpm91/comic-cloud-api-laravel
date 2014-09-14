@@ -269,7 +269,7 @@ class CollectionsController extends ApiController {
 
         $this->collection_id = $collection->id;
 
-        $this->createComic($data['newFileNameNoExt'], $collection);
+        $this->createComic($data['originalFileName'], $collection);
 
         if($prcoessArchive){
             Log::info('Process Archive');
