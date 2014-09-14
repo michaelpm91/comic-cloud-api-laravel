@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return array(//todo-mike: Probably want to make cors a bit more secure.
 
     /*
      |--------------------------------------------------------------------------
@@ -26,18 +26,12 @@ return array(
     ),
 
     'paths' => array(
-        'api/*' => array(
-            'allowedOrigins' => array('*'),
-            'allowedHeaders' => array('*'),
-            'allowedMethods' => array('*'),
-            'maxAge' => 3600,
-        ),
         '*' => array(
             'allowedOrigins' => array('*'),
-            'allowedHeaders' => array('Content-Type'),
+            'allowedHeaders' => array('*'),
             'allowedMethods' => array('POST', 'PUT', 'GET', 'DELETE'),
             'maxAge' => 3600,
-            'hosts' => array('api.*'),
+            //'hosts' => array('api.*'),
         ),
     ),
 

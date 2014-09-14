@@ -13,7 +13,7 @@ class Comic extends \Eloquent {
 
     protected $dates = ['deleted_at'];
 
-    private $image_url = '/api/v1/image/'; //todo-mike: find a more suitable location or way for this url.
+    private $image_url = '/0.1/image/'; //todo-mike: find a more suitable location or way for this url.
 
 	// Don't forget to fill this array
 	protected $fillable = ['comic_issue','comic_writer','comic_collection'];

@@ -120,11 +120,15 @@ class CollectionsController extends ApiController {
 
                 $collection->collection_contents = json_encode($pages, JSON_FORCE_OBJECT);
 
+                $collection->collection_status = 1;
+
                 $collection->save();
 
                 $comic = Comic::find($this->comic_id);
 
                 $comic->comic_collection = json_encode($pages, JSON_FORCE_OBJECT);
+
+                $comic->comic_status = 1;
 
                 $comic->save();
             }
@@ -175,11 +179,15 @@ class CollectionsController extends ApiController {
 
                 $collection->collection_contents = json_encode($pages, JSON_FORCE_OBJECT);
 
+                $collection->collection_status = 1;
+
                 $collection->save();
 
                 $comic = Comic::find($this->comic_id);
 
                 $comic->comic_collection = json_encode($pages, JSON_FORCE_OBJECT);
+
+                $comic->comic_status = 1;
 
                 $comic->save();
 
@@ -207,7 +215,7 @@ class CollectionsController extends ApiController {
                     'width' => 673, 'height' => 1037
                 ],
                 'thumbnail' => [
-                    'width' => 111, 'height' => 170
+                    'width' => 222, 'height' => 340
                 ]
             ];
 
