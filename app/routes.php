@@ -18,7 +18,7 @@ Route::get('/', function()
 
 });
 
-Route::group(array('prefix' => 'api/v1'/*/0.1*/, 'before' => /*'auth.basic'*/'auth.basic.once'), function(){
+Route::group(array('prefix' => getenv('api_prefix'), 'before' => /*'auth.basic'*/'auth.basic.once'), function(){
 	Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
 	Route::resource('comic','ComicsController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
     Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show', 'destroy')));

@@ -50,10 +50,15 @@ class CollectionsController extends ApiController {
     }
 
     public function getComicInfo($filename){
+        $seriesTitle = 'Unknown';
 
-        $comicInfo = ['issue' => 1, 'comic_writer' => 'Unknown','series_title' => 'Unknown'];
+        $seriesPreg = ' Vol.[0-9]+| #[0-9]+|\(.*?\)|\.[a-z0-9A-Z]+$';
+        $tempSeriesTitle = trim(preg_replace('/'.$seriesPreg.'/', "", $filename));
+        if($tempSeriesTitle) $seriesTitle = $tempSeriesTitle;
 
+        $comicInfo = ['issue' => 1, 'comic_writer' => 'Unknown','series_title' => $seriesTitle]; //Default array
 
+        //$comicInfo = ['issue' => 1, 'comic_writer' => 'Unknown','series_title' => 'Unknown']; //Default array
 
         return $comicInfo;
     }
@@ -77,7 +82,7 @@ class CollectionsController extends ApiController {
 
     }
 
-    public function extractArchive($file, $fileNoExt, $fileExtension){
+    public function extractArchive($file, $fileNoExt, $fileExtension){//todo-mike: Need to make this more DRY. Also PDFs and virus checks...
 
         if(in_array($fileExtension, array('zip', 'cbz'))){
 
