@@ -32,9 +32,9 @@ class CollectionsController extends ApiController {
 
     }
 
-    public function createSeries($seriesTitle){
+    public function createSeries($seriesTitle){//todo-mike: make sure this function only returns series that user has access to.
 
-        $series = User::find($this->user_id)->first()->series()->where('series_title', '=', $seriesTitle)->first();
+        $series = User::find($this->user_id)->first()->series()->where('series_title', '=', $seriesTitle)->first();//todo-mike: this isn't returning user specific series
 
         if(!$series){
             $series = new Series;
@@ -82,8 +82,9 @@ class CollectionsController extends ApiController {
 
     }
 
-    public function extractArchive($file, $fileNoExt, $fileExtension){//todo-mike: Need to make this more DRY. Also PDFs and virus checks...
-
+    public function extractArchive($file, $fileNoExt, $fileExtension){
+    //todo-mike: Need to make this more DRY. Also PDFs and virus checks...
+    //todo-mike: Natsort is working as expected...
         if(in_array($fileExtension, array('zip', 'cbz'))){
 
             $zip = new ZipArchive;
@@ -251,7 +252,7 @@ class CollectionsController extends ApiController {
         return $imageentry->image_slug;
     }
 
-    public function fire($job, $data){
+    public function fire($job, $data){//todo-mike: fire needs to handle errors...
 
         Log::info('Firing.');
         $this->user_id = $data['user_id'];

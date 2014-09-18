@@ -28,6 +28,7 @@ $env = $app->detectEnvironment(array(
 
 	'local' => array('homestead'),
     'development' => array('atomichael.com'),
+    'production' => array('comiccloud')
 ));
 /*$env = $app->detectEnvironment(function(){
     return getenv('ENV')?:'development';
