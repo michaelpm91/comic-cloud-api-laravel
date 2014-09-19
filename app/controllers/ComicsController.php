@@ -9,7 +9,9 @@ class ComicsController extends ApiController {
 	 */
 	public function index()
 	{
-        $comics = Auth::user()->comics()->with('series')->get();
+        $ownerId = ResourceServer::getOwnerId();
+        $comics = User::find($ownerId)->comics()->with('series')->get();
+        //$comics = Auth::user()->comics()->with('series')->get();
         if(!$comics){
             return $this->respondNotFound('No Comic Found');
         }
@@ -27,7 +29,9 @@ class ComicsController extends ApiController {
 	 */
 	public function show($id)
 	{
-        $comic = Auth::user()->comics()->with('series')->find($id);
+        $ownerId = ResourceServer::getOwnerId();
+        $comic = User::find($ownerId)->comics()->with('series')->find($id);
+        //$comic = Auth::user()->comics()->with('series')->find($id);
 
         if(!$comic){
             return $this->respondNotFound('Comic Not Found');
