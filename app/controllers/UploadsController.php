@@ -2,6 +2,13 @@
 
 class UploadsController extends ApiController {
 
+    /**
+     *app/controllers/UploadsController.php:5
+     */
+    public function __construct(){
+        $user = User::find(ResourceServer::getOwnerId());
+        Auth::login($user);
+    }
 	/**
 	 * Display a listing of uploads
 	 *

@@ -6,7 +6,7 @@
     RewriteEngine On
 
 	#Only needed if laravel if in a subdirectory...
-    #RewriteBase /Comic-Cloud-API
+    #RewriteBase /Comic-Cloud-API/
 
     # Redirect Trailing Slashes...
     RewriteRule ^(.*)/$ /$1 [L,R=301]

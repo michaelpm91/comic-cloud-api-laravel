@@ -2,14 +2,23 @@
 
 class SeriesController extends ApiController {
 
-	/**
-	 * Display a listing of series
-	 *
-	 * @return Response
-	 */
+    /**
+     * Login in resource owner
+     */
+    public function __construct(){
+        $user = User::find(ResourceServer::getOwnerId());
+        Auth::login($user);
+    }
+
+    /**
+     * Display a listing of series
+     *
+     * @return Response
+     */
 	public function index()
 	{
 
+        //$series = User::find($this->user_id)->series()->with('comics')->get();
         $series = Auth::user()->series()->with('comics')->get();
         if(!$series){
             return $this->respondNotFound('No Series Found');
@@ -47,6 +56,7 @@ class SeriesController extends ApiController {
 	 */
 	public function show($id)
 	{
+        //$series = User::find($this->user_id)->series()->with('comics')->find($id);
         $series = Auth::user()->series()->with('comics')->find($id);
 
         if(!$series){
