@@ -64,10 +64,19 @@ return array(
             'class'            => 'League\OAuth2\Server\Grant\Password',
             'access_token_ttl' => 3600,
             'callback'         => function ($username, $password) {
-                return Auth::validate([
-                    'email'    => $username,
+                $credentials = array(
+                    'email' => $username,
                     'password' => $password,
-                ]);
+                );
+
+                $valid = Auth::validate($credentials);
+
+                if (!$valid) {
+                    return false;
+                }
+
+                return Auth::getProvider()->retrieveByCredentials($credentials)->id;
+
             }
         ),
         'refresh_token' => array(

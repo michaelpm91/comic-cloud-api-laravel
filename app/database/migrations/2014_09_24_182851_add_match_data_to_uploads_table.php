@@ -14,7 +14,7 @@ class AddMatchDataToUploadsTable extends Migration {
 	{
 		Schema::table('uploads', function(Blueprint $table)
 		{
-			
+            $table->text('match_data')->after('file_upload_name');
 		});
 	}
 
@@ -28,8 +28,8 @@ class AddMatchDataToUploadsTable extends Migration {
 	{
 		Schema::table('uploads', function(Blueprint $table)
 		{
-			
-		});
+            $table->dropColumn('match_data');
+        });
 	}
 
 }

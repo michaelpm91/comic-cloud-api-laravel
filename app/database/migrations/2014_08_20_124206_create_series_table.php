@@ -14,7 +14,7 @@ class CreateSeriesTable extends Migration {
 	{
 		Schema::create('series', function(Blueprint $table)
 		{
-			$table->increments('id');
+            $table->string('id', 40)->primary();
 			$table->string('series_title');
 			$table->integer('series_start_year');
 			$table->string('series_publisher');

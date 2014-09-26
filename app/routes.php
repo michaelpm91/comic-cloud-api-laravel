@@ -27,8 +27,10 @@ Route::group(array('prefix' => getenv('api_prefix'), 'before' => 'oauth'/*'auth.
 
 Route::post('oauth/access_token', function()
 {
-    //return AuthorizationServer::performAccessTokenFlow();
-    //return Response::json(Authorizer::issueAccessToken());
+    //todo-mike: Make a filter to check params are all passed in...
     return Response::json(AuthorizationServer::issueAccessToken());
 });
-
+Route::get('user', array('before' => 'oauth', function()
+{
+    return $ownerId = ResourceServer::getOwnerId()."\r\n".Auth::user();
+}));

@@ -45,6 +45,9 @@ class UploadsController extends ApiController {
                 $newFileNameNoExt = str_random(40);
                 $upload->file_upload_name = $newFileName = $newFileNameNoExt.'.'.$file->getClientOriginalExtension();
                 $upload->user_id = Auth::user()->id;
+                if(Input::get('match_data')){
+                    $upload->match_data =  Input::get('match_data');
+                }
                 $upload->save();
 
                 $tempPath = $file->getRealPath();

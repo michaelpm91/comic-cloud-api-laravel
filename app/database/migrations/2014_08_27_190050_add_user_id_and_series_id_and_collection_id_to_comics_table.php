@@ -15,7 +15,7 @@ class AddUserIdAndSeriesIdAndCollectionIdToComicsTable extends Migration{
 		{
             $table->integer('user_id')->length(10)->unsigned()->after('comic_collection');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->integer('series_id')->length(10)->unsigned()->after('user_id');
+            $table->string('series_id', 40)->after('user_id');
             $table->foreign('series_id')->references('id')->on('series')->onDelete('cascade');
             $table->integer('collection_id')->length(10)->unsigned()->after('series_id');
             $table->foreign('collection_id')->references('id')->on('collections')->onDelete('cascade');

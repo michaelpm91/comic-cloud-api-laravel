@@ -14,30 +14,37 @@ class CollectionsController extends ApiController {
 
     //protected $user_data;
 
-    public function createComic($fileName, $collection){
+    public function createComic($upload_id, $collection){
 
-        $comic_info = $this->getComicInfo($fileName);
+        $comic_info = $this->getComicInfo($upload_id);
 
+        Log::info('Series ID: ' .$comic_info['series_id']);
+        $newComicID = str_random(40);
         $comic = new Comic;
-        $comic->comic_issue = $comic_info['issue'];
+        $comic->id = $newComicID;
+        $comic->comic_issue = $comic_info['comic_issue'];
         $comic->comic_writer = $comic_info['comic_writer'];
         $comic->comic_collection = (($collection->collection_contents ? $collection->collection_contents : '' ));
         $comic->user_id = $this->user_id;
-        $comic->series_id = $this->createSeries($comic_info['series_title']);
+        $comic->series_id = $comic_info['series_id'];
         $comic->collection_id = $collection->id;
         $comic->comic_status = $collection->collection_status;
         $comic->save();
 
-        $this->comic_id = $comic->id;
+        $this->comic_id = $newComicID;
+
+        Log::info('comic ID 1: ' .$this->comic_id );
+        Log::info('comic ID 2: ' .$comic->id );
 
     }
 
-    public function createSeries($seriesTitle){//todo-mike: make sure this function only returns series that user has access to.
+    public function getSeries($seriesTitle){//todo-mike: make sure this function only returns series that user has access to.
 
         $series = User::find($this->user_id)->first()->series()->where('series_title', '=', $seriesTitle)->first();//todo-mike: this isn't returning user specific series
 
         if(!$series){
             $series = new Series;
+            $series->id = str_random(40);
             $series->series_title = $seriesTitle;
             $series->series_start_year = '0000';
             $series->series_publisher = 'Unknown';
@@ -49,17 +56,28 @@ class CollectionsController extends ApiController {
 
     }
 
-    public function getComicInfo($filename){
-        $seriesTitle = 'Unknown';
+    public function getComicInfo($upload_id){
+        Log::info('Upload ID: ' .$upload_id);
+        $upload = Upload::find($upload_id);
+        $match_data = json_decode($upload->match_data, true);
+        if($match_data['exists']){
+            //todo-mike Make sure you're validating user data... They shouldn't be able to submit a invalid id
+            //$series = User::find($this->user_id)->first()->series()->where('series_title', '=', $seriesTitle)->first();//todo-mike: this isn't returning user specific series
+            $comicInfo = ['comic_issue' => $match_data['comic_issue'], 'series_id' => $match_data['series_id'], 'comic_writer' => 'Unknown'];
+        }else{
 
-        $seriesPreg = ' Vol.[0-9]+| #[0-9]+|\(.*?\)|\.[a-z0-9A-Z]+$';
-        $tempSeriesTitle = trim(preg_replace('/'.$seriesPreg.'/', "", $filename));
-        if($tempSeriesTitle) $seriesTitle = $tempSeriesTitle;
+            $series = new Series;
+            $series->id = $match_data['series_id'];
+            $series->series_title = $match_data['series_title'];
+            $series->series_start_year = $match_data['series_start_year'];
+            $series->series_publisher = 'Unknown';
+            $series->user_id = $this->user_id;
+            $series->save();
 
-        $comicInfo = ['issue' => 1, 'comic_writer' => 'Unknown','series_title' => $seriesTitle]; //Default array
+            $comicInfo = ['comic_issue' => $match_data['comic_issue'], 'series_id' => $match_data['series_id'], 'comic_writer' => 'Unknown'];
 
-        //$comicInfo = ['issue' => 1, 'comic_writer' => 'Unknown','series_title' => 'Unknown']; //Default array
-
+        }
+        Log::info('Comic Info-Series Title: '.$match_data['series_title']);
         return $comicInfo;
     }
 
@@ -124,6 +142,8 @@ class CollectionsController extends ApiController {
 
                 $collection = Collection::find($this->collection_id);
 
+                Log::info('Collection ID: ' .$this->collection_id);
+
                 $collection->collection_contents = json_encode($pages, JSON_FORCE_OBJECT);
 
                 $collection->collection_status = 1;
@@ -182,6 +202,8 @@ class CollectionsController extends ApiController {
                 //json_encode($pages);
 
                 $collection = Collection::find($this->collection_id);
+
+                Log::info('Collection ID: ' .$this->collection_id);
 
                 $collection->collection_contents = json_encode($pages, JSON_FORCE_OBJECT);
 
@@ -254,7 +276,15 @@ class CollectionsController extends ApiController {
 
     public function fire($job, $data){//todo-mike: fire needs to handle errors...
 
+        if ($job->attempts() > 3)
+        {
+            Log::info('Too many attempts. Exiting.');
+            $job->delete();
+            return;
+        }
+
         Log::info('Firing.');
+        Log::info('First Upload ID: '.$data['upload_id']);
         $this->user_id = $data['user_id'];
         $collection = Collection::where('collection_hash', '=', $data['hash'])->first();
         $prcoessArchive = false;
@@ -270,7 +300,7 @@ class CollectionsController extends ApiController {
 
         $this->collection_id = $collection->id;
 
-        $this->createComic($data['originalFileName'], $collection);
+        $this->createComic($data['upload_id'], $collection);
 
         if($prcoessArchive){
             Log::info('Process Archive');
