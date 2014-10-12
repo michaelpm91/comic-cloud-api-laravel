@@ -19,7 +19,7 @@ class CollectionsController extends ApiController {
         $comic_info = $this->getComicInfo($upload_id);
 
         Log::info('Series ID: ' .$comic_info['series_id']);
-        $newComicID = str_random(40);
+        $newComicID = $comic_info['comic_id'];//str_random(40);
         $comic = new Comic;
         $comic->id = $newComicID;
         $comic->comic_issue = $comic_info['comic_issue'];
@@ -63,7 +63,7 @@ class CollectionsController extends ApiController {
         if($match_data['exists']){
             //todo-mike Make sure you're validating user data... They shouldn't be able to submit a invalid id
             //$series = User::find($this->user_id)->first()->series()->where('series_title', '=', $seriesTitle)->first();//todo-mike: this isn't returning user specific series
-            $comicInfo = ['comic_issue' => $match_data['comic_issue'], 'series_id' => $match_data['series_id'], 'comic_writer' => 'Unknown'];
+            $comicInfo = ['comic_issue' => $match_data['comic_issue'], 'comic_id' => $match_data['comic_id'], 'series_id' => $match_data['series_id'], 'comic_writer' => 'Unknown'];
         }else{
 
             $series = new Series;
@@ -74,10 +74,10 @@ class CollectionsController extends ApiController {
             $series->user_id = $this->user_id;
             $series->save();
 
-            $comicInfo = ['comic_issue' => $match_data['comic_issue'], 'series_id' => $match_data['series_id'], 'comic_writer' => 'Unknown'];
+            $comicInfo = ['comic_issue' => $match_data['comic_issue'], 'comic_id' => $match_data['comic_id'], 'series_id' => $match_data['series_id'], 'comic_writer' => 'Unknown'];
 
         }
-        Log::info('Comic Info-Series Title: '.$match_data['series_title']);
+        //Log::info('Comic Info-Series Title: '.$match_data['series_title']);
         return $comicInfo;
     }
 

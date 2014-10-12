@@ -53,7 +53,7 @@ class ComicsController extends ApiController {
 	 */
 	public function update($id)
 	{
-		$comic = Comic::findOrFail($id);
+		/*$comic = Comic::findOrFail($id);
 
 		$validator = Validator::make($data = Input::all(), Comic::$rules);
 
@@ -64,7 +64,28 @@ class ComicsController extends ApiController {
 
 		$comic->update($data);
 
-		return Redirect::route('comics.index');
+		return Redirect::route('comics.index');*/
+
+        $comic = Auth::user()->comics()->find($id);
+        if($comic){
+
+            $validator = Validator::make($data = Input::all(), Comic::$rules);
+
+            if ($validator->fails())
+            {
+                //return Redirect::back()->withErrors($validator)->withInput();
+                //todo-mike: Create error stuff
+            }
+
+            //$series->update($data);
+            /*$series->series_title = $data['title'];
+            $series->series_start_year = $data['start_year'];
+            $series->series_publisher = $data['publisher'];*/
+            $comic->comic_issue = $data['issue'];
+            $comic->comic_writer = $data['writer'];
+            $comic->save();
+            return $this->respondSuccessful('Comic Updated');
+        }
 	}
 
 	/**

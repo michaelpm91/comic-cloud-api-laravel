@@ -76,7 +76,7 @@ class SeriesController extends ApiController {
 	 */
 	public function update($id)
 	{
-		$series = Series::findOrFail($id);
+		/*$series = Series::findOrFail($id);
 
 		$validator = Validator::make($data = Input::all(), Series::$rules);
 
@@ -87,7 +87,27 @@ class SeriesController extends ApiController {
 
 		$series->update($data);
 
-		return Redirect::route('series.index');
+		return Redirect::route('series.index');*/
+        $series = Auth::user()->series()->find($id);
+        if($series){
+
+            //$series->series_title = $data;
+
+            $validator = Validator::make($data = Input::all(), Series::$rules);
+
+            if ($validator->fails())
+            {
+                //return Redirect::back()->withErrors($validator)->withInput();
+                //todo-mike: Create error stuff
+            }
+
+		    //$series->update($data);
+            $series->series_title = $data['title'];
+            $series->series_start_year = $data['start_year'];
+            $series->series_publisher = $data['publisher'];
+            $series->save();
+            return $this->respondSuccessful('Series Updated');
+        }
 	}
 
 	/**

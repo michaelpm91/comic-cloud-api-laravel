@@ -9,6 +9,7 @@ class Comic extends \Eloquent {
 	// Add your validation rules here
 	public static $rules = [
 		// 'title' => 'required'
+        'id' => 'required'
 	];
 
     protected $dates = ['deleted_at'];
