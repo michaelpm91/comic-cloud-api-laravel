@@ -103,6 +103,8 @@ class CollectionsController extends ApiController {
     public function extractArchive($file, $fileNoExt, $fileExtension){
     //todo-mike: Need to make this more DRY. Also PDFs and virus checks...
     //todo-mike: Natsort is working as expected...
+	//todo-mike: Support nested archives.
+	//todo-mike: Extraction process should clean up after itself and delete files.
         if(in_array($fileExtension, array('zip', 'cbz'))){
 
             $zip = new ZipArchive;
@@ -238,7 +240,7 @@ class CollectionsController extends ApiController {
 
 			$image_slug = str_random(40);
 
-            $sizes = [
+            /*$sizes = [
                 'medium' => [
                     'width' => 673, 'height' => 1037
                 ],
@@ -259,7 +261,16 @@ class CollectionsController extends ApiController {
                     'SourceFile' => $tempLoc,
                     'ACL'        => 'public-read',
                 ));
-            }
+            }*/
+
+            $s3 = AWS::get('s3');
+            $s3->setRegion('eu-west-1');//Set endpoint with non american buckets
+            $result = $s3->putObject(array(
+                'Bucket'     => 'devcomiccloudmasterimage',
+                'Key'        => $image_slug.".".$imageExt,
+                'SourceFile' => $image,
+                'ACL'        => 'public-read',
+            ));
 
             $imageentry = new ComicImage;
 
