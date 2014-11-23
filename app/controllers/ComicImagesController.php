@@ -24,10 +24,10 @@ class ComicImagesController extends ApiController {
             if(!in_array($comicCollectionID, $userCollectionIDs)) return $this->respondNotFound('No Image Found');
         }
         $imageUrl = getenv('AWS_Comic_Cloud_Images_URL').$comic_slug.'.jpg';
-        $size = (is_numeric($size)? size : 1000);
+        $size = (is_numeric($size)? $size : 1000);
 
         $img = Image::cache(function($image) use ($imageUrl, $size) {
-            $image->make($imageUrl)->resize(null, $size, function ($constraint) { $constraint->aspectRatio(); $constraint->upsize(); });
+            $image->make($imageUrl)->interlace()->resize(null, $size, function ($constraint) { $constraint->aspectRatio(); $constraint->upsize(); });
         }, 60, true);
 
         return $img->response();

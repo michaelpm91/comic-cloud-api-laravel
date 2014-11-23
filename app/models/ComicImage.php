@@ -12,7 +12,7 @@ class ComicImage extends \Eloquent {
 
     public function collections(){
         //return $this->belongsTo('Collection');
-        return $this->belongsToMany('Collection');
+        return $this->belongsToMany('Collection')->withTimestamps();
     }
 
 }

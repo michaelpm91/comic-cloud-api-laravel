@@ -97,7 +97,10 @@ class ComicsController extends ApiController {
 	public function destroy($id)
 	{
 		//Comic::destroy($id);
+        $series_id = Auth::user()->comics()->find($id)['series_id'];
+        $seriesCount = Series::find($series_id)->comics()->get()->count();
         if(Auth::user()->comics()->find($id)->delete()){
+            if($seriesCount == 0)  Series::find($series_id)->delete();
             return $this->respondSuccessful('Comic Deleted');
         }
         //else response code
