@@ -126,7 +126,9 @@ return array(
         'Chumper\Zipper\ZipperServiceProvider',
         'Intervention\Image\ImageServiceProvider',
         'Barryvdh\Cors\CorsServiceProvider',
+        'LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider',
         'LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider',
+
 
 	),
 
@@ -197,8 +199,9 @@ return array(
         'AWS'             => 'Aws\Laravel\AwsFacade',
         'Zipper'          => 'Chumper\Zipper\Zipper',
         'Image'           => 'Intervention\Image\Facades\Image',
-        'AuthorizationServer' => 'LucaDegasperi\OAuth2Server\Facades\AuthorizationServerFacade',
-        'ResourceServer' => 'LucaDegasperi\OAuth2Server\Facades\ResourceServerFacade',
+        //'AuthorizationServer' => 'LucaDegasperi\OAuth2Server\Facades\AuthorizationServerFacade',
+        //'ResourceServer' => 'LucaDegasperi\OAuth2Server\Facades\ResourceServerFacade',
+        'Authorizer' => 'LucaDegasperi\OAuth2Server\Facades\AuthorizerFacade',
 
 	),
 

@@ -1,6 +1,17 @@
 <?php
 
-return array(
+return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Database Connection to use
+    |--------------------------------------------------------------------------
+    |
+    | Set the default database connection to use for the repositories,
+    | when set to default, it uses whatever connection you specified in your laravel db config.
+    |
+    */
+    'database' => 'default',
 
     /*
     |--------------------------------------------------------------------------
@@ -13,38 +24,43 @@ return array(
     | https://github.com/php-loep/oauth2-server/wiki/Which-OAuth-2.0-grant-should-I-use%3F
     |
     | Available grant types are:
-    | 
-    | 'grant_types' => array(
     |
-    |    'authorization_code' => array(
-    |        'class'            => 'League\OAuth2\Server\Grant\AuthCode',
+    | 'grant_types' => [
+    |
+    |    'authorization_code' => [
+    |        'class'            => 'League\OAuth2\Server\Grant\AuthCodeGrant',
     |        'access_token_ttl' => 3600,
     |
     |        // the authorization code time to live
     |        'auth_token_ttl'   => 3600,
-    |    ),
+    |    ],
     |
-    |    'password' => array(
-    |        'class'            => 'League\OAuth2\Server\Grant\Password',
+    |    'password' => [
+    |        'class'            => 'League\OAuth2\Server\Grant\PasswordGrant',
     |        'access_token_ttl' => 604800,
     |
     |        // the code to run in order to verify the user's identity
     |        'callback'         => function($username, $password){
-    |            
-    |            return Auth::validate(array(
+    |            $credentials = [
     |                'email'    => $username,
     |                'password' => $password,
-    |            ));
+    |            ];
+    |
+    |            if (Auth::once($credentials)) {
+    |                return Auth::user()->id;
+    |            } else {
+    |                return false;
+    |            }
     |        }
-    |    ),
+    |    ],
     |
-    |    'client_credentials' => array(
-    |        'class'                 => 'League\OAuth2\Server\Grant\ClientCredentials',
+    |    'client_credentials' => [
+    |        'class'                 => 'League\OAuth2\Server\Grant\ClientCredentialsGrant',
     |        'access_token_ttl'      => 3600,
-    |    ),
+    |    ],
     |
-    |    'refresh_token' => array(
-    |        'class'                 => 'League\OAuth2\Server\Grant\RefreshToken',
+    |    'refresh_token' => [
+    |        'class'                 => 'League\OAuth2\Server\Grant\RefreshTokenGrant',
     |        'access_token_ttl'      => 3600,
     |
     |        // the refresh token time to live
@@ -52,19 +68,19 @@ return array(
     |
     |        // whether or not to issue a new refresh token when a new access token is issued
     |        'rotate_refresh_tokens' => false,
-    |    ),
-    |    
-    | ),
+    |    ],
+    |
+    | ],
     |
     */
 
-    'grant_types' => array(
+    'grant_types' => [
 
         'password' => array(
-            'class'            => 'League\OAuth2\Server\Grant\Password',
+            'class'            => '\League\OAuth2\Server\Grant\PasswordGrant',
             'access_token_ttl' => 3600,
             'callback'         => function ($username, $password) {
-                $credentials = array(
+                /*$credentials = array(
                     'email' => $username,
                     'password' => $password,
                 );
@@ -75,16 +91,45 @@ return array(
                     return false;
                 }
 
-                return Auth::getProvider()->retrieveByCredentials($credentials)->id;
+                return Auth::getProvider()->retrieveByCredentials($credentials)->id;*/
+
+                /*return Auth::attempt(compact('username', 'password'))
+                    ? Auth::id()
+                    : false;*/
+
+                $credentials = [
+                    'email'    => $username,
+                    'password' => $password,
+                ];
+                if (Auth::once($credentials)) {
+                    return Auth::user()->id;
+                } else {
+                    return false;
+                }
+
 
             }
         ),
         'refresh_token' => array(
-            'class' => '\League\OAuth2\Server\Grant\RefreshToken',
+            'class' => 'League\OAuth2\Server\Grant\RefreshTokenGrant',
             'access_token_ttl' => 3600,
             'refresh_token_ttl' => 36000
         ),
-    ),
+
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Output Token Type
+    |--------------------------------------------------------------------------
+    |
+    | This will tell the authorization server the output format for the access token
+    | and will tell the resource server how to parse the access token used.
+    |
+    | Default value is League\OAuth2\Server\TokenType\Bearer
+    |
+    */
+    'token_type' => 'League\OAuth2\Server\TokenType\Bearer',
 
     /*
     |--------------------------------------------------------------------------
@@ -124,7 +169,7 @@ return array(
     | The default scope to use if not present in the query string
     |
     */
-    'default_scope' => 'basic',
+    'default_scope' => null,
 
     /*
     |--------------------------------------------------------------------------
@@ -180,4 +225,4 @@ return array(
     |
     */
     'http_headers_only' => false,
-);
+];

@@ -17,7 +17,7 @@ Route::get('/', function()
 
 });
 
-Route::group(array('prefix' => getenv('api_prefix'), 'before' => 'oauth'/*'auth.basic'*//*'auth.basic.once'*/), function(){
+Route::group(array('prefix' => getenv('api_prefix'), 'before' => 'oauth'), function(){
 	Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
 	Route::resource('comic','ComicsController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
     Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show', 'destroy')));
@@ -25,10 +25,10 @@ Route::group(array('prefix' => getenv('api_prefix'), 'before' => 'oauth'/*'auth.
 	Route::get('comic/{comic_id}/meta', 'ComicsController@getMeta');
 });
 
-Route::post('oauth/access_token', function()
+Route::post(getenv('api_prefix').'/oauth/access_token', function()
 {
     //todo-mike: Make a filter to check params are all passed in...
-    return Response::json(AuthorizationServer::issueAccessToken());
+    return Response::json(Authorizer::issueAccessToken());
 });
 Route::get('user', array('before' => 'oauth', function()
 {

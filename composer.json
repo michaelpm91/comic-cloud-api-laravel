@@ -12,7 +12,7 @@
         "intervention/imagecache": "2.0.3",
         "barryvdh/laravel-cors": "0.2.x",
         "guzzlehttp/guzzle": "~4.0",
-        "lucadegasperi/oauth2-server-laravel": "1.0.x"
+        "lucadegasperi/oauth2-server-laravel": "3.0.x"
 	},
 	"require-dev": {
 		"way/generators": "2.*",

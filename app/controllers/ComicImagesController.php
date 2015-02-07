@@ -3,8 +3,7 @@
 class ComicImagesController extends ApiController {
 
     public function __construct(){
-        $user = User::find(ResourceServer::getOwnerId());
-        Auth::login($user);
+        $user = Auth::loginUsingId(Authorizer::getResourceOwnerId());
     }
 	/**
 	 * Display the specified image.

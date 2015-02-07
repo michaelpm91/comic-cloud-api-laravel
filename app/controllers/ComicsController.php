@@ -6,8 +6,7 @@ class ComicsController extends ApiController {
      * Login in resource owner
      */
     public function __construct(){
-        $user = User::find(ResourceServer::getOwnerId());
-        Auth::login($user);
+        $user = Auth::loginUsingId(Authorizer::getResourceOwnerId());
     }
 	/**
 	 * Display a listing of comics
