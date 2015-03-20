@@ -5,9 +5,20 @@
 	"license": "MIT",
 	"type": "project",
 	"require": {
-		"laravel/framework": "5.0.*"
+		"laravel/framework": "5.0.*",
+        "barryvdh/laravel-cors" : "0.4.x",
+        "aws/aws-sdk-php": "2.7.23",
+        "aws/aws-sdk-php-laravel": "~2.0",
+        "intervention/image": "2.1.2 ",
+        "intervention/imagecache": "2.1.1",
+        "Chumper/Zipper": "0.6.x",
+        "guzzlehttp/guzzle": "5.2.0",
+        "lucadegasperi/oauth2-server-laravel": "4.0.x@dev",
+        "league/flysystem-aws-s3-v2": "1.0.1"
+
 	},
 	"require-dev": {
+        "fzaninotto/faker": "1.4.0",
 		"phpunit/phpunit": "~4.0",
 		"phpspec/phpspec": "~2.1"
 	},
