@@ -48,24 +48,28 @@ return [
 			'root'   => storage_path().'/app',
 		],
 
-		's3' => [
-			'driver' => 's3',
-			'key'    => 'your-key',
-			'secret' => 'your-secret',
-			'region' => 'your-region',
-			'bucket' => 'your-bucket',
-		],
+        /*'s3' => [
+            'driver' => 's3',
+            'key'    => 'your-key',
+            'secret' => 'your-secret',
+            'region' => 'your-region',
+            'bucket' => 'your-bucket',
+        ],*/
 
-		'rackspace' => [
-			'driver'    => 'rackspace',
-			'username'  => 'your-username',
-			'key'       => 'your-key',
-			'container' => 'your-container',
-			'endpoint'  => 'https://identity.api.rackspacecloud.com/v2.0/',
-			'region'    => 'IAD',
-			'url_type'  => 'publicURL'
-		],
-
+        'AWS_S3_Uploads' => [
+            'driver' => 's3',
+            'key'    => env('AWS_Key'),
+            'secret' => env('AWS_Secret'),
+            'region' => env('AWS_S3_Region'),
+            'bucket' => env('AWS_S3_Uploads'),
+        ],
+        'AWS_S3_Images' => [
+            'driver' => 's3',
+            'key'    => env('AWS_Key'),
+            'secret' => env('AWS_Secret'),
+            'region' => env('AWS_S3_Region'),
+            'bucket' => env('AWS_S3_Images'),
+        ],
 	],
 
 ];

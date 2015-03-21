@@ -11,4 +11,21 @@
 |
 */
 
-Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show', 'destroy')));
+Route::get('/', function()
+{
+    return View::make('home');
+
+});
+
+//Route::group(array('before' => 'oauth'), function() {
+    Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show', 'destroy')));
+//});
+
+Route::post('oauth/access_token', function () {
+    return Response::json(Authorizer::issueAccessToken());
+});
+
+Route::controllers([
+    'auth' => 'Auth\AuthController',
+    'password' => 'Auth\PasswordController',
+]);

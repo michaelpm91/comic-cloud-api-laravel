@@ -14,8 +14,13 @@ class CreateComicBookArchivesTable extends Migration {
 	{
 		Schema::create('comic_book_archives', function(Blueprint $table)
 		{
-			$table->increments('id');
-			$table->timestamps();
+            $table->increments('id');
+            $table->integer('upload_id')->length(10)->unsigned();
+            $table->foreign('upload_id')->references('id')->on('uploads')->onDelete('cascade');
+            $table->text('comic_book_archive_contents');
+            $table->string('comic_book_archive_hash');
+            $table->integer('comic_book_archive_status');
+            $table->timestamps();
 		});
 	}
 
