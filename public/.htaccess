@@ -9,7 +9,11 @@
     RewriteBase /v0.2/
 
     # Redirect Trailing Slashes...
-    RewriteRule ^(.*)/$ /$1 [L,R=301]
+    #RewriteRule ^(.*)/$ /$1 [L,R=301]
+
+    # Redirect Trailing Slashes in Sub directories...
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
 
     #Authorization Headers
     RewriteCond %{HTTP:Authorization} .
