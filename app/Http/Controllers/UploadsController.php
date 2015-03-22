@@ -8,17 +8,21 @@ use Storage;
 use Request;
 use Queue;
 use File;
+use Auth;
+use Authorizer;
 
 class UploadsController extends Controller {
 
     protected $upload;
 
     public function __construct(Upload $upload){//
-        $this->upload = $upload;
+        $this->upload = $upload;//For unit testing... maybe
+        Auth::loginUsingId(Authorizer::getResourceOwnerId());
+
     }
 
 	public function index(){
-        return 'lol';
+        return Upload::all();
     }
 
     /**
@@ -55,8 +59,15 @@ class UploadsController extends Controller {
                 //Storage::disk('AWS_S3_Uploads')->put();
 
                 //Queue::push('CollectionsController', array('upload_id' => $upload->id,'user_id'=> Auth::user()->id, 'hash'=> $fileHash, 'newFileName' => $newFileName,'newFileNameNoExt' => $newFileNameWithNoExtension, 'fileExt' => $file->getClientOriginalExtension(),'originalFileName' => $file->getClientOriginalName(),'time' => time()));
+                return $this->respondCreated('Upload Successful');
 
+            } else {
+                return $this->respondBadRequest('Invalid File');
             }
+        }else{
+            return $this->respondBadRequest('No File Uploaded');
         }
     }
+
+
 }

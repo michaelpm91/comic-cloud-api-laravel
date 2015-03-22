@@ -12,26 +12,15 @@ use Laracasts\TestDummy\DbTestCase;
 
 class ApiTester extends DBTestCase {
 
-    protected $fake;
 
-    protected $times = 1;
-
-    function __construct()
+    protected function getRequest($uri, $auth_header = '')
     {
-        $this->fake = Faker::create();
+        return json_encode($this->call('GET', $uri)->getContent(), [], ['Authorization' => $auth_header]);
     }
 
-
-    protected function times($count)
+    protected function postRequest($uri, $data = [], $auth_header = '')
     {
-        $this->times = $count;
-        return $this;
-
-    }
-
-    protected function getJson($uri)
-    {
-        return json_encode($this->call('GET', $uri)->getContent());
+        return json_encode($this->call('POST', $uri, $data)->getContent(), [], ['Authorization' => $auth_header]);
     }
 
 
