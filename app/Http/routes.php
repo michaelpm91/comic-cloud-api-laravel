@@ -17,9 +17,9 @@ Route::get('/', function()
 
 });
 
-//Route::group(array('before' => 'oauth'), function() {
+Route::group(array('before' => 'oauth'), function() {
     Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show', 'destroy')));
-//});
+});
 
 Route::post('oauth/access_token', function () {
     return Response::json(Authorizer::issueAccessToken());
@@ -27,5 +27,7 @@ Route::post('oauth/access_token', function () {
 
 Route::controllers([
     'auth' => 'Auth\AuthController',
-    'password' => 'Auth\PasswordController',
+    //'password' => 'Auth\PasswordController',//temporarily disabled
 ]);
+
+//Route::post('register', 'AuthController@register');
