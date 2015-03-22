@@ -8,7 +8,9 @@
 
 use Faker\Factory as Faker;
 
-class ApiTester extends TestCase {
+use Laracasts\TestDummy\DbTestCase;
+
+class ApiTester extends DBTestCase {
 
     protected $fake;
 

@@ -7,33 +7,53 @@
  */
 
 use App\Upload;
+use Laracasts\TestDummy\Factory;
 
 class UploadTest extends ApiTester {
 
-    /** @test */
+    protected $user;
 
-    public function it_fetches_uploads(){
+    /*public function setUp(){//runs per test :(
+        parent::setUp();
+        $this->user = Factory::create('App\User');
+
+    }*/
+    public function test_must_be_authenticated(){
+
+    }
+
+    public function test_it_creates_upload(){
+
+    }
+    public function test_it_creates_uploads(){
+
+    }
+    public function test_it_fetches_uploads(){//Retrieve all user uploads
         //arrange
-        $this->times(5)->makeUpload();
-        //Factory::create('App\Upload');
+        $upload = Factory::times(10)->create('App\Upload');
 
         //act
-        $this->getJson('/upload');
+        $response = $this->getJson('/upload');
+        //dd($response);
 
         //assert
         $this->assertResponseOk();
     }
+    public function test_it_fetches_upload(){//Retrieve single upload
+        //arrange
+        //$upload = Factory::create('App\Upload');
 
-    private function makeUpload( $uploadData = []){
+    }
+    public function test_it_updates_upload(){
 
-        $upload = array_merge([
-            'user_id' => 1,
-            'file_original_name' => $this->fake->word(3).'.cbz',
-            'file_size' => rand(5000, 150000),
-            'file_upload_name' => str_random(40).'.cbz'
-        ], $uploadData);
+    }
+    public function test_it_updates_uploads(){
 
-        while ($this->times -- ) Upload::create($upload);
+    }
+    public function test_it_deletes_upload(){
+
+    }
+    public function test_it_deletes_uploads(){
 
     }
 
