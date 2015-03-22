@@ -11,6 +11,12 @@ use File;
 
 class UploadsController extends Controller {
 
+    protected $upload;
+
+    public function __construct(Upload $upload){//
+        $this->upload = $upload;
+    }
+
 	public function index(){
         return 'lol';
     }
