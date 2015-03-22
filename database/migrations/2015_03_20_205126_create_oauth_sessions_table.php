@@ -17,7 +17,7 @@ class CreateOauthSessionsTable extends Migration
             $table->increments('id');
             $table->string('client_id', 40);
             $table->enum('owner_type', ['client', 'user'])->default('user');
-            $table->string('owner_id');
+            $table->integer('owner_id')->length(10)->unsigned();
             $table->string('client_redirect_uri')->nullable();
             $table->timestamps();
 
