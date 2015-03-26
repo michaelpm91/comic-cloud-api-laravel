@@ -1,5 +1,8 @@
 <?php namespace App\Http\Controllers;
 
+use App\Commands\ProcessComicBookArchive;
+use App\Commands\ProcessComicBookArchiveCommand;
+use App\Commands\RandomCommand;
 use App\Upload;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
@@ -11,7 +14,7 @@ use File;
 use Auth;
 use Authorizer;
 
-class UploadsController extends Controller {
+class UploadsController extends ApiController {
 
     protected $upload;
 
@@ -21,8 +24,42 @@ class UploadsController extends Controller {
 
     }
 
-	public function index(){
-        return Upload::all();
+    /**
+     * @return mixed
+     */
+    public function index(){
+
+
+        //Queue::push(new ProcessComicBookArchiveCommand(['stuff' => 'more', 'wild' => 'van']));
+        //$this->dispatch(new ProcessComicBookArchiveCommand(['stuff' => 'more', 'wild' => 'van']));
+        $this->dispatch(new RandomCommand());
+        $uploads = Auth::user()->uploads()->get();
+        if(!$uploads){
+            return $this->respondNotFound('No Uploads Found');
+        }
+
+        return $this->respond([
+            'Uploads' => $uploads
+        ]);
+    }
+
+    /**
+     * Display the specified upload.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function show($id)
+    {
+        $upload = Auth::user()->uploads()->find($id);
+
+        if(!$upload){
+            return $this->respondNotFound('No Upload Found');
+        }
+
+        return $this->respond([
+            'Upload' => $upload
+        ]);
     }
 
     /**
@@ -46,7 +83,7 @@ class UploadsController extends Controller {
                 $upload->file_size = $file->getSize();
                 $newFileNameWithNoExtension = str_random(40);
                 $upload->file_upload_name = $newFileName = $newFileNameWithNoExtension . '.' . $file->getClientOriginalExtension();
-                $upload->user_id = "1";//Auth::user()->id;
+                $upload->user_id = Auth::user()->id;
                 if (Request::get('match_data')) {
                     $upload->match_data = Request::get('match_data');
                 }
@@ -56,9 +93,19 @@ class UploadsController extends Controller {
                 $fileHash = hash_file('md5', $tempPath);
 
                 Storage::disk('AWS_S3_Uploads')->put($newFileName, File::get($file));
-                //Storage::disk('AWS_S3_Uploads')->put();
 
-                //Queue::push('CollectionsController', array('upload_id' => $upload->id,'user_id'=> Auth::user()->id, 'hash'=> $fileHash, 'newFileName' => $newFileName,'newFileNameNoExt' => $newFileNameWithNoExtension, 'fileExt' => $file->getClientOriginalExtension(),'originalFileName' => $file->getClientOriginalName(),'time' => time()));
+                $process_info = [
+                    'upload_id' => $upload->id,
+                    'user_id'=> Auth::user()->id,
+                    'hash'=> $fileHash,
+                    'newFileName' => $newFileName,
+                    'newFileNameNoExt' => $newFileNameWithNoExtension,
+                    'fileExt' => $file->getClientOriginalExtension(),
+                    'originalFileName' => $file->getClientOriginalName(),
+                    'time' => time()
+                ];
+                //Queue::push(new ProcessComicBookArchive('oh hai'));
+                Queue::push(new ProcessComicBookArchiveCommand($process_info));
                 return $this->respondCreated('Upload Successful');
 
             } else {

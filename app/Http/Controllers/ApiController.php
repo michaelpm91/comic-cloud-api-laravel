@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as IlluminateResponse;
+use Illuminate\Contracts\Routing\ResponseFactory;
 
 class ApiController extends Controller {
     //const HTTP_NOT_FOUND = 404;
@@ -86,7 +87,7 @@ class ApiController extends Controller {
      * @return mixed
      */
     public function respond($data, $headers = []){
-        return Response::json($data, $this->getStatusCode(), $headers);
+        return response()->json($data, $this->getStatusCode(), $headers);
     }
 
     /**

@@ -26,6 +26,7 @@
 	"autoload": {
 		"classmap": [
 			"database",
+            "database/seeds",
             "tests/Api/ApiTester.php"
 		],
 		"psr-4": {

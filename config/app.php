@@ -200,6 +200,7 @@ return [
 		'View'      => 'Illuminate\Support\Facades\View',
 
         'Authorizer' => 'LucaDegasperi\OAuth2Server\Facades\AuthorizerFacade',
+        'Carbon'    => 'Carbon\Carbon'
 
 	],
 

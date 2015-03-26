@@ -13,14 +13,14 @@ use Laracasts\TestDummy\DbTestCase;
 class ApiTester extends DBTestCase {
 
 
-    protected function getRequest($uri, $auth_header = '')
+    protected function getRequest($uri)
     {
-        return json_encode($this->call('GET', $uri)->getContent(), [], ['Authorization' => $auth_header]);
+        return json_encode($this->call('GET', $uri, [], [], [],['HTTP_Authorization' => 'Bearer '.'test_access_token'])->getContent());
     }
 
-    protected function postRequest($uri, $data = [], $auth_header = '')
+    protected function postRequest($uri, $data = [], $files =[])
     {
-        return json_encode($this->call('POST', $uri, $data)->getContent(), [], ['Authorization' => $auth_header]);
+        return json_encode($this->call('POST', $uri, $data, [], $files, ['HTTP_Authorization' => 'Bearer '.'test_access_token'])->getContent());
     }
 
 

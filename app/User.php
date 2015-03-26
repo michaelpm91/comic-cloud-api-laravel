@@ -33,7 +33,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 
     public function uploads()
     {
-        return $this->hasMany('Upload');
+        return $this->hasMany('App\Upload');
     }
 
 }

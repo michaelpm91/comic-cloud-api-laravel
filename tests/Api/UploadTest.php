@@ -7,7 +7,9 @@
  */
 
 use App\Upload;
+use App\User;
 use Laracasts\TestDummy\Factory;
+
 
 class UploadTest extends ApiTester {
 
@@ -16,17 +18,26 @@ class UploadTest extends ApiTester {
 
     public function setUp(){//runs per test :(
         parent::setUp();
-        $this->user = Factory::create('App\User');
-        //dd($this->user->id);
-        $this->postRequest('/oauth/access_token', [],);
-        $user = Auth::loginUsingId($this->user->id);
+        $this->user = User::find(1);
+        //dd(User::find(1));
+        Auth::loginUsingId($this->user->id);
 
     }
     public function test_must_be_authenticated(){
 
     }
-
     public function test_it_creates_upload(){
+        //arrange
+
+        //act
+        //$uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile('/path/to/file', 'original-file-name.ext');
+        //$response = $this->postRequest('/upload', ['file' => 'comic'], ['file' => $uploadedFile]);
+
+        //dd($response);
+
+        //assert
+        //$this->assertResponseOk();
+
 
     }
     public function test_it_creates_uploads(){
@@ -38,7 +49,8 @@ class UploadTest extends ApiTester {
 
         //act
         $response = $this->getRequest('/upload');
-        dd($response);
+
+        //dd($response);
 
         //assert
         $this->assertResponseOk();
