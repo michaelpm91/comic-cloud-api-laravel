@@ -7,14 +7,14 @@ use Carbon\Carbon;
 
 Use App\User;
 
-class TestSeeder extends Seeder {
+class LocalSeeder extends Seeder {
 
 
 	public function run()
 	{
         User::create([
-            'username' => 'test_user',
-            'email' => 'test@comiccloud.io',
+            'username' => 'local_user',
+            'email' => 'local@comiccloud.io',
             'password' => Hash::make('1234')
         ]);
 
@@ -23,9 +23,9 @@ class TestSeeder extends Seeder {
 
         $clients = [
             [
-                'id' => 'test_client_id',
-                'secret' => 'test_client_secret',
-                'name' => 'test_client',
+                'id' => 'local_client_id',
+                'secret' => 'local_client_secret',
+                'name' => 'local_client',
                 'created_at' => $datetime,
                 'updated_at' => $datetime,
             ],
@@ -35,7 +35,7 @@ class TestSeeder extends Seeder {
 
         $sessions = [
             [
-                'client_id' => 'test_client_id',
+                'client_id' => 'local_client_id',
                 'owner_id'  => 1,
                 'owner_type' => 'user',
                 'created_at' => $datetime,
@@ -47,9 +47,9 @@ class TestSeeder extends Seeder {
 
         $tokens = [
             [
-                'id' => 'test_access_token',
+                'id' => 'local_access_token',
                 'session_id'  => 1,
-                'expire_time' => time() + 600,
+                'expire_time' => time() + 60,
                 'created_at' => $datetime,
                 'updated_at' => $datetime,
             ]
@@ -59,9 +59,9 @@ class TestSeeder extends Seeder {
 
         $refreshtokens = [
             [
-                'id' => 'test_refresh_token',
-                'access_token_id' => 'test_access_token',
-                'expire_time' => time() + 600,
+                'id' => 'local_refresh_token',
+                'access_token_id' => 'local_access_test',
+                'expire_time' => time() + 60,
                 'created_at' => $datetime,
                 'updated_at' => $datetime,
             ],

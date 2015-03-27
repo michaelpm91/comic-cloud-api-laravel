@@ -10,7 +10,7 @@ use Illuminate\Contracts\Bus\SelfHandling;
 
 use Log;
 
-class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued { //, SelfHandling{
+class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, SelfHandling{
 
 	use InteractsWithQueue, SerializesModels;
 
@@ -31,9 +31,9 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued {
         Log::info('Construct Queue Message:' . implode(', ', $message));
 	}
 
-    /*public function handle(){
+    public function handle(){
         //dd($this->message);
         Log::info('Handle Queue Message:' . implode(', ', $this->message));
-    }*/
+    }
 
 }

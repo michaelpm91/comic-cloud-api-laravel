@@ -31,8 +31,8 @@ class UploadsController extends ApiController {
 
 
         //Queue::push(new ProcessComicBookArchiveCommand(['stuff' => 'more', 'wild' => 'van']));
-        //$this->dispatch(new ProcessComicBookArchiveCommand(['stuff' => 'more', 'wild' => 'van']));
-        $this->dispatch(new RandomCommand());
+        $this->dispatch(new ProcessComicBookArchiveCommand(['stuff' => 'more', 'wild' => 'van']));
+        //$this->dispatch(new RandomCommand());
         $uploads = Auth::user()->uploads()->get();
         if(!$uploads){
             return $this->respondNotFound('No Uploads Found');
@@ -105,7 +105,7 @@ class UploadsController extends ApiController {
                     'time' => time()
                 ];
                 //Queue::push(new ProcessComicBookArchive('oh hai'));
-                Queue::push(new ProcessComicBookArchiveCommand($process_info));
+                //Queue::push(new ProcessComicBookArchiveCommand($process_info));
                 return $this->respondCreated('Upload Successful');
 
             } else {
