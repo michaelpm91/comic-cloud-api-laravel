@@ -23,12 +23,7 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 	 */
 	public function __construct($message)
 	{
-		//
-        //Log::info('Construct Queue Message:' . $message);
         $this->message = $message;
-        //Log::info('Construct Queue Message:' . $message);
-
-        Log::info('Construct Queue Message:' . implode(', ', $message));
 	}
 
     public function handle(){

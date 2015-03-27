@@ -29,10 +29,6 @@ class UploadsController extends ApiController {
      */
     public function index(){
 
-
-        //Queue::push(new ProcessComicBookArchiveCommand(['stuff' => 'more', 'wild' => 'van']));
-        $this->dispatch(new ProcessComicBookArchiveCommand(['stuff' => 'more', 'wild' => 'van']));
-        //$this->dispatch(new RandomCommand());
         $uploads = Auth::user()->uploads()->get();
         if(!$uploads){
             return $this->respondNotFound('No Uploads Found');
@@ -92,7 +88,7 @@ class UploadsController extends ApiController {
                 $tempPath = $file->getRealPath();
                 $fileHash = hash_file('md5', $tempPath);
 
-                Storage::disk('AWS_S3_Uploads')->put($newFileName, File::get($file));
+                Storage::disk(env('user_uploads'))->put($newFileName, File::get($file));
 
                 $process_info = [
                     'upload_id' => $upload->id,
@@ -104,8 +100,9 @@ class UploadsController extends ApiController {
                     'originalFileName' => $file->getClientOriginalName(),
                     'time' => time()
                 ];
-                //Queue::push(new ProcessComicBookArchive('oh hai'));
-                //Queue::push(new ProcessComicBookArchiveCommand($process_info));
+
+                Queue::push(new ProcessComicBookArchiveCommand($process_info));
+
                 return $this->respondCreated('Upload Successful');
 
             } else {

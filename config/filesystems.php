@@ -43,27 +43,23 @@ return [
 
 	'disks' => [
 
-		'local' => [
+		'local_user_uploads' => [
 			'driver' => 'local',
-			'root'   => storage_path().'/app',
+			'root'   => storage_path().'/app/user_uploads',
 		],
+        'local_user_images' => [
+            'driver' => 'local',
+            'root'   => storage_path().'/app/user_images',
+        ],
 
-        /*'s3' => [
-            'driver' => 's3',
-            'key'    => 'your-key',
-            'secret' => 'your-secret',
-            'region' => 'your-region',
-            'bucket' => 'your-bucket',
-        ],*/
-
-        'AWS_S3_Uploads' => [
+        'aws_s3_user_uploads' => [
             'driver' => 's3',
             'key'    => env('AWS_Key'),
             'secret' => env('AWS_Secret'),
             'region' => env('AWS_S3_Region'),
             'bucket' => env('AWS_S3_Uploads'),
         ],
-        'AWS_S3_Images' => [
+        'aws_s3_user_images' => [
             'driver' => 's3',
             'key'    => env('AWS_Key'),
             'secret' => env('AWS_Secret'),
