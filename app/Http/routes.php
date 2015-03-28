@@ -18,7 +18,11 @@ Route::get('/', function()
 });
 
 Route::group(array('before' => 'oauth'), function() {
-    Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show', 'destroy')));
+    Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show')));
+    Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
+    Route::resource('comic','ComicsController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
+    Route::get('image/{image_set_key}/{size?}', 'ComicImagesController@show');
+    Route::get('comic/{comic_id}/meta', 'ComicsController@getMeta');
 });
 
 Route::post('oauth/access_token', function () {

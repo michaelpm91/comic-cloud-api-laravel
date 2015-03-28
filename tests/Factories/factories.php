@@ -24,3 +24,15 @@ $factory('App\Upload', function ($faker){
         'file_upload_name' => str_random(40).'.'.$thisFileExt
     ];
 });
+
+$factory('App\Comic', [
+
+]);
+
+$factory('App\Series', [
+
+]);
+
+$factory('App\ComicImage', [
+
+]);
