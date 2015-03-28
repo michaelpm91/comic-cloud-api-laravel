@@ -1,5 +1,6 @@
 <?php namespace App\Commands;
 
+use App\ComicBookArchive;
 use App\Commands\Command;
 
 use Illuminate\Queue\SerializesModels;
@@ -14,7 +15,9 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
 	use InteractsWithQueue, SerializesModels;
 
-    public $message;
+    protected $message;
+    protected $user_id;
+
 
 	/**
 	 * Create a new command instance.
@@ -27,8 +30,20 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 	}
 
     public function handle(){
-        //dd($this->message);
-        Log::info('Handle Queue Message:' . implode(', ', $this->message));
+        $process_info = $this->message;
+        $this->user_id = $process_info['user_id'];
+        $cba = ComicBookArchive::where('comic_book_archive_hash', '=', $process_info['hash'])->first();
+        $processArchive = false;
+
+        if(!$cba){
+            $cba = new ComicBookArchive();
+            $cba->upload_id = $process_info['upload_id'];
+            $cba->comic_book_archive_hash = $process_info['hash'];
+            $cba->comic_book_archive_status = 0;
+            $cba->save();
+            $processArchive = true;
+        }
+
     }
 
 }

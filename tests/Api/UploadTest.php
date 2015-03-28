@@ -26,6 +26,16 @@ class UploadTest extends ApiTester {
 
     }
     public function test_must_be_authenticated(){
+        //arrange
+        Auth::logout();
+        $this->test_access_token = "";
+
+        //act
+        $response = $this->getRequest('/upload');
+
+        //assert
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+
 
     }
     public function test_it_creates_upload(){
@@ -42,7 +52,7 @@ class UploadTest extends ApiTester {
 
 
     }
-    public function test_it_creates_uploads(){
+    public function test_it_creates_uploads(){//multiple uplaods
 
     }
     public function test_it_fetches_uploads(){//Retrieve all user uploads
@@ -59,19 +69,40 @@ class UploadTest extends ApiTester {
     }
     public function test_it_fetches_upload(){//Retrieve single upload
         //arrange
-        //$upload = Factory::create('App\Upload');
+        $upload = Factory::create('App\Upload', ['user_id' => $this->user->id]);
+
+        //act
+        $response = $this->getRequest('/upload/'.$upload->id);
+
+        //assert
+        $this->assertResponseOk();
 
     }
-    public function test_it_updates_upload(){
+    public function test_it_fetches_user_uploads_only(){//
+        //arrange
+        $user_uploads = Factory::times(5)->create('App\Upload', ['user_id' => $this->user->id]);
+        $other_user_upload = Factory::create('App\Upload', ['user_id' => 2]);
+
+        //act
+        $response = $this->getRequest('/upload');
+
+        //assert
+        //$this->assertArrayHasKey('foo', array('bar' => 'baz'));
+        //$this->assertEquals(true, $result);
+
+
+
 
     }
-    public function test_it_updates_uploads(){
+    public function test_it_fetches_user_upload_only(){//
+        //arrange
+        $upload = Factory::create('App\Upload', ['user_id' => 2]);
 
-    }
-    public function test_it_deletes_upload(){
+        //act
+        $response = $this->getRequest('/upload/'.$upload->id);
 
-    }
-    public function test_it_deletes_uploads(){
+        //assert
+        $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are madem ore consistent
 
     }
 

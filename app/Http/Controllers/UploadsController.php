@@ -63,12 +63,13 @@ class UploadsController extends ApiController {
      *
      * @return Response
      */
-    public function store()
-    {
+    public function store(){//TODO: Multiple Uploads in one request.
+
         if (Request::hasFile('file')) {
 
 
             $file = Request::file('file');
+            //dd($file);
 
             $acceptedMimetypes = array('application/zip', 'application/rar', 'application/x-zip-compressed', 'multipart/x-zip', 'application/x-compressed', 'application/octet-stream', 'application/x-rar-compressed', 'compressed/rar', 'application/x-rar');
             $acceptedExtensionTypes = array('zip', 'rar', 'cbz', 'cbr');
