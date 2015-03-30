@@ -2,8 +2,8 @@
 
 use App\Commands\ProcessComicBookArchive;
 use App\Commands\ProcessComicBookArchiveCommand;
-use App\Commands\RandomCommand;
 use App\Upload;
+use App\User;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
@@ -17,10 +17,12 @@ use Authorizer;
 class UploadsController extends ApiController {
 
     protected $upload;
+    //protected $user;
+    public $user;
 
     public function __construct(Upload $upload){//
-        $this->upload = $upload;//For unit testing... maybe
-        Auth::loginUsingId(Authorizer::getResourceOwnerId());
+        //$this->upload = $upload;//For unit testing... maybe
+        //if(Authorizer::getResourceOwnerId()) $this->user = User::findOrFail(Authorizer::getResourceOwnerId());
 
     }
 
@@ -28,8 +30,10 @@ class UploadsController extends ApiController {
      * @return mixed
      */
     public function index(){
+        $this->user = User::findOrFail(Authorizer::getResourceOwnerId());
+        dd($this->user);
 
-        $uploads = Auth::user()->uploads()->get();
+        $uploads = $this->user->uploads()->get();
         if(!$uploads){
             return $this->respondNotFound('No Uploads Found');
         }
@@ -47,7 +51,7 @@ class UploadsController extends ApiController {
      */
     public function show($id)
     {
-        $upload = Auth::user()->uploads()->find($id);
+        $upload = $this->user->uploads()->find($id);
 
         if(!$upload){
             return $this->respondNotFound('No Upload Found');
@@ -80,7 +84,7 @@ class UploadsController extends ApiController {
                 $upload->file_size = $file->getSize();
                 $newFileNameWithNoExtension = str_random(40);
                 $upload->file_upload_name = $newFileName = $newFileNameWithNoExtension . '.' . $file->getClientOriginalExtension();
-                $upload->user_id = Auth::user()->id;
+                $upload->user_id = $this->user->id;
                 if (Request::get('match_data')) {
                     $upload->match_data = Request::get('match_data');
                 }
@@ -93,7 +97,7 @@ class UploadsController extends ApiController {
 
                 $process_info = [
                     'upload_id' => $upload->id,
-                    'user_id'=> Auth::user()->id,
+                    'user_id'=> $this->user->id,
                     'hash'=> $fileHash,
                     'newFileName' => $newFileName,
                     'newFileNameNoExt' => $newFileNameWithNoExtension,

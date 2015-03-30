@@ -88,10 +88,10 @@ return [
                 ];
 
                 if (Auth::once($credentials)) {
-                        return Auth::user()->id;
-                    } else {
-                        return false;
-                    }
+                    return Auth::user()->id;
+                } else {
+                    return false;
+                }
             }
         ],
         'refresh_token' => [

@@ -38,11 +38,21 @@ class AuthTest extends ApiTester {
 
     }
 
-    public function test_it_logs_user_out(){
-
-    }
-
     public function test_it_can_register_user(){
+
+        //arrange
+
+        //act
+        $response = $this->postRequest('/oauth/access_token', [
+            'grant_type' => 'password',
+            'client_id' => 'test_client_id',
+            'client_secret' => 'test_client_secret',
+            'username' => '',
+            'password' => '1234'
+        ]);
+
+        //assert
+        $this->assertResponseOk();
 
     }
 
