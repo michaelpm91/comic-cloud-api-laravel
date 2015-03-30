@@ -17,7 +17,7 @@ Route::get('/', function()
 
 });
 
-Route::group(array('before' => 'oauth', 'middleware'=>'oauthlogin'), function() {
+Route::group(array('before' => 'oauth'), function() {
     Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show')));
     Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
     Route::resource('comic','ComicsController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
@@ -34,4 +34,4 @@ Route::post('oauth/access_token', function () {
     //'password' => 'Auth\PasswordController' //temporarily disabled
 ]);*/
 
-Route::post('auth/register', 'AuthController@postRegister');
+//Route::post('auth/register', 'AuthController@postRegister');

@@ -12,28 +12,25 @@ use Request;
 use Queue;
 use File;
 use Auth;
-use Authorizer;
 
 class UploadsController extends ApiController {
 
     protected $upload;
     //protected $user;
-    public $user;
+    //public $user;
 
-    public function __construct(Upload $upload){//
+    /*public function __construct(Upload $upload){//
         //$this->upload = $upload;//For unit testing... maybe
-        //if(Authorizer::getResourceOwnerId()) $this->user = User::findOrFail(Authorizer::getResourceOwnerId());
+        parent::__construct();
 
-    }
+    }*/
 
     /**
      * @return mixed
      */
     public function index(){
-        $this->user = User::findOrFail(Authorizer::getResourceOwnerId());
-        dd($this->user);
 
-        $uploads = $this->user->uploads()->get();
+        $uploads = $this->currentUser->uploads()->get();
         if(!$uploads){
             return $this->respondNotFound('No Uploads Found');
         }
@@ -51,7 +48,7 @@ class UploadsController extends ApiController {
      */
     public function show($id)
     {
-        $upload = $this->user->uploads()->find($id);
+        $upload = $this->currentUser->uploads()->find($id);
 
         if(!$upload){
             return $this->respondNotFound('No Upload Found');
@@ -84,7 +81,7 @@ class UploadsController extends ApiController {
                 $upload->file_size = $file->getSize();
                 $newFileNameWithNoExtension = str_random(40);
                 $upload->file_upload_name = $newFileName = $newFileNameWithNoExtension . '.' . $file->getClientOriginalExtension();
-                $upload->user_id = $this->user->id;
+                $upload->user_id = $this->currentUser->id;
                 if (Request::get('match_data')) {
                     $upload->match_data = Request::get('match_data');
                 }
@@ -97,7 +94,7 @@ class UploadsController extends ApiController {
 
                 $process_info = [
                     'upload_id' => $upload->id,
-                    'user_id'=> $this->user->id,
+                    'user_id'=> $this->currentUser->id,
                     'hash'=> $fileHash,
                     'newFileName' => $newFileName,
                     'newFileNameNoExt' => $newFileNameWithNoExtension,

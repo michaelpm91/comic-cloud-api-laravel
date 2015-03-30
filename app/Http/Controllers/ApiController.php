@@ -7,9 +7,35 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response as IlluminateResponse;
 use Illuminate\Contracts\Routing\ResponseFactory;
 
+use LucaDegasperi\OAuth2Server\Authorizer;
+
+use App\User;
+
 class ApiController extends Controller {
     //const HTTP_NOT_FOUND = 404;
     //self::HTTP_NOT_FOUND
+
+    protected $currentUser;
+    protected $authorizer;
+
+    public function __construct(Authorizer $authorizer = null){
+        $this->authorizer = $authorizer;
+        $this->currentUser = null;
+
+        if( ( null !== $authorizer->getChecker()->getAccessToken()) ){
+            $uid = $this->authorizer->getResourceOwnerId();
+            $this->currentUser = User::find($uid);
+        }
+    }
+
+    /*public function __construct(){
+        $this->currUser = null;
+
+        if( ( null !== $authorizer->getChecker()->getAccessToken()) ){
+            $uid = $this->authorizer->getResourceOwnerId();
+            $this->currUser = User::find($uid);
+        }
+    }*/
 
     /**
      * @var int
