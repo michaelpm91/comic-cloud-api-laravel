@@ -15,3 +15,8 @@ Route::get('/', function()
 {
 	return View::make('hello');
 });
+
+
+Route::api(['version' => 'v1', 'before' => 'api.logs'], function () {
+    Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show')));
+});
