@@ -4,7 +4,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class ComicImage extends Model {
 
+    public $incrementing = false;
+
     public function comicBookArchives(){
-        return $this->belongsToMany('ComicBookArchive')->withTimestamps();
+        return $this->belongsToMany('App\ComicBookArchive')->withTimestamps();
     }
 }

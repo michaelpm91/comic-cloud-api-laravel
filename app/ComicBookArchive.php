@@ -8,7 +8,7 @@ class ComicBookArchive extends Model {
         return $this->belongsTo('Upload');
     }
     public function comicimages(){
-        return $this->belongsToMany('ComicImage');
+        return $this->belongsToMany('App\ComicImage');
     }
 
 }

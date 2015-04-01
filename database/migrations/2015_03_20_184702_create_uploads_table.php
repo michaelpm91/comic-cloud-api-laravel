@@ -20,6 +20,7 @@ class CreateUploadsTable extends Migration {
             $table->string('file_original_name');
             $table->integer('file_size');
             $table->string('file_upload_name');
+            $table->text('match_data');
             $table->timestamps();
         });
 	}

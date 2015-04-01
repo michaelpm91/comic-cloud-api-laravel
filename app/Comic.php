@@ -8,6 +8,8 @@ class Comic extends Model {
         'id' => 'required'
     ];
 
+    public $incrementing = false;
+
     protected $dates = ['deleted_at'];
 
     protected $fillable = ['comic_issue','comic_writer','comic_book_archive_contents'];
@@ -16,11 +18,11 @@ class Comic extends Model {
 
     public function series()
     {
-        return $this->belongsTo('Series');
+        return $this->belongsTo('App\Series');
     }
     public function user()
     {
-        return $this->belongsTo('User');
+        return $this->belongsTo('App\User');
     }
     public function getComicBookArchiveContentsAttribute($json_array){
         if($json_array) {
