@@ -34,4 +34,4 @@ Route::post('oauth/access_token', function () {
     //'password' => 'Auth\PasswordController' //temporarily disabled
 ]);*/
 
-//Route::post('auth/register', 'AuthController@postRegister');
+Route::post('auth/register', 'AuthController@store');
