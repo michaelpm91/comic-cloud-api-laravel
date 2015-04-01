@@ -1,6 +1,9 @@
 <?php namespace App\Commands;
 
 use App\ComicBookArchive;
+use App\Upload;
+use App\Comic;
+use App\Series;
 use App\Commands\Command;
 
 use Illuminate\Queue\SerializesModels;
@@ -44,43 +47,37 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
             $processArchive = true;
         }
 
-        $this->collection_id = $cba->id;
+        //$this->collection_id = $cba->id;
 
         $this->createComic($process_info['upload_id'], $cba);
 
         if($processArchive){
-            Log::info('Process Archive');
+            //Log::info('Process Archive');
             //$this->processArchive($process_info);
         }
 
 
     }
 
-    protected function createComic($upload_id, $collection){
+    protected function createComic($upload_id, $cba){
 
         $comic_info = $this->getComicInfo($upload_id);
 
-        Log::info('Series ID: ' .$comic_info['series_id']);
-        $newComicID = $comic_info['comic_id'];//str_random(40);
+        $newComicID = $comic_info['comic_id'];
         $comic = new Comic;
         $comic->id = $newComicID;
         $comic->comic_issue = $comic_info['comic_issue'];
         $comic->comic_writer = $comic_info['comic_writer'];
-        $comic->comic_collection = (($collection->collection_contents ? $collection->collection_contents : '' ));
+        $comic->comic_book_archive_contents = (($cba->comic_book_archive_contents ? $cba->comic_book_archive_contents : '' ));
         $comic->user_id = $this->user_id;
         $comic->series_id = $comic_info['series_id'];
-        $comic->collection_id = $collection->id;
-        $comic->comic_status = $collection->collection_status;
+        $comic->comic_book_archive_id = $cba->id;
+        $comic->comic_status = $cba->comic_book_archive_status;
         $comic->save();
-
-        $this->comic_id = $newComicID;
-
-        //Log::info('comic ID 1: ' .$this->comic_id );
-        //Log::info('comic ID 2: ' .$comic->id );
 
     }
 
-    protected function getSeries($seriesTitle){//todo-mike: make sure this function only returns series that user has access to.
+    protected function getSeriesInfo($seriesTitle){//todo-mike: make sure this function only returns series that user has access to.
 
         $series = User::find($this->user_id)->first()->series()->where('series_title', '=', $seriesTitle)->first();//todo-mike: this isn't returning user specific series
 
@@ -99,27 +96,21 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
     }
 
     protected function getComicInfo($upload_id){
-        Log::info('Upload ID: ' .$upload_id);
-        $upload = Upload::find($upload_id);
+        $upload = Upload::findOrFail($upload_id);//TODO: Decide on find of find or fail
         $match_data = json_decode($upload->match_data, true);
+        $series_id = getSeriesInfo();
         if($match_data['exists']){
-            //todo-mike Make sure you're validating user data... They shouldn't be able to submit a invalid id
-            //$series = User::find($this->user_id)->first()->series()->where('series_title', '=', $seriesTitle)->first();//todo-mike: this isn't returning user specific series
             $comicInfo = ['comic_issue' => $match_data['comic_issue'], 'comic_id' => $match_data['comic_id'], 'series_id' => $match_data['series_id'], 'comic_writer' => 'Unknown'];
         }else{
-
             $series = new Series;
             $series->id = $match_data['series_id'];
             $series->series_title = $match_data['series_title'];
             $series->series_start_year = $match_data['series_start_year'];
             $series->series_publisher = 'Unknown';
-            $series->user_id = $this->user_id;
+            $series->user_id = $upload->user_id;
             $series->save();
-
             $comicInfo = ['comic_issue' => $match_data['comic_issue'], 'comic_id' => $match_data['comic_id'], 'series_id' => $match_data['series_id'], 'comic_writer' => 'Unknown'];
-
         }
-        //Log::info('Comic Info-Series Title: '.$match_data['series_title']);
         return $comicInfo;
     }
 

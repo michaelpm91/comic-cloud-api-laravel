@@ -16,4 +16,9 @@ class Upload extends Model {
         return $this->belongsTo('App\User');
     }
 
+    public function ComicBookArchives()
+    {
+        return $this->hasMany('ComicBookArchive');
+    }
+
 }
