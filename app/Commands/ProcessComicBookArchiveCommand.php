@@ -14,6 +14,7 @@ use Illuminate\Contracts\Queue\ShouldBeQueued;
 use Illuminate\Contracts\Bus\SelfHandling;
 
 use Log;
+use Storage;
 
 class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, SelfHandling
 {
@@ -29,15 +30,13 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
      *
      * @return void
      */
-    public function __construct($message)
-    {
+    public function __construct($message){
         $this->message = $message;
     }
     /**
      *
      */
-    public function handle()
-    {
+    public function handle(){
         $process_info = $this->message;
         $this->user_id = $process_info['user_id'];
 
@@ -50,16 +49,14 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
         $this->createComic($comic_info);
 
-        //$this->processArchive($process_info);
-
+        $this->processArchive($process_info['upload_id']);
 
     }
 
     /**
      * @return ComicBookArchive
      */
-    private function createComicBookArchive()
-    {
+    private function createComicBookArchive(){
         $process_info = $this->message;
 
         $cba = new ComicBookArchive();
@@ -75,8 +72,7 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
      * @param $comic_info
      * @return Comic
      */
-    private function createComic($comic_info)
-    {
+    private function createComic($comic_info){
 
         $cba = ComicBookArchive::findOrFail($comic_info['comic_book_archive_id']);
 
@@ -111,8 +107,6 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
         $series->series_publisher = 'Unknown';
         $series->user_id = $this->user_id;
         $series->save();
-
-        //dd($series->id);
 
         return $series;
     }
@@ -155,13 +149,26 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
     }
 
-    private function processArchive(){
+    private function processArchive($upload_id){
+        $upload_obj = Upload::find($upload_id);
 
         //download archive
+        if(Storage::disk(env('user_uploads'))->exists($upload_obj->file_upload_name)){
+            $withoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $upload_obj->file_upload_name);//TODO: This should probably be split on upload and handled DB side.
+            $cba = Storage::disk(env('user_uploads'))->get($upload_obj->file_upload_name);
+            $archive_extract_area = $withoutExt.'/archive/'.$upload_obj->file_upload_name;
+            Storage::disk(env('cba_extraction_area'))->put($archive_extract_area, $cba);
+
+
+        }
+
 
         //Determine Archive Type and begin extraction
 
         //Pass extracted Image through to process function
+
+        //Delete extraction zone.
+        //Storage::disk(env('cba_extraction_area'))->delete('file.jpg');//Something like this?
     }
 
     private function processImage(){
