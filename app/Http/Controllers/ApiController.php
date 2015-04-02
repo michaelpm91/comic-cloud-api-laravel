@@ -28,15 +28,6 @@ class ApiController extends Controller {
         }
     }
 
-    /*public function __construct(){
-        $this->currUser = null;
-
-        if( ( null !== $authorizer->getChecker()->getAccessToken()) ){
-            $uid = $this->authorizer->getResourceOwnerId();
-            $this->currUser = User::find($uid);
-        }
-    }*/
-
     /**
      * @var int
      */

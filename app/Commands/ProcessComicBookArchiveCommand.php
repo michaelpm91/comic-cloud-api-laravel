@@ -155,4 +155,17 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
     }
 
+    private function processArchive(){
+
+        //download archive
+
+        //Determine Archive Type and begin extraction
+
+        //Pass extracted Image through to process function
+    }
+
+    private function processImage(){
+
+    }
+
 }

@@ -43,16 +43,94 @@ class AuthTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->postRequest('/oauth/access_token', [
-            'grant_type' => 'password',
-            'client_id' => 'test_client_id',
-            'client_secret' => 'test_client_secret',
-            'username' => 'test@test.com',
-            'password' => '1234'
+        $response = $this->postRequest('/auth/register', [
+            'username' => 'test_2',
+            'email' => 'test_2@test.com',
+            'password' => '1234567',
+            'password_confirmation' => '1234567'
         ]);
-
         //assert
-        $this->assertResponseOk();
+        $this->assertResponseStatus(201);
+
+    }
+
+    public function test_registering_a_user_will_fail_without_username(){
+
+        //arrange
+
+        //act
+        $response = $this->postRequest('/auth/register', [
+            'username' => '',
+            'email' => 'test_2@test.com',
+            'password' => '1234567',
+            'password_confirmation' => '1234567'
+        ]);
+        //assert
+        $this->assertResponseStatus(400);
+
+    }
+
+    public function test_registering_a_user_will_fail_without_email(){
+
+        //arrange
+
+        //act
+        $response = $this->postRequest('/auth/register', [
+            'username' => 'test_2',
+            'email' => '',
+            'password' => '1234567',
+            'password_confirmation' => '1234567'
+        ]);
+        //assert
+        $this->assertResponseStatus(400);
+
+    }
+
+    public function test_registering_a_user_will_fail_without_password(){
+
+        //arrange
+
+        //act
+        $response = $this->postRequest('/auth/register', [
+            'username' => 'test_2',
+            'email' => 'test_2@test.com',
+            'password' => '',
+            'password_confirmation' => '1234567'
+        ]);
+        //assert
+        $this->assertResponseStatus(400);
+
+    }
+
+    public function test_registering_a_user_will_fail_without_password_confirmation(){
+
+        //arrange
+
+        //act
+        $response = $this->postRequest('/auth/register', [
+            'username' => 'test_2',
+            'email' => 'test_2@test.com',
+            'password' => '1234567',
+            'password_confirmation' => ''
+        ]);
+        //assert
+        $this->assertResponseStatus(400);
+
+    }
+
+    public function test_registering_a_user_will_fail_if_passwords_do_not_match(){
+
+        //arrange
+
+        //act
+        $response = $this->postRequest('/auth/register', [
+            'username' => 'test_2',
+            'email' => 'test_2@test.com',
+            'password' => '12345678',
+            'password_confirmation' => '87654321'
+        ]);
+        //assert
+        $this->assertResponseStatus(400);
 
     }
 
