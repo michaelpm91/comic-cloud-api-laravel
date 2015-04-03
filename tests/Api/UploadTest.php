@@ -20,14 +20,11 @@ class UploadTest extends ApiTester {
         parent::setUp();
         Artisan::call('db:seed');//TODO: Would be nice to move this...
         $this->user = User::find(1);
-        //User::create(['username'=>'user', 'email' => 'email@email.co', 'password' => '1234']);
-        //dd(User::find(1));
         Auth::loginUsingId($this->user->id);
 
     }
     public function test_must_be_authenticated(){
         //arrange
-        Auth::logout();
         $this->test_access_token = "";
 
         //act
@@ -229,8 +226,6 @@ class UploadTest extends ApiTester {
             if($upload['id'] == $other_user_upload->id) $result = true;
         }
         $this->assertEquals(false, $result);
-
-
 
     }
     public function test_it_fetches_user_upload_only(){//

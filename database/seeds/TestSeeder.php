@@ -49,7 +49,7 @@ class TestSeeder extends Seeder {
             [
                 'id' => 'test_access_token',
                 'session_id'  => 1,
-                'expire_time' => time() + 600,
+                'expire_time' => time() + 6000000,//Should be 60
                 'created_at' => $datetime,
                 'updated_at' => $datetime,
             ]
@@ -61,7 +61,7 @@ class TestSeeder extends Seeder {
             [
                 'id' => 'test_refresh_token',
                 'access_token_id' => 'test_access_token',
-                'expire_time' => time() + 600,
+                'expire_time' => time() + 6000000,//Should be 60
                 'created_at' => $datetime,
                 'updated_at' => $datetime,
             ],

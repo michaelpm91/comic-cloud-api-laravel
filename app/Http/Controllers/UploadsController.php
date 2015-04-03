@@ -4,7 +4,6 @@ use App\Commands\ProcessComicBookArchive;
 use App\Commands\ProcessComicBookArchiveCommand;
 use App\Upload;
 use App\User;
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use Storage;
@@ -16,7 +15,6 @@ use Validator;
 
 class UploadsController extends ApiController {
 
-    protected $upload;
     //protected $user;
     //public $user;
 
@@ -104,7 +102,7 @@ class UploadsController extends ApiController {
         $upload->file_upload_name = $newFileName = $newFileNameWithNoExtension . '.' . $file->getClientOriginalExtension();
         $upload->file_original_file_type = $file->getClientOriginalExtension();
         $upload->user_id = $this->currentUser->id;
-        $upload->match_data = "mmnbm";//json_encode(Request::except('file'));
+        $upload->match_data = json_encode(Request::except('file'));
         $upload->save();
 
         $tempPath = $file->getRealPath();
