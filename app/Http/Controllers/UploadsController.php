@@ -83,8 +83,18 @@ class UploadsController extends ApiController {
                 $upload->file_upload_name = $newFileName = $newFileNameWithNoExtension . '.' . $file->getClientOriginalExtension();
                 $upload->file_original_file_type = $file->getClientOriginalExtension();
                 $upload->user_id = $this->currentUser->id;
-                if (Request::get('match_data')) {
-                    $upload->match_data = Request::get('match_data');
+
+                $match_data = Request::get('match_data');
+
+                if ($match_data) { //TODO: This validation should be a Laravel validator
+                    $required_keys = ["exists", "series_id", "comic_id", "series_title", "series_start_year", "comic_issue"];
+                    $match_data_array = json_decode($match_data, true);
+                    if(!is_array($match_data_array)) return $this->respondBadRequest('Invalid Match Data');
+                    if (count(array_diff($required_keys, array_keys($match_data_array))) != 0) return $this->respondBadRequest('Invalid Match Data');
+                    $upload->match_data = $match_data;
+
+                }else{
+                    return $this->respondBadRequest('No Match Data');
                 }
                 $upload->save();
 

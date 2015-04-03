@@ -17,12 +17,12 @@ class ApiTester extends DBTestCase {
 
     protected function getRequest($uri)
     {
-        return json_encode($this->call('GET', $uri, [], [], [],['HTTP_Authorization' => 'Bearer '.$this->test_access_token])->getContent());
+        return $this->call('GET', $uri, [], [], [],['HTTP_Authorization' => 'Bearer '. $this->test_access_token])->getContent();
     }
 
     protected function postRequest($uri, $data = [], $files =[])
     {
-        return json_encode($this->call('POST', $uri, $data, [], $files, ['HTTP_Authorization' => 'Bearer '.$this->test_access_token])->getContent());
+        return $this->call('POST', $uri, $data, [], $files, ['HTTP_Authorization' => 'Bearer '. $this->test_access_token])->getContent();
     }
 
 

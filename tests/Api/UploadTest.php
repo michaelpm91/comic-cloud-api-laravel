@@ -42,8 +42,20 @@ class UploadTest extends ApiTester {
         //arrange
 
         //act
-        //$uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile('/path/to/file', 'original-file-name.ext');
-        //$response = $this->postRequest('/upload', ['file' => 'comic'], ['file' => $uploadedFile]);
+        $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
+
+        $response = $this->postRequest('/upload', [
+            "match_data" => /*json_encode([
+                "exists" => false,
+                "series_id" => "12345",
+                "comic_id" => "1",
+                "series_title" => "test",
+                "series_start_year" => "2015",
+                "comic_issue" => 1
+            ])*/
+            json_encode(['exists' => 'yo'])
+            //'{"exists":false,"series_id":"12345","comic_id":"1","series_title":"test","series_start_year":"2015","comic_issue":1}'
+        ], ['file' => $uploadedFile]);
 
         //dd($response);
 
@@ -52,6 +64,10 @@ class UploadTest extends ApiTester {
 
 
     }
+    public function test_uploads_must_have_match_data(){
+
+    }
+
     public function test_it_creates_uploads(){//multiple uplaods
 
     }
@@ -61,8 +77,6 @@ class UploadTest extends ApiTester {
 
         //act
         $response = $this->getRequest('/upload');
-
-        //dd($response);
 
         //assert
         $this->assertResponseOk();
@@ -87,9 +101,11 @@ class UploadTest extends ApiTester {
         $response = $this->getRequest('/upload');
 
         //assert
-        //$this->assertArrayHasKey('foo', array('bar' => 'baz'));
-        //$this->assertEquals(true, $result);
-
+        $result = false;
+        foreach(json_decode($response, true)['Uploads'] as $upload){
+            if($upload['id'] == $other_user_upload->id) $result = true;
+        }
+        $this->assertEquals(false, $result);
 
 
 
@@ -102,7 +118,7 @@ class UploadTest extends ApiTester {
         $response = $this->getRequest('/upload/'.$upload->id);
 
         //assert
-        $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are madem ore consistent
+        $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
 
     }
 
