@@ -79,8 +79,9 @@ class UploadsController extends ApiController {
                 $upload = new Upload;
                 $upload->file_original_name = $file->getClientOriginalName();
                 $upload->file_size = $file->getSize();
-                $newFileNameWithNoExtension = str_random(40);
+                $newFileNameWithNoExtension = $upload->file_random_upload_id = str_random(40);
                 $upload->file_upload_name = $newFileName = $newFileNameWithNoExtension . '.' . $file->getClientOriginalExtension();
+                $upload->file_original_file_type = $file->getClientOriginalExtension();
                 $upload->user_id = $this->currentUser->id;
                 if (Request::get('match_data')) {
                     $upload->match_data = Request::get('match_data');

@@ -51,7 +51,7 @@ return [
             'driver' => 'local',
             'root'   => storage_path().'/app/user_images',
         ],
-        'local_cba_extraction_area' => [
+        'cba_extraction_area' => [
             'driver' => 'local',
             'root'   => storage_path().'/app/comic_book_archive_extraction_area',
         ],

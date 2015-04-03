@@ -16,12 +16,15 @@ $factory('App\Upload', function ($faker){
     $fileExt = ['cbz', 'cbr', 'pdf',];
     $thisFileExt = $fileExt[rand(0,2)];
     $fileName = implode(' ', $faker->words(rand(3,7))).'.'.$thisFileExt;
+    $random_upload_id = str_random(40);
 
     return[
         'user_id'  => 'factory:App\User',
         'file_original_name' => $fileName,
         'file_size' => rand(1000000, 50000000),
-        'file_upload_name' => str_random(40).'.'.$thisFileExt,
+        'file_upload_name' => $random_upload_id.'.'.$thisFileExt,
+        'file_original_file_type' => $thisFileExt,
+        'file_random_upload_id' => $random_upload_id,
         'match_data' => json_encode([
             'exists' => false,
             'series_id' => 'factory:App\Series',

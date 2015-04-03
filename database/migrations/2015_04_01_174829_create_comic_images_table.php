@@ -14,8 +14,11 @@ class CreateComicImagesTable extends Migration {
 	{
 		Schema::create('comic_images', function(Blueprint $table)
 		{
-			$table->increments('id');
-			$table->timestamps();
+            $table->increments('id');
+            $table->string('image_slug');
+            $table->string('image_size');
+            $table->string('image_hash');
+            $table->timestamps();
 		});
 	}
 

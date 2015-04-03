@@ -5,6 +5,7 @@ use App\ComicBookArchive;
 use App\Upload;
 use App\Comic;
 use App\Series;
+use App\ComicImage;
 use App\Commands\Command;
 
 use Illuminate\Queue\SerializesModels;
@@ -16,6 +17,8 @@ use Illuminate\Contracts\Bus\SelfHandling;
 use Log;
 use Storage;
 
+use ZipArchive;
+
 class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, SelfHandling
 {
 
@@ -23,6 +26,7 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
     protected $message;
     protected $user_id;
+    protected $cba_id;
 
 
     /**
@@ -42,12 +46,17 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
         $cba = ComicBookArchive::where('comic_book_archive_hash', '=', $process_info['hash'])->first();
 
-        if (!$cba) $cba = $this->createComicBookArchive();
+        if (!$cba){
+            $cba = $this->createComicBookArchive();
+        }
+        $this->cba_id = $cba->id;
 
         $comic_info = $this->getComicInfo($process_info['upload_id']);
         $comic_info['comic_book_archive_id'] = $cba->id;
 
         $this->createComic($comic_info);
+
+
 
         $this->processArchive($process_info['upload_id']);
 
@@ -151,15 +160,16 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
     private function processArchive($upload_id){
         $upload_obj = Upload::find($upload_id);
+        $user_uploads = Storage::disk(env('user_uploads'));
 
         //download archive
-        if(Storage::disk(env('user_uploads'))->exists($upload_obj->file_upload_name)){
-            $withoutExt = preg_replace('/\\.[^.\\s]{3,4}$/', '', $upload_obj->file_upload_name);//TODO: This should probably be split on upload and handled DB side.
-            $cba = Storage::disk(env('user_uploads'))->get($upload_obj->file_upload_name);
-            $archive_extract_area = $withoutExt.'/archive/'.$upload_obj->file_upload_name;
-            Storage::disk(env('cba_extraction_area'))->put($archive_extract_area, $cba);
-
-
+        if($user_uploads->exists($upload_obj->file_upload_name)){
+            $cba = $user_uploads->get($upload_obj->file_upload_name);
+            $archive_extract_area = $upload_obj->file_random_upload_id.'/archive/'.$upload_obj->file_upload_name;
+            $cba_extract_area = Storage::disk('cba_extraction_area');
+            $cba_extract_area->put($archive_extract_area, $cba);
+            $cba_extract_area->makeDirectory($upload_obj->file_random_upload_id.'/images/');
+            $this->extractArchive($upload_obj);
         }
 
 
@@ -171,7 +181,72 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
         //Storage::disk(env('cba_extraction_area'))->delete('file.jpg');//Something like this?
     }
 
-    private function processImage(){
+    public function extractArchive($upload_obj){
+        //TODO: Support nested archives.
+
+        $cba_extract_area = Storage::disk('cba_extraction_area')->getDriver()->getAdapter()->getPathPrefix();
+        $archive = $cba_extract_area.'/'.$upload_obj->file_random_upload_id.'/archive/'.$upload_obj->file_upload_name;
+        $images = $cba_extract_area.'/'.$upload_obj->file_random_upload_id.'/images';
+        if(Storage::disk('cba_extraction_area')->exists($upload_obj->file_random_upload_id)){//check if extraction zone exists
+
+            if(in_array($upload_obj->file_original_file_type, array('zip', 'cbz'))) {
+
+                $zip = new ZipArchive;
+
+                if ($zip->open($archive) === true) {
+                    $pages = [];
+                    for ($i = 0; $i < $zip->numFiles; $i++) {
+
+                        $entry = $zip->getNameIndex($i);
+
+                        if (substr($entry, -1) == '/') continue; // skip directories
+
+                        $entryExt = strtolower(pathinfo(basename($entry), PATHINFO_EXTENSION));
+                        $acceptedExtensions = ['jpg', 'jpeg'];
+                        if (!in_array($entryExt, $acceptedExtensions)) continue; //skip non-jpegs
+
+                        $zip->extractTo($images, array($entry));
+
+                        $image_slug = $this->processImage($images . "/" . basename($entry));
+                        $pages[$image_slug] = basename($entry);
+
+                    }
+                    $zip->close();
+
+                }
+
+            }
+
+        }
+    }
+
+    private function processImage($image){
+
+        $fileHash = hash_file('md5', $image);
+
+        $imageentry = ComicImage::where('image_hash', '=', $fileHash)->first();
+
+
+        if(!$imageentry){
+
+            $imageExt = strtolower(pathinfo($image, PATHINFO_EXTENSION));
+
+
+            $image_slug = str_random(40);
+
+            Storage::disk(env('user_images'))->put($image_slug.".".$imageExt, file_get_contents($image));
+
+            $imageentry = new ComicImage;
+
+            $imageentry->image_slug = $image_slug;// = str_random(10);
+            $imageentry->image_hash = $fileHash;
+            $imageentry->image_size = filesize($image);
+            $imageentry->save();
+
+        }
+        $imageentry->comicBookArchives()->attach($this->cba_id);
+
+        return $image_slug;//$imageentry->image_slug;
 
     }
 
