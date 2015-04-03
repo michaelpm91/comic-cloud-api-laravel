@@ -31,7 +31,7 @@ class UploadTest extends ApiTester {
         $response = $this->getRequest('/upload');
 
         //assert
-        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
 
 
     }
@@ -76,10 +76,9 @@ class UploadTest extends ApiTester {
 
         //assert
 
-        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
 
     }
-
     public function test_uploads_must_have_match_data_series_id(){
 
         //arrange
@@ -99,7 +98,7 @@ class UploadTest extends ApiTester {
 
         //assert
 
-        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
 
     }
     public function test_uploads_must_have_match_data_comic_id(){
@@ -121,7 +120,7 @@ class UploadTest extends ApiTester {
 
         //assert
 
-        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
 
     }
     public function test_uploads_must_have_match_data_series_title(){
@@ -143,7 +142,7 @@ class UploadTest extends ApiTester {
 
         //assert
 
-        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
 
     }
     public function test_uploads_must_have_match_data_series_start_year(){
@@ -165,7 +164,7 @@ class UploadTest extends ApiTester {
 
         //assert
 
-        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
 
     }
     public function test_uploads_must_have_match_data_comic_issue(){
@@ -187,10 +186,9 @@ class UploadTest extends ApiTester {
 
         //assert
 
-        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
 
     }
-
     public function test_it_fetches_uploads(){//Retrieve all user uploads
         //arrange
         $mocked_uploads = Factory::times(10)->create('App\Upload', ['user_id' => $this->user->id]);
@@ -219,6 +217,9 @@ class UploadTest extends ApiTester {
 
         //assert
         $this->assertResponseOk();
+
+    }
+    public function test_it_cannot_fetch_an_upload_that_does_not_exist(){
 
     }
     public function test_it_fetches_user_uploads_only(){//

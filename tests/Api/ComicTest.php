@@ -34,7 +34,6 @@ class ComicTest extends ApiTester {
         $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
 
     }
-    //READ
     public function test_it_fetches_comics(){//Retrieve all user comics
         //arrange
         $mocked_comics = Factory::times(10)->create('App\Comic', ['user_id' => $this->user->id]);
@@ -65,6 +64,10 @@ class ComicTest extends ApiTester {
         $this->assertResponseOk();
 
     }
+
+    public function test_it_cannot_fetch_a_comic_that_does_not_exist(){
+
+    }
     public function test_it_fetches_user_comics_only(){//
         //arrange
         $user_comics = Factory::times(5)->create('App\Comic', ['user_id' => $this->user->id]);
@@ -90,6 +93,25 @@ class ComicTest extends ApiTester {
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
+
+    }
+
+    public function test_it_can_edit_a_comic(){
+
+    }
+    public function test_it_cannot_edit_another_users_comic(){
+
+    }
+    public function test_it_cannot_edit_a_comic_that_does_not_exist(){
+
+    }
+    public function test_it_can_delete_a_comic(){
+
+    }
+    public function test_it_cannot_delete_a_comic_that_does_not_exist(){
+
+    }
+    public function test_it_cannot_delete_another_users_comic(){
 
     }
 }
