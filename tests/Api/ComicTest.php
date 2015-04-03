@@ -37,13 +37,22 @@ class ComicTest extends ApiTester {
     //READ
     public function test_it_fetches_comics(){//Retrieve all user comics
         //arrange
-        $comics = Factory::times(10)->create('App\Comic', ['user_id' => $this->user->id]);
+        $mocked_comics = Factory::times(10)->create('App\Comic', ['user_id' => $this->user->id]);
 
         //act
         $response = $this->getRequest('/comic');
 
         //assert
-        $this->assertResponseOk();
+        $result = true;
+        foreach($mocked_comics as $mocked_comic ){
+            $mocked_id = $mocked_comic->id;
+            if (!in_array($mocked_comic->id, json_decode($response, true)['Comics'])) {
+                $result = false;
+                break;
+            }
+        }
+        $this->assertEquals(false, $result);
+
     }
     public function test_it_fetches_comic(){//Retrieve single comic
         //arrange

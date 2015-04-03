@@ -193,13 +193,22 @@ class UploadTest extends ApiTester {
 
     public function test_it_fetches_uploads(){//Retrieve all user uploads
         //arrange
-        $upload = Factory::times(10)->create('App\Upload', ['user_id' => $this->user->id]);
+        $mocked_uploads = Factory::times(10)->create('App\Upload', ['user_id' => $this->user->id]);
 
         //act
         $response = $this->getRequest('/upload');
 
         //assert
-        $this->assertResponseOk();
+        $result = true;
+        foreach($mocked_uploads as $mocked_upload ){
+            $mocked_id = $mocked_upload->id;
+            if (!in_array($mocked_upload->id, json_decode($response, true)['Uploads'])) {
+                $result = false;
+                break;
+            }
+        }
+        $this->assertEquals(false, $result);
+        //$this->assertResponseOk();
     }
     public function test_it_fetches_upload(){//Retrieve single upload
         //arrange
