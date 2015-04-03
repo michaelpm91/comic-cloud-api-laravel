@@ -42,7 +42,14 @@ $factory('App\Comic', function($faker){
         'id' => $faker->unique()->randomNumber,
         'comic_issue' => rand(1, 99),
         'comic_writer' => $faker->name,
-        'comic_book_archive_contents' => str_random(20),
+        'comic_book_archive_contents' => json_encode([
+            1 => str_random(20).".jpg",
+            2 => str_random(20).".jpg",
+            3 => str_random(20).".jpg",
+            4 => str_random(20).".jpg",
+            5 => str_random(20).".jpg",
+            6 => str_random(20).".jpg",
+        ]),
         'user_id' => 'factory:App\User',
         'series_id' => 'factory:App\Series',
         'comic_book_archive_id' => 'factory:App\ComicBookArchive',
@@ -61,7 +68,14 @@ $factory('App\Series', [
 $factory('App\ComicBookArchive', [
     'upload_id' => 'factory:App\Upload',
     'comic_book_archive_contents' => '',
-    'comic_book_archive_hash' => str_random(20),
+    'comic_book_archive_hash' => json_encode([
+        1 => str_random(20).".jpg",
+        2 => str_random(20).".jpg",
+        3 => str_random(20).".jpg",
+        4 => str_random(20).".jpg",
+        5 => str_random(20).".jpg",
+        6 => str_random(20).".jpg",
+    ]),
     'comic_book_archive_status' => 1
 ]);
 

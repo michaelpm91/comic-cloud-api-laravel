@@ -41,7 +41,6 @@ class ComicTest extends ApiTester {
 
         //act
         $response = $this->getRequest('/comic');
-        dd($response);
 
         //assert
         $this->assertResponseOk();
