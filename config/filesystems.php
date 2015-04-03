@@ -55,6 +55,9 @@ return [
             'driver' => 'local',
             'root'   => storage_path().'/app/comic_book_archive_extraction_area',
         ],
+
+        //TODO: Create a test extraction zone so we can wipe it all afterwards
+
         'aws_s3_user_uploads' => [
             'driver' => 's3',
             'key'    => env('AWS_Key'),

@@ -55,7 +55,7 @@ $factory('App\Series', [
     'user_id' => 'factory:App\User'
 ]);
 
-$factory('App\ComicBookArchiv', [
+$factory('App\ComicBookArchive', [
     'upload_id' => 'factory:App\Upload',
     'comic_book_archive_contents' => '',
     'comic_book_archive_hash' => str_random(20),

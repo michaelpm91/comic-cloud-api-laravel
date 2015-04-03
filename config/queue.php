@@ -31,6 +31,10 @@ return [
 
 	'connections' => [
 
+        'test_sync' => [
+            'driver' => 'null'
+        ],
+
 		'sync' => [
 			'driver' => 'sync',
 		],

@@ -17,7 +17,7 @@ class CreateComicBookArchivesTable extends Migration {
             $table->increments('id');
             $table->integer('upload_id')->length(10)->unsigned();
             $table->foreign('upload_id')->references('id')->on('uploads')->onDelete('cascade');
-            $table->text('comic_book_archive_contents');
+            $table->text('comic_book_archive_contents')->nullable();//Nullable may break stuff...
             $table->string('comic_book_archive_hash');
             $table->integer('comic_book_archive_status');
             $table->timestamps();

@@ -45,32 +45,155 @@ class UploadTest extends ApiTester {
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
 
         $response = $this->postRequest('/upload', [
-            "match_data" => /*json_encode([
-                "exists" => false,
-                "series_id" => "12345",
-                "comic_id" => "1",
-                "series_title" => "test",
-                "series_start_year" => "2015",
-                "comic_issue" => 1
-            ])*/
-            json_encode(['exists' => 'yo'])
-            //'{"exists":false,"series_id":"12345","comic_id":"1","series_title":"test","series_start_year":"2015","comic_issue":1}'
-        ], ['file' => $uploadedFile]);
+            "exists" => false,
+            "series_id" => "12345",
+            "comic_id" => "1",
+            "series_title" => "test",
+            "series_start_year" => "2015",
+            "comic_issue" => 1
+          ], ['file' => $uploadedFile]);
 
-        //dd($response);
 
         //assert
-        //$this->assertResponseOk();
+
+        $this->assertResponseStatus(201);
 
 
     }
-    public function test_uploads_must_have_match_data(){
+    public function test_uploads_must_have_match_data_exists(){
+
+        //arrange
+
+        //act
+        $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
+
+        $response = $this->postRequest('/upload', [
+            "exists" => "",
+            "series_id" => "12345",
+            "comic_id" => "1",
+            "series_title" => "test",
+            "series_start_year" => "2015",
+            "comic_issue" => 1
+        ], ['file' => $uploadedFile]);
+
+
+        //assert
+
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
 
     }
 
-    public function test_it_creates_uploads(){//multiple uplaods
+    public function test_uploads_must_have_match_data_series_id(){
+
+        //arrange
+
+        //act
+        $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
+
+        $response = $this->postRequest('/upload', [
+            "exists" => false,
+            "series_id" => "",
+            "comic_id" => "1",
+            "series_title" => "test",
+            "series_start_year" => "2015",
+            "comic_issue" => 1
+        ], ['file' => $uploadedFile]);
+
+
+        //assert
+
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
 
     }
+    public function test_uploads_must_have_match_data_comic_id(){
+
+        //arrange
+
+        //act
+        $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
+
+        $response = $this->postRequest('/upload', [
+            "exists" => false,
+            "series_id" => "12345",
+            "comic_id" => "",
+            "series_title" => "test",
+            "series_start_year" => "2015",
+            "comic_issue" => 1
+        ], ['file' => $uploadedFile]);
+
+
+        //assert
+
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+
+    }
+    public function test_uploads_must_have_match_data_series_title(){
+
+        //arrange
+
+        //act
+        $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
+
+        $response = $this->postRequest('/upload', [
+            "exists" => false,
+            "series_id" => "12345",
+            "comic_id" => "1",
+            "series_title" => "",
+            "series_start_year" => "2015",
+            "comic_issue" => 1
+        ], ['file' => $uploadedFile]);
+
+
+        //assert
+
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+
+    }
+    public function test_uploads_must_have_match_data_series_start_year(){
+
+        //arrange
+
+        //act
+        $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
+
+        $response = $this->postRequest('/upload', [
+            "exists" => false,
+            "series_id" => "12345",
+            "comic_id" => "1",
+            "series_title" => "test",
+            "series_start_year" => "",
+            "comic_issue" => 1
+        ], ['file' => $uploadedFile]);
+
+
+        //assert
+
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+
+    }
+    public function test_uploads_must_have_match_data_comic_issue(){
+
+        //arrange
+
+        //act
+        $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
+
+        $response = $this->postRequest('/upload', [
+            "exists" => false,
+            "series_id" => "12345",
+            "comic_id" => "1",
+            "series_title" => "test",
+            "series_start_year" => "2015",
+            "comic_issue" => ""
+        ], ['file' => $uploadedFile]);
+
+
+        //assert
+
+        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+
+    }
+
     public function test_it_fetches_uploads(){//Retrieve all user uploads
         //arrange
         $upload = Factory::times(10)->create('App\Upload', ['user_id' => $this->user->id]);
