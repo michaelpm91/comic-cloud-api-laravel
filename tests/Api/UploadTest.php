@@ -221,6 +221,14 @@ class UploadTest extends ApiTester {
     }
     public function test_it_cannot_fetch_an_upload_that_does_not_exist(){
 
+        //arrange
+
+        //act
+        $response = $this->getRequest('/upload/xxxxx');
+
+        //assert
+        $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
+
     }
     public function test_it_fetches_user_uploads_only(){//
         //arrange

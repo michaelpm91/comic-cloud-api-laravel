@@ -64,8 +64,14 @@ class ComicTest extends ApiTester {
         $this->assertResponseOk();
 
     }
-
     public function test_it_cannot_fetch_a_comic_that_does_not_exist(){
+        //arrange
+
+        //act
+        $response = $this->getRequest('/comic/xxxxx');
+
+        //assert
+        $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
 
     }
     public function test_it_fetches_user_comics_only(){//
@@ -95,23 +101,119 @@ class ComicTest extends ApiTester {
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
 
     }
+    public function test_it_can_edit_a_comic_comic_writer(){//TODO:Multiple Asserts...
+        //arrange
+        $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
 
-    public function test_it_can_edit_a_comic(){
+        //act
+        $response = $this->patchRequest('/comic/'.$comic->id, [
+            'comic_writer' => 'John Smith'
+        ]);
 
+        //assert
+        $this->assertResponseOk();
+
+        //act
+        $response = $this->getRequest('/comic/'.$comic->id);
+
+        //assert
+        $this->assertEquals('John Smith', json_decode($response, true)['comic']['comic_writer']);
+
+
+    }
+    public function test_can_edit_a_comic_comic_issue(){//TODO:Multiple Asserts
+        //arrange
+        $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
+
+        //act
+        $response = $this->patchRequest('/comic/'.$comic->id, [
+            'comic_issue' => 1
+        ]);
+
+        //assert
+        $this->assertResponseOk();
+
+        //act
+        $response = $this->getRequest('/comic/'.$comic->id);
+
+        //assert
+        $this->assertEquals(1, json_decode($response, true)['comic']['comic_issue']);
     }
     public function test_it_cannot_edit_another_users_comic(){
 
-    }
-    public function test_it_cannot_edit_a_comic_that_does_not_exist(){
+        //arrange
+        $otherusercomic = Factory::create('App\Comic', ['user_id' => 2]);
+
+        //act
+        $response = $this->patchRequest('/comic/'.$otherusercomic->id, [
+            'comic_issue' => 1
+        ]);
+
+        //assert
+        $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
 
     }
-    public function test_it_can_delete_a_comic(){
+    public function test_it_cannot_edit_a_comic_comic_issue_that_does_not_exist(){
+        //arrange
+
+        //act
+        $response = $this->patchRequest('/comic/xxxxx', [
+            'comic_issue' => 1
+        ]);
+
+        //assert
+        $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
+
+    }
+    public function test_it_cannot_edit_a_comic_comic_writer_that_does_not_exist(){
+        //arrange
+
+        //act
+        $response = $this->patchRequest('/comic/xxxxx', [
+            'comic_writer' => 'John Smith'
+        ]);
+
+        //assert
+        $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
+
+    }
+    public function test_it_can_delete_a_comic(){//TODO: Multiple asserts
+        //arrange
+        $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
+
+        //act
+        $response = $this->deleteRequest('/comic/'.$comic->id);
+
+        //assert
+        $this->assertResponseOk();
+
+        //act
+        $response = $this->getRequest('/comic/'.$comic->id);
+
+        //assert
+        $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
 
     }
     public function test_it_cannot_delete_a_comic_that_does_not_exist(){
+        //arrange
+
+        //act
+        $response = $this->deleteRequest('/comic/xxxxx');
+
+        //assert
+        $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
+
 
     }
     public function test_it_cannot_delete_another_users_comic(){
+        //arrange
+        $otherusercomic = Factory::create('App\Comic', ['user_id' => 2]);
+
+        //act
+        $response = $this->deleteRequest('/comic/'.$otherusercomic->id);
+
+        //assert
+        $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
 
     }
 }
