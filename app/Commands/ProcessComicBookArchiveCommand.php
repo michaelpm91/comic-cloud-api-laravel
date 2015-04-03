@@ -18,6 +18,7 @@ use Log;
 use Storage;
 
 use ZipArchive;
+use RarArchive;
 
 class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, SelfHandling
 {
@@ -27,6 +28,7 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
     protected $message;
     protected $user_id;
     protected $cba_id;
+    protected $comic_id;
 
 
     /**
@@ -43,22 +45,27 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
     public function handle(){
         $process_info = $this->message;
         $this->user_id = $process_info['user_id'];
+        $process_archive = false;
 
         $cba = ComicBookArchive::where('comic_book_archive_hash', '=', $process_info['hash'])->first();
 
         if (!$cba){
             $cba = $this->createComicBookArchive();
+            $process_archive = true;
         }
         $this->cba_id = $cba->id;
 
         $comic_info = $this->getComicInfo($process_info['upload_id']);
+
         $comic_info['comic_book_archive_id'] = $cba->id;
 
-        $this->createComic($comic_info);
+        $comic = $this->createComic($comic_info);
+        $this->comic_id = $comic->id;
 
 
-
-        $this->processArchive($process_info['upload_id']);
+        if($process_archive){
+            $this->processArchive($process_info['upload_id']);
+        }
 
     }
 
@@ -149,7 +156,7 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
         //dd($this->user_id);
         $series = User::find($this->user_id)->first()->series()->find($match_data['series_id']);
 
-        if ($match_data['exists'] == false && $series == null) {
+        if ($match_data['exists'] == false || $series == null) {
 
             $series = $this->createSeries($match_data);
 
@@ -164,29 +171,30 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
         //download archive
         if($user_uploads->exists($upload_obj->file_upload_name)){
-            $cba = $user_uploads->get($upload_obj->file_upload_name);
+            $cba_file_name = $user_uploads->get($upload_obj->file_upload_name);
             $archive_extract_area = $upload_obj->file_random_upload_id.'/archive/'.$upload_obj->file_upload_name;
             $cba_extract_area = Storage::disk('cba_extraction_area');
-            $cba_extract_area->put($archive_extract_area, $cba);
+            $cba_extract_area->put($archive_extract_area, $cba_file_name);
             $cba_extract_area->makeDirectory($upload_obj->file_random_upload_id.'/images/');
-            $this->extractArchive($upload_obj);
+
+            $comic_json = $this->extractArchive($upload_obj);
+
         }
 
-
-        //Determine Archive Type and begin extraction
-
-        //Pass extracted Image through to process function
 
         //Delete extraction zone.
         //Storage::disk(env('cba_extraction_area'))->delete('file.jpg');//Something like this?
     }
 
-    public function extractArchive($upload_obj){
+    private function extractArchive($upload_obj){
         //TODO: Support nested archives.
 
         $cba_extract_area = Storage::disk('cba_extraction_area')->getDriver()->getAdapter()->getPathPrefix();
         $archive = $cba_extract_area.'/'.$upload_obj->file_random_upload_id.'/archive/'.$upload_obj->file_upload_name;
         $images = $cba_extract_area.'/'.$upload_obj->file_random_upload_id.'/images';
+
+        $pages = [];
+
         if(Storage::disk('cba_extraction_area')->exists($upload_obj->file_random_upload_id)){//check if extraction zone exists
 
             if(in_array($upload_obj->file_original_file_type, array('zip', 'cbz'))) {
@@ -194,21 +202,22 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
                 $zip = new ZipArchive;
 
                 if ($zip->open($archive) === true) {
-                    $pages = [];
+
                     for ($i = 0; $i < $zip->numFiles; $i++) {
 
                         $entry = $zip->getNameIndex($i);
 
-                        if (substr($entry, -1) == '/') continue; // skip directories
-
-                        $entryExt = strtolower(pathinfo(basename($entry), PATHINFO_EXTENSION));
+                        $entryExt = strtolower(pathinfo(basename($entry), PATHINFO_EXTENSION));//Get Extension
                         $acceptedExtensions = ['jpg', 'jpeg'];
+
+                        if (substr($entry, -1) == '/') continue; // skip directories
                         if (!in_array($entryExt, $acceptedExtensions)) continue; //skip non-jpegs
 
+                        $file = basename($entry);
                         $zip->extractTo($images, array($entry));
 
-                        $image_slug = $this->processImage($images . "/" . basename($entry));
-                        $pages[$image_slug] = basename($entry);
+                        $image_slug = $this->processImage($images . "/" . $file);
+                        $pages[$image_slug] = $file;
 
                     }
                     $zip->close();
@@ -216,6 +225,58 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
                 }
 
             }
+
+            else if(in_array($upload_obj->file_original_file_type, array('rar', 'cbr'))){
+
+                $rar = RarArchive::open($archive);
+
+                if (!$rar === false) {//rar archive doesn't like truth
+
+
+                    foreach ($rar->getEntries() as $key => $entry) {
+
+                        $entryExt = strtolower(pathinfo(basename($entry->getName()), PATHINFO_EXTENSION));
+                        $acceptedExtensions = ['jpg', 'jpeg'];
+
+                        if (!in_array($entryExt, $acceptedExtensions)) continue; //skip non-jpegs
+                        if (!in_array($entryExt, $acceptedExtensions)) continue; //skip non-jpegs
+
+                        $file = basename($entry->getName());
+
+                        $entry->extract( false , $images.'/'.$file);
+
+                        $image_slug = $this->processImage($images."/".$file);
+                        $pages[$image_slug] = $file;
+                    }
+
+                    $rar->close();
+
+                }
+
+
+            }
+
+
+            natsort($pages);
+            $pages = array_flip($pages);
+            $pages = array_values($pages);
+
+            array_unshift($pages, 'presentation_value');
+            unset($pages[0]);//Add and remove value at zero to shift array to 1. Just for presentation.
+
+
+
+            $cba= ComicBookArchive::find($this->cba_id);
+            $cba->comic_book_archive_contents = json_encode($pages, JSON_FORCE_OBJECT);
+            $cba->comic_book_archive_status = 1;
+            $cba->save();
+
+            $comic = Comic::find($this->comic_id);
+            $comic->comic_book_archive_contents = json_encode($pages, JSON_FORCE_OBJECT);
+            $comic->comic_status = 1;
+            $comic->save();
+
+            return $pages;
 
         }
     }
@@ -238,7 +299,7 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
             $imageentry = new ComicImage;
 
-            $imageentry->image_slug = $image_slug;// = str_random(10);
+            $imageentry->image_slug = $image_slug;
             $imageentry->image_hash = $fileHash;
             $imageentry->image_size = filesize($image);
             $imageentry->save();
@@ -246,7 +307,7 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
         }
         $imageentry->comicBookArchives()->attach($this->cba_id);
 
-        return $image_slug;//$imageentry->image_slug;
+        return $imageentry->image_slug;
 
     }
 
