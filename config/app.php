@@ -150,6 +150,7 @@ return [
          */
         'LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider',
         'LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider',
+        'Intervention\Image\ImageServiceProvider'
 
 	],
 
@@ -200,7 +201,8 @@ return [
 		'View'      => 'Illuminate\Support\Facades\View',
 
         'Authorizer' => 'LucaDegasperi\OAuth2Server\Facades\AuthorizerFacade',
-        'Carbon'    => 'Carbon\Carbon'
+        'Carbon'    => 'Carbon\Carbon',
+        'Image' => 'Intervention\Image\Facades\Image'
 
 	],
 

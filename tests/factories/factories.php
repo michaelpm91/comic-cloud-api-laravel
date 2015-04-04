@@ -80,5 +80,7 @@ $factory('App\ComicBookArchive', [
 ]);
 
 $factory('App\ComicImage', [
-
+    'image_slug' => '',
+    'image_size' => '',
+    'image_hash' => ''
 ]);

@@ -1,84 +1,44 @@
 <?php namespace App\Http\Controllers;
 
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-use Illuminate\Http\Request;
 
-class ComicImagesController extends Controller {
+use App\ComicImage;
 
-	/**
-	 * Display a listing of the resource.
-	 *
-	 * @return Response
-	 */
-	public function index()
-	{
-		//
+use Image;
+use Storage;
+use Request;
+
+class ComicImagesController extends ApiController {
+    /**
+     * Display the specified resource.
+     *
+     * @param $comic_slug
+     * @param string $size
+     * @internal param int $id
+     * @return Response
+     */
+	public function show($comic_slug, $size = '500'){
+
+        $comicImage = ComicImage::where('image_slug', '=', $comic_slug)->first();
+
+        if(!$comicImage) return $this->respondNotFound('No Image Found');
+
+        $userCbaIds = $this->currentUser->comics()->lists('comic_book_archive_id');
+        $comicCbaIds = $comicImage->comicBookArchives()->lists('comic_book_archive_id');
+
+        foreach($comicCbaIds as $comicCbaId){
+            if(!in_array($comicCbaId, $userCbaIds)) return $this->respondNotFound('No Image Found');
+        }
+
+        $img = Storage::disk(env('user_images'))->get($comicImage->image_slug.".jpg");//TODO: Hard coded file type
+        $size = (is_numeric($size)? $size : 500);
+
+        $imgCache = Image::cache(function($image) use ($img, $size) {
+            $image->make($img)->interlace()->resize(null, $size, function ($constraint) { $constraint->aspectRatio(); $constraint->upsize(); });
+        }, 60, true);
+
+        return $imgCache->response();
+
 	}
-
-	/**
-	 * Show the form for creating a new resource.
-	 *
-	 * @return Response
-	 */
-	public function create()
-	{
-		//
-	}
-
-	/**
-	 * Store a newly created resource in storage.
-	 *
-	 * @return Response
-	 */
-	public function store()
-	{
-		//
-	}
-
-	/**
-	 * Display the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function show($id)
-	{
-		//
-	}
-
-	/**
-	 * Show the form for editing the specified resource.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function edit($id)
-	{
-		//
-	}
-
-	/**
-	 * Update the specified resource in storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function update($id)
-	{
-		//
-	}
-
-	/**
-	 * Remove the specified resource from storage.
-	 *
-	 * @param  int  $id
-	 * @return Response
-	 */
-	public function destroy($id)
-	{
-		//
-	}
-
 }

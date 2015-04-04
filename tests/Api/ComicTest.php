@@ -20,8 +20,6 @@ class ComicTest extends ApiTester {
         parent::setUp();
         Artisan::call('db:seed');//TODO: Would be nice to move this...
         $this->user = User::find(1);
-        Auth::loginUsingId($this->user->id);
-
     }
     public function test_must_be_authenticated(){
         //arrange
