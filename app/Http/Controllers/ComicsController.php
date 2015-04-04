@@ -17,14 +17,13 @@ class ComicsController extends ApiController {
 	 *
 	 * @return Response
 	 */
-	public function index()
-	{
+	public function index(){
         $comics = $this->currentUser->comics()->with('series')->get();
 
         if(!$comics) return $this->respondNotFound('No Comics Found');
 
         return $this->respond([
-            'Comics' => $comics
+            'comics' => $comics
         ]);
 
 	}

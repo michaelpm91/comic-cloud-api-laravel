@@ -34,6 +34,7 @@ class AuthTest extends ApiTester {
         ]);
 
         //assert
+        $this->assertJson($response);
         $this->assertResponseOk();
 
     }
@@ -50,6 +51,7 @@ class AuthTest extends ApiTester {
             'password_confirmation' => '1234567'
         ]);
         //assert
+        $this->assertJson($response);
         $this->assertResponseStatus(201);
 
     }
@@ -66,6 +68,7 @@ class AuthTest extends ApiTester {
             'password_confirmation' => '1234567'
         ]);
         //assert
+        $this->assertJson($response);
         $this->assertResponseStatus(400);
 
     }
@@ -82,6 +85,7 @@ class AuthTest extends ApiTester {
             'password_confirmation' => '1234567'
         ]);
         //assert
+        $this->assertJson($response);
         $this->assertResponseStatus(400);
 
     }
@@ -98,6 +102,7 @@ class AuthTest extends ApiTester {
             'password_confirmation' => '1234567'
         ]);
         //assert
+        $this->assertJson($response);
         $this->assertResponseStatus(400);
 
     }
@@ -114,6 +119,7 @@ class AuthTest extends ApiTester {
             'password_confirmation' => ''
         ]);
         //assert
+        $this->assertJson($response);
         $this->assertResponseStatus(400);
 
     }
@@ -130,6 +136,7 @@ class AuthTest extends ApiTester {
             'password_confirmation' => '87654321'
         ]);
         //assert
+        $this->assertJson($response);
         $this->assertResponseStatus(400);
 
     }

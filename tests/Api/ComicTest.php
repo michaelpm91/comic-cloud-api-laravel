@@ -43,7 +43,7 @@ class ComicTest extends ApiTester {
         $result = true;
         foreach($mocked_comics as $mocked_comic ){
             $mocked_id = $mocked_comic->id;
-            if (!in_array($mocked_comic->id, json_decode($response, true)['Comics'])) {
+            if (!in_array($mocked_comic->id, json_decode($response, true)['comics'])) {
                 $result = false;
                 break;
             }
@@ -82,7 +82,7 @@ class ComicTest extends ApiTester {
 
         //assert
         $result = false;
-        foreach(json_decode($response, true)['Comics'] as $comic){
+        foreach(json_decode($response, true)['comics'] as $comic){
             if($comic['id'] == $other_user_comic->id) $result = true;
         }
         $this->assertEquals(false, $result);
@@ -119,7 +119,7 @@ class ComicTest extends ApiTester {
 
 
     }
-    public function test_can_edit_a_comic_comic_issue(){//TODO:Multiple Asserts
+    public function test_it_can_edit_a_comic_comic_issue(){//TODO:Multiple Asserts
         //arrange
         $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
 
