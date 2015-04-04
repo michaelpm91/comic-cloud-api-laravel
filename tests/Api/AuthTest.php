@@ -9,7 +9,6 @@
 use App\User;
 use Laracasts\TestDummy\Factory;
 
-
 class AuthTest extends ApiTester {
 
     public function setUp(){

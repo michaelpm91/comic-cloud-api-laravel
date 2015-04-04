@@ -21,7 +21,7 @@ class UploadTest extends ApiTester {
         Artisan::call('db:seed');//TODO: Would be nice to move this...
         $this->user = User::find(1);
     }
-    public function test_must_be_authenticated(){
+    public function test_it_must_be_authenticated(){
         //arrange
         $this->test_access_token = "";
 
@@ -41,16 +41,14 @@ class UploadTest extends ApiTester {
 
         $response = $this->postRequest('/upload', [
             "exists" => false,
-            "series_id" => "12345",
-            "comic_id" => "1",
+            "series_id" => "0000000000000000000000000000000000000000",
+            "comic_id" => "1111111111111111111111111111111111111111",
             "series_title" => "test",
             "series_start_year" => "2015",
             "comic_issue" => 1
           ], ['file' => $uploadedFile]);
 
-
         //assert
-
         $this->assertResponseStatus(201);
 
 
@@ -187,7 +185,7 @@ class UploadTest extends ApiTester {
         $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
 
     }
-    public function test_it_fetches_uploads(){//Retrieve all user uploads
+    public function test_it_fetches_all_uploads(){//Retrieve all user uploads
         //arrange
         $mocked_uploads = Factory::times(10)->create('App\Upload', ['user_id' => $this->user->id]);
 

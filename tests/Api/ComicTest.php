@@ -21,7 +21,7 @@ class ComicTest extends ApiTester {
         Artisan::call('db:seed');//TODO: Would be nice to move this...
         $this->user = User::find(1);
     }
-    public function test_must_be_authenticated(){
+    public function test_it_must_be_authenticated(){
         //arrange
         $this->test_access_token = "";
 
@@ -32,7 +32,7 @@ class ComicTest extends ApiTester {
         $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
 
     }
-    public function test_it_fetches_comics(){//Retrieve all user comics
+    public function test_it_fetches_all_comics(){//Retrieve all user comics
         //arrange
         $mocked_comics = Factory::times(10)->create('App\Comic', ['user_id' => $this->user->id]);
 
@@ -137,6 +137,12 @@ class ComicTest extends ApiTester {
         //assert
         $this->assertEquals(1, json_decode($response, true)['comic']['comic_issue']);
     }
+    public function test_it_can_set_a_comic_series_id_to_one_that_exists(){
+
+    }
+    public function test_it_cannot_set_a_comic_series_id_to_one_that_does_not_exist(){
+
+    }
     public function test_it_cannot_edit_another_users_comic(){
 
         //arrange
@@ -173,6 +179,9 @@ class ComicTest extends ApiTester {
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
+
+    }
+    public function test_it_returns_an_appropriate_message_when_no_edit_fields_are_entered(){
 
     }
     public function test_it_can_delete_a_comic(){//TODO: Multiple asserts

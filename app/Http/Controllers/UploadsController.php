@@ -4,6 +4,7 @@ use App\Commands\ProcessComicBookArchive;
 use App\Commands\ProcessComicBookArchiveCommand;
 use App\Upload;
 use App\User;
+use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use Storage;
@@ -82,8 +83,8 @@ class UploadsController extends ApiController {
         $validator = Validator::make(Request::all(), [
             'file' => 'required|valid_cba|between:1,150000',
             "exists" => 'required|boolean',
-            "series_id" => 'required|alpha_num',
-            "comic_id" => 'required|alpha_num',
+            "series_id" => 'required|alpha_num|min:40|max:40',
+            "comic_id" => 'required|alpha_num|min:40|max:40',
             "series_title" => 'required',
             "series_start_year" => 'required|numeric',
             "comic_issue" => 'required|numeric',

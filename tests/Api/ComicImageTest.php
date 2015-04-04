@@ -21,7 +21,7 @@ class ComicImageTest extends ApiTester {
         Artisan::call('db:seed');//TODO: Would be nice to move this...
         $this->user = User::find(1);
     }
-    public function test_must_be_authenticated(){
+    public function test_it_must_be_authenticated(){
         //arrange
         $this->test_access_token = "";
 

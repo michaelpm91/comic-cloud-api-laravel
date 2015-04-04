@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 class Series extends Model {
 
     public static $rules = [
-        'id' => 'required'
+        'id' => 'required|alpha_num|min:40|max:40'
     ];
 
     public $incrementing = false;

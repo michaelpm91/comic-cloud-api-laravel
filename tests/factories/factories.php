@@ -39,7 +39,7 @@ $factory('App\Upload', function ($faker){
 $factory('App\Comic', function($faker){
     $id = str_random(40);
     return [
-        'id' => $faker->unique()->randomNumber,
+        'id' => $id,
         'comic_issue' => rand(1, 99),
         'comic_writer' => $faker->name,
         'comic_book_archive_contents' => json_encode([
@@ -57,13 +57,16 @@ $factory('App\Comic', function($faker){
     ];
 });
 
-$factory('App\Series', [
-    'id' => $faker->unique()->randomNumber,
-    'series_title' => $faker->sentence(),
-    'series_start_year' => rand(1900, 2015),
-    'series_publisher' => 'unknown',
-    'user_id' => 'factory:App\User'
-]);
+$factory('App\Series', function($faker){
+    $id = str_random(40);
+    return [
+        'id' => $id,
+        'series_title' => $faker->sentence(),
+        'series_start_year' => rand(1900, 2015),
+        'series_publisher' => 'unknown',
+        'user_id' => 'factory:App\User'
+    ];
+});
 
 $factory('App\ComicBookArchive', [
     'upload_id' => 'factory:App\Upload',
