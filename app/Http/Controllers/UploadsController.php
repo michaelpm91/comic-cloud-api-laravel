@@ -36,7 +36,7 @@ class UploadsController extends ApiController {
         }
 
         return $this->respond([
-            'Uploads' => $uploads
+            'uploads' => $uploads
         ]);
     }
 
@@ -55,7 +55,7 @@ class UploadsController extends ApiController {
         }
 
         return $this->respond([
-            'Upload' => $upload
+            'upload' => $upload
         ]);
     }
 

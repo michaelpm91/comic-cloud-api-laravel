@@ -46,6 +46,13 @@ return [
 
 	'connections' => [
 
+        'test_mysql' => [
+
+        ],
+        'travis_ci_mysql' => [
+
+        ],
+
 		'sqlite' => [
 			'driver'   => 'sqlite',
 			'database' => ':memory:',//storage_path().'/database.sqlite',

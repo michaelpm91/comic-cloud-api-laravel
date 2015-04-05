@@ -66,7 +66,7 @@ class ComicTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->getRequest('/comic/xxxxx');
+        $response = $this->getRequest('/comic/'.str_random(40));
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
@@ -161,7 +161,7 @@ class ComicTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->patchRequest('/comic/xxxxx', [
+        $response = $this->patchRequest('/comic/'.str_random(40), [
             'comic_issue' => 1
         ]);
 
@@ -173,7 +173,7 @@ class ComicTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->patchRequest('/comic/xxxxx', [
+        $response = $this->patchRequest('/comic/'.str_random(40), [
             'comic_writer' => 'John Smith'
         ]);
 
@@ -205,7 +205,7 @@ class ComicTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->deleteRequest('/comic/xxxxx');
+        $response = $this->deleteRequest('/comic/'.str_random(40));
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
@@ -221,6 +221,9 @@ class ComicTest extends ApiTester {
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
+
+    }
+    public function test_it_will_delete_a_series_if_the_last_comic_has_been_deleted(){
 
     }
 }

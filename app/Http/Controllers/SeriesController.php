@@ -15,8 +15,7 @@ class SeriesController extends ApiController {
 	 *
 	 * @return Response
 	 */
-	public function index()
-	{
+	public function index(){
         $series = $this->currentUser->series()->with('comics')->get();
         if(!$series){
             return $this->respondNotFound('No Series Found');
@@ -52,8 +51,7 @@ class SeriesController extends ApiController {
      *
      * @return Response
      */
-    public function store()
-    {
+    public function store(){
         $validator = Validator::make($data = Request::all(), [
             'id' => 'required|alpha_num|min:40|max:40',
             'comic_id' => 'required|alpha_num|min:40|max:40',
@@ -65,10 +63,11 @@ class SeriesController extends ApiController {
         {
             return $this->respondBadRequest($validator->errors());
         }
+        if(Series::find($data['id'])) return $this->respondBadRequest("Duplicate ID Error");//TODO: Better Solution please
         $comic = $this->currentUser->comics()->find($data['comic_id']);
         if($comic) {
             $old_series_id = $comic->series_id;
-            if(Series::find($data['id'])) $data['id'] = str_random(40);
+            //if(Series::find($data['id'])) $data['id'] = str_random(40);//TODO: Consider duplicate IDs been sent in.
             $series = new Series;
             $series->id = $data['id'];
             $series->user_id = $this->currentUser->id;

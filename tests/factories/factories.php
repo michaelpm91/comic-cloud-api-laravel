@@ -63,7 +63,7 @@ $factory('App\Series', function($faker){
         'id' => $id,
         'series_title' => $faker->sentence(),
         'series_start_year' => rand(1900, 2015),
-        'series_publisher' => 'unknown',
+        'series_publisher' => 'Unknown',
         'user_id' => 'factory:App\User'
     ];
 });
