@@ -11,6 +11,9 @@ use Laracasts\TestDummy\Factory;
 
 class AuthTest extends ApiTester {
 
+    protected $oauth_endpoint = "/oauth/access_token/";
+    protected $register_endpoint = "/auth/register/";
+
     public function setUp(){
         parent::setUp();
         Artisan::call('db:seed');//TODO: Would be nice to move this...
@@ -24,7 +27,7 @@ class AuthTest extends ApiTester {
         ]);
 
         //act
-        $response = $this->postRequest('/oauth/access_token', [
+        $response = $this->postRequest($this->oauth_endpoint, [
             'grant_type' => 'password',
             'client_id' => 'test_client_id',
             'client_secret' => 'test_client_secret',
@@ -43,7 +46,7 @@ class AuthTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->postRequest('/auth/register', [
+        $response = $this->postRequest($this->register_endpoint, [
             'username' => 'test_2',
             'email' => 'test_2@test.com',
             'password' => '1234567',
@@ -60,7 +63,7 @@ class AuthTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->postRequest('/auth/register', [
+        $response = $this->postRequest($this->register_endpoint, [
             'username' => '',
             'email' => 'test_2@test.com',
             'password' => '1234567',
@@ -77,7 +80,7 @@ class AuthTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->postRequest('/auth/register', [
+        $response = $this->postRequest($this->register_endpoint, [
             'username' => 'test_2',
             'email' => '',
             'password' => '1234567',
@@ -94,7 +97,7 @@ class AuthTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->postRequest('/auth/register', [
+        $response = $this->postRequest($this->register_endpoint, [
             'username' => 'test_2',
             'email' => 'test_2@test.com',
             'password' => '',
@@ -111,7 +114,7 @@ class AuthTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->postRequest('/auth/register', [
+        $response = $this->postRequest($this->register_endpoint, [
             'username' => 'test_2',
             'email' => 'test_2@test.com',
             'password' => '1234567',
@@ -128,7 +131,7 @@ class AuthTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->postRequest('/auth/register', [
+        $response = $this->postRequest($this->register_endpoint, [
             'username' => 'test_2',
             'email' => 'test_2@test.com',
             'password' => '12345678',

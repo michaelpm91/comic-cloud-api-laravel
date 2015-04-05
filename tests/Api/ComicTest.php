@@ -15,6 +15,7 @@ class ComicTest extends ApiTester {
 
     protected $user;
     protected $auth_header;
+    protected $comic_endpoint = "/comic/";
 
     public function setUp(){//runs per test :(
         parent::setUp();
@@ -26,7 +27,7 @@ class ComicTest extends ApiTester {
         $this->test_access_token = "";
 
         //act
-        $response = $this->getRequest('/comic');
+        $response = $this->getRequest($this->comic_endpoint);
 
         //assert
         $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
@@ -37,7 +38,7 @@ class ComicTest extends ApiTester {
         $mocked_comics = Factory::times(10)->create('App\Comic', ['user_id' => $this->user->id]);
 
         //act
-        $response = $this->getRequest('/comic');
+        $response = $this->getRequest($this->comic_endpoint);
 
         //assert
         $result = true;
@@ -56,7 +57,7 @@ class ComicTest extends ApiTester {
         $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
 
         //act
-        $response = $this->getRequest('/comic/'.$comic->id);
+        $response = $this->getRequest($this->comic_endpoint.$comic->id);
 
         //assert
         $this->assertResponseOk();
@@ -66,7 +67,7 @@ class ComicTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->getRequest('/comic/'.str_random(40));
+        $response = $this->getRequest($this->comic_endpoint.str_random(40));
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
@@ -78,7 +79,7 @@ class ComicTest extends ApiTester {
         $other_user_comic = Factory::create('App\Comic', ['user_id' => 2]);
 
         //act
-        $response = $this->getRequest('/comic');
+        $response = $this->getRequest($this->comic_endpoint);
 
         //assert
         $result = false;
@@ -93,7 +94,7 @@ class ComicTest extends ApiTester {
         $comic = Factory::create('App\Comic', ['user_id' => 2]);
 
         //act
-        $response = $this->getRequest('/comic/'.$comic->id);
+        $response = $this->getRequest($this->comic_endpoint.$comic->id);
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
@@ -104,7 +105,7 @@ class ComicTest extends ApiTester {
         $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
 
         //act
-        $response = $this->patchRequest('/comic/'.$comic->id, [
+        $response = $this->patchRequest($this->comic_endpoint.$comic->id, [
             'comic_writer' => 'John Smith'
         ]);
 
@@ -112,7 +113,7 @@ class ComicTest extends ApiTester {
         $this->assertResponseOk();
 
         //act
-        $response = $this->getRequest('/comic/'.$comic->id);
+        $response = $this->getRequest($this->comic_endpoint.$comic->id);
 
         //assert
         $this->assertEquals('John Smith', json_decode($response, true)['comic']['comic_writer']);
@@ -124,7 +125,7 @@ class ComicTest extends ApiTester {
         $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
 
         //act
-        $response = $this->patchRequest('/comic/'.$comic->id, [
+        $response = $this->patchRequest($this->comic_endpoint.$comic->id, [
             'comic_issue' => 1
         ]);
 
@@ -132,7 +133,7 @@ class ComicTest extends ApiTester {
         $this->assertResponseOk();
 
         //act
-        $response = $this->getRequest('/comic/'.$comic->id);
+        $response = $this->getRequest($this->comic_endpoint.$comic->id);
 
         //assert
         $this->assertEquals(1, json_decode($response, true)['comic']['comic_issue']);
@@ -149,7 +150,7 @@ class ComicTest extends ApiTester {
         $otherusercomic = Factory::create('App\Comic', ['user_id' => 2]);
 
         //act
-        $response = $this->patchRequest('/comic/'.$otherusercomic->id, [
+        $response = $this->patchRequest($this->comic_endpoint.$otherusercomic->id, [
             'comic_issue' => 1
         ]);
 
@@ -161,7 +162,7 @@ class ComicTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->patchRequest('/comic/'.str_random(40), [
+        $response = $this->patchRequest($this->comic_endpoint.str_random(40), [
             'comic_issue' => 1
         ]);
 
@@ -173,7 +174,7 @@ class ComicTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->patchRequest('/comic/'.str_random(40), [
+        $response = $this->patchRequest($this->comic_endpoint.str_random(40), [
             'comic_writer' => 'John Smith'
         ]);
 
@@ -189,13 +190,13 @@ class ComicTest extends ApiTester {
         $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
 
         //act
-        $response = $this->deleteRequest('/comic/'.$comic->id);
+        $response = $this->deleteRequest($this->comic_endpoint.$comic->id);
 
         //assert
         $this->assertResponseOk();
 
         //act
-        $response = $this->getRequest('/comic/'.$comic->id);
+        $response = $this->getRequest($this->comic_endpoint.$comic->id);
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
@@ -205,7 +206,7 @@ class ComicTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->deleteRequest('/comic/'.str_random(40));
+        $response = $this->deleteRequest($this->comic_endpoint.str_random(40));
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
@@ -217,7 +218,7 @@ class ComicTest extends ApiTester {
         $otherusercomic = Factory::create('App\Comic', ['user_id' => 2]);
 
         //act
-        $response = $this->deleteRequest('/comic/'.$otherusercomic->id);
+        $response = $this->deleteRequest($this->comic_endpoint.$otherusercomic->id);
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent

@@ -16,6 +16,7 @@ class SeriesTest extends ApiTester {
 
     protected $auth_header;
     protected $user;
+    protected $series_endpoint = "/series/";
 
     public function setUp(){//runs per test :(
         parent::setUp();
@@ -27,7 +28,7 @@ class SeriesTest extends ApiTester {
         $this->test_access_token = "";
 
         //act
-        $response = $this->getRequest('/series');
+        $response = $this->getRequest($this->series_endpoint);
 
         //assert
         $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
@@ -43,7 +44,7 @@ class SeriesTest extends ApiTester {
 
         //act
         $newSeriesId = str_random(40);
-        $response = $this->postRequest('/series/', [
+        $response = $this->postRequest($this->series_endpoint, [
             'id' => $newSeriesId,
             'comic_id' => $comic->id,
             'series_title' => 'Test Title 1',
@@ -54,7 +55,7 @@ class SeriesTest extends ApiTester {
         $this->assertResponseStatus(201);
 
         //act
-        $response = $this->getRequest('/series/'.$newSeriesId);
+        $response = $this->getRequest($this->series_endpoint.$newSeriesId);
 
         //assert
         $this->assertResponseOk();
@@ -72,7 +73,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $response = $this->postRequest('/series/', [
+        $response = $this->postRequest($this->series_endpoint, [
             'comic_id' => $comic->id,
             'series_title' => 'Test Title 1',
             'series_start_year' => '1991'
@@ -91,7 +92,7 @@ class SeriesTest extends ApiTester {
 
         //act
         $newSeriesId = str_random(40);
-        $response = $this->postRequest('/series/', [
+        $response = $this->postRequest($this->series_endpoint, [
             'id' => $newSeriesId,
             'series_title' => 'Test Title 1',
             'series_start_year' => '1991'
@@ -110,7 +111,7 @@ class SeriesTest extends ApiTester {
 
         //act
         $newSeriesId = str_random(40);
-        $response = $this->postRequest('/series/', [
+        $response = $this->postRequest($this->series_endpoint, [
             'id' => $newSeriesId,
             'comic_id' => $comic->id,
             'series_start_year' => '1991'
@@ -129,7 +130,7 @@ class SeriesTest extends ApiTester {
 
         //act
         $newSeriesId = str_random(40);
-        $response = $this->postRequest('/series/', [
+        $response = $this->postRequest($this->series_endpoint, [
             'id' => $newSeriesId,
             'comic_id' => $comic->id,
             'series_title' => 'Test Title 1',
@@ -149,7 +150,7 @@ class SeriesTest extends ApiTester {
 
         //act
         $newSeriesId = str_random(40);
-        $response = $this->postRequest('/series/', [
+        $response = $this->postRequest($this->series_endpoint, [
             'id' => $newSeriesId,
             'comic_id' => $comic->id,
             'series_title' => 'Test Title 1',
@@ -169,7 +170,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $response = $this->getRequest('/series');
+        $response = $this->getRequest($this->series_endpoint);
 
         //assert
         $result = true;
@@ -190,7 +191,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $response = $this->getRequest('/series/'.$comic->series->id);
+        $response = $this->getRequest($this->series_endpoint.$comic->series->id);
 
         //assert
         $this->assertResponseOk();
@@ -202,7 +203,7 @@ class SeriesTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->getRequest('/series/'.str_random(40));
+        $response = $this->getRequest($this->series_endpoint.str_random(40));
 
         //assert
         $this->assertResponseStatus(404);
@@ -216,7 +217,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $response = $this->getRequest('/series/'.$comic->series->id);
+        $response = $this->getRequest($this->series_endpoint.$comic->series->id);
 
         //assert
         $this->assertResponseStatus(404);
@@ -229,7 +230,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $response = $this->patchRequest('/series/'.$comic->series->id, [
+        $response = $this->patchRequest($this->series_endpoint.$comic->series->id, [
             'series_title' => 'Test Series Title'
         ]);
 
@@ -237,7 +238,7 @@ class SeriesTest extends ApiTester {
         $this->assertResponseOk();
 
         //act
-        $response = $this->getRequest('/series/'.$comic->series->id);
+        $response = $this->getRequest($this->series_endpoint.$comic->series->id);
 
         //assert
         $this->assertResponseOk();
@@ -255,7 +256,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $response = $this->patchRequest('/series/'.$comic->series->id, [
+        $response = $this->patchRequest($this->series_endpoint.$comic->series->id, [
             'series_start_year' => 1991
         ]);
 
@@ -263,7 +264,7 @@ class SeriesTest extends ApiTester {
         $this->assertResponseOk();
 
         //act
-        $response = $this->getRequest('/series/'.$comic->series->id);
+        $response = $this->getRequest($this->series_endpoint.$comic->series->id);
 
         //assert
         $this->assertResponseOk();
@@ -281,7 +282,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $response = $this->patchRequest('/series/'.$comic->series->id, [
+        $response = $this->patchRequest($this->series_endpoint.$comic->series->id, [
             'series_publisher' => 'Test Series Publisher'
         ]);
 
@@ -289,7 +290,7 @@ class SeriesTest extends ApiTester {
         $this->assertResponseOk();
 
         //act
-        $response = $this->getRequest('/series/'.$comic->series->id);
+        $response = $this->getRequest($this->series_endpoint.$comic->series->id);
 
         //assert
         $this->assertResponseOk();
@@ -307,7 +308,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $response = $this->patchRequest('/series/'.$comic->series->id, [
+        $response = $this->patchRequest($this->series_endpoint.$comic->series->id, [
             'series_title' => 'Test Series Title'
         ]);
 
@@ -323,7 +324,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $response = $this->patchRequest('/series/'.$comic->series->id, [
+        $response = $this->patchRequest($this->series_endpoint.$comic->series->id, [
             'series_start_year' => 1991
         ]);
 
@@ -339,7 +340,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $response = $this->patchRequest('/series/'.$comic->series->id, [
+        $response = $this->patchRequest($this->series_endpoint.$comic->series->id, [
             'series_publisher' => 'Test Series Publisher'
         ]);
 
@@ -356,7 +357,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $response = $this->deleteRequest('/series/' . $mocked_series->id);
+        $response = $this->deleteRequest($this->series_endpoint . $mocked_series->id);
 
         //assert
         $this->assertResponseOk();
@@ -374,9 +375,9 @@ class SeriesTest extends ApiTester {
         //dd($mocked_comics, $mocked_series->id);
 
         //act
-        $response = $this->deleteRequest('/series/'.$mocked_series->id);
+        $response = $this->deleteRequest($this->series_endpoint.$mocked_series->id);
 
-        dd($response = $this->getRequest('/series/'), $response = $this->getRequest('/comic/'));
+        dd($response = $this->getRequest($this->series_endpoint), $response = $this->getRequest('/comic/'));
 
         //assert
         $this->assertResponseOk();
@@ -397,7 +398,7 @@ class SeriesTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->deleteRequest('/series/'.str_random(40));
+        $response = $this->deleteRequest($this->series_endpoint.str_random(40));
 
         //assert
         $this->assertResponseStatus(404);

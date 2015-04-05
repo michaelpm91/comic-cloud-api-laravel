@@ -15,6 +15,7 @@ class UploadTest extends ApiTester {
 
     protected $user;
     protected $auth_header;
+    protected $upload_endpoint = "/upload/";
 
     public function setUp(){//runs per test :(
         parent::setUp();
@@ -26,7 +27,7 @@ class UploadTest extends ApiTester {
         $this->test_access_token = "";
 
         //act
-        $response = $this->getRequest('/upload');
+        $response = $this->getRequest($this->upload_endpoint);
 
         //assert
         $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
@@ -39,7 +40,7 @@ class UploadTest extends ApiTester {
         //act
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
 
-        $response = $this->postRequest('/upload', [
+        $response = $this->postRequest($this->upload_endpoint, [
             "exists" => false,
             "series_id" => "0000000000000000000000000000000000000000",
             "comic_id" => "1111111111111111111111111111111111111111",
@@ -60,7 +61,7 @@ class UploadTest extends ApiTester {
         //act
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
 
-        $response = $this->postRequest('/upload', [
+        $response = $this->postRequest($this->upload_endpoint, [
             "exists" => "",
             "series_id" => "12345",
             "comic_id" => "1",
@@ -82,7 +83,7 @@ class UploadTest extends ApiTester {
         //act
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
 
-        $response = $this->postRequest('/upload', [
+        $response = $this->postRequest($this->upload_endpoint, [
             "exists" => false,
             "series_id" => "",
             "comic_id" => "1",
@@ -104,7 +105,7 @@ class UploadTest extends ApiTester {
         //act
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
 
-        $response = $this->postRequest('/upload', [
+        $response = $this->postRequest($this->upload_endpoint, [
             "exists" => false,
             "series_id" => "12345",
             "comic_id" => "",
@@ -126,7 +127,7 @@ class UploadTest extends ApiTester {
         //act
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
 
-        $response = $this->postRequest('/upload', [
+        $response = $this->postRequest($this->upload_endpoint, [
             "exists" => false,
             "series_id" => "12345",
             "comic_id" => "1",
@@ -148,7 +149,7 @@ class UploadTest extends ApiTester {
         //act
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
 
-        $response = $this->postRequest('/upload', [
+        $response = $this->postRequest($this->upload_endpoint, [
             "exists" => false,
             "series_id" => "12345",
             "comic_id" => "1",
@@ -170,7 +171,7 @@ class UploadTest extends ApiTester {
         //act
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(storage_path()."/test files/test-comic-6-pages.cbz", 'test-comic-6-pages.cbz');
 
-        $response = $this->postRequest('/upload', [
+        $response = $this->postRequest($this->upload_endpoint, [
             "exists" => false,
             "series_id" => "12345",
             "comic_id" => "1",
@@ -190,7 +191,7 @@ class UploadTest extends ApiTester {
         $mocked_uploads = Factory::times(10)->create('App\Upload', ['user_id' => $this->user->id]);
 
         //act
-        $response = $this->getRequest('/upload');
+        $response = $this->getRequest($this->upload_endpoint);
 
         //assert
         $result = true;
@@ -209,7 +210,7 @@ class UploadTest extends ApiTester {
         $upload = Factory::create('App\Upload', ['user_id' => $this->user->id]);
 
         //act
-        $response = $this->getRequest('/upload/'.$upload->id);
+        $response = $this->getRequest($this->upload_endpoint.$upload->id);
 
         //assert
         $this->assertResponseOk();
@@ -222,7 +223,7 @@ class UploadTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->getRequest('/upload/'.str_random(40));
+        $response = $this->getRequest($this->upload_endpoint.str_random(40));
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
@@ -234,7 +235,7 @@ class UploadTest extends ApiTester {
         $other_user_upload = Factory::create('App\Upload', ['user_id' => 2]);
 
         //act
-        $response = $this->getRequest('/upload');
+        $response = $this->getRequest($this->upload_endpoint);
 
         //assert
         $result = false;
@@ -249,7 +250,7 @@ class UploadTest extends ApiTester {
         $upload = Factory::create('App\Upload', ['user_id' => 2]);
 
         //act
-        $response = $this->getRequest('/upload/'.$upload->id);
+        $response = $this->getRequest($this->upload_endpoint.$upload->id);
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent

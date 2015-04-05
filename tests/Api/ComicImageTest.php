@@ -15,6 +15,7 @@ class ComicImageTest extends ApiTester {
 
     protected $user;
     protected $auth_header;
+    protected $comic_image_endpoint = "/image/";
 
     public function setUp(){//runs per test :(
         parent::setUp();
@@ -26,7 +27,7 @@ class ComicImageTest extends ApiTester {
         $this->test_access_token = "";
 
         //act
-        $response = $this->getRequest('/image/xxxxx');
+        $response = $this->getRequest($this->comic_image_endpoint.str_random(40));
 
         //assert
         $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
@@ -65,7 +66,7 @@ class ComicImageTest extends ApiTester {
         $imageentry->comicBookArchives()->attach($cba->id);//Pivot table needed which aren't currently support by Test Dummy :(
 
         //act
-        $response = $this->getRequest('/image/'.$img_slug);
+        $response = $this->getRequest($this->comic_image_endpoint.$img_slug);
 
         //assert
         $this->assertResponseOk();
@@ -77,7 +78,7 @@ class ComicImageTest extends ApiTester {
         //arrange
 
         //act
-        $response = $this->getRequest('/image/xxxxx');
+        $response = $this->getRequest($this->comic_image_endpoint.str_random(40));
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
@@ -116,7 +117,7 @@ class ComicImageTest extends ApiTester {
         $imageentry->comicBookArchives()->attach($cba->id);//Pivot table needed which aren't currently support by Test Dummy :(
 
         //act
-        $response = $this->getRequest('/image/'.$img_slug);
+        $response = $this->getRequest($this->comic_image_endpoint.$img_slug);
 
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
