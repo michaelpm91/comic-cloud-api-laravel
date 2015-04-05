@@ -11,6 +11,7 @@ php:
 sudo: false
 
 before_script:
+  - mysql -e 'create database travis-comiccloud;'
   - composer install
 
 script: vendor/bin/phpunit

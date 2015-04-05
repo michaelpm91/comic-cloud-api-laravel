@@ -46,18 +46,17 @@ return [
 
 	'connections' => [
 
-        'test_mysql' => [
-
-        ],
-        'travis_ci_mysql' => [
-
-        ],
-
-		'sqlite' => [
+		'sqlite_in_memory' => [
 			'driver'   => 'sqlite',
 			'database' => ':memory:',//storage_path().'/database.sqlite',
 			'prefix'   => '',
 		],
+
+        'sqlite' => [
+            'driver'   => 'sqlite',
+            'database' => storage_path().'/database.sqlite',
+            'prefix'   => '',
+        ],
 
 		'mysql' => [
 			'driver'    => 'mysql',
