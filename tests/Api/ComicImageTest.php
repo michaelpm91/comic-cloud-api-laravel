@@ -8,6 +8,7 @@
 
 use Laracasts\TestDummy\Factory;
 
+use App\Upload; //TODO: Remove this
 use App\User;
 use App\ComicImage;
 
@@ -90,13 +91,14 @@ class ComicImageTest extends ApiTester {
         $img_json =  json_encode([1 => $img_slug]);
 
         $upload = Factory::create('App\Upload', [
-            'user_id' =>  2
+            'user_id.id' =>  2
         ]);
 
         $cba = Factory::create('App\ComicBookArchive', [
             'upload_id' => $upload->id,
             'comic_book_archive_hash' => $img_json
         ]);
+
 
         $comic = Factory::create('App\Comic', [
             'user_id' => 2,

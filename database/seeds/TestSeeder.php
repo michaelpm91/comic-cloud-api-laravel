@@ -12,7 +12,14 @@ class TestSeeder extends Seeder {
 
 	public function run()
 	{
-        User::create([
+        //DB::statement('Set foreign_keys = ON;');
+        //if (DB::connection() instanceof Illuminate\Database\SQLiteConnection) {
+        //    DB::statement(DB::raw('PRAGMA foreign_keys=1'));
+        //}
+
+
+        $user = User::create([
+            'id' => 1,
             'username' => 'test_user',
             'email' => 'test@comiccloud.io',
             'password' => Hash::make('1234')

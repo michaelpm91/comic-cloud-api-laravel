@@ -232,7 +232,7 @@ class UploadTest extends ApiTester {
     public function test_it_fetches_user_uploads_only(){//
         //arrange
         $user_uploads = Factory::times(5)->create('App\Upload', ['user_id' => $this->user->id]);
-        $other_user_upload = Factory::create('App\Upload', ['user_id' => 2]);
+        $other_user_upload = Factory::create('App\Upload', ['user_id.id' => 2]);
 
         //act
         $response = $this->getRequest($this->upload_endpoint);
@@ -247,7 +247,7 @@ class UploadTest extends ApiTester {
     }
     public function test_it_fetches_user_upload_only(){//
         //arrange
-        $upload = Factory::create('App\Upload', ['user_id' => 2]);
+        $upload = Factory::create('App\Upload', ['user_id.id' => 2]);
 
         //act
         $response = $this->getRequest($this->upload_endpoint.$upload->id);

@@ -57,14 +57,30 @@ class ComicsController extends ApiController {
 
         $comic = $this->currentUser->comics()->find($id);
         if($comic){
+            Validator::extend('user_series', function($attribute, $value, $parameters) {
+                if($this->currentUser->series()->with('comics')->find($value)){
+                    return true;
+                }else{
+                    return false;
+                }
+            });
+
+            $messages = [
+                'series_id.user_series' => 'Not a valid Series ID',
+            ];
+
             $validator = Validator::make($data = Request::all(), [
-                'comic_issue' => 'numeric'
-            ]);
+                'comic_issue' => 'numeric',
+                'series_id' => 'user_series|alpha_num|min:40|max:40'
+            ], $messages);
 
             if ($validator->fails()) return $this->respondBadRequest($validator->errors());
 
+            if(empty($data)) return $this->respondBadRequest("No Data Sent");
+
             if(isset($data['comic_issue'])) $comic->comic_issue = $data['comic_issue'];
-            if(isset( $data['comic_writer'])) $comic->comic_writer = $data['comic_writer'];
+            if(isset($data['comic_writer'])) $comic->comic_writer = $data['comic_writer'];
+            if(isset($data['series_id'])) $comic->series_id = $data['series_id'];
             $comic->save();
 
             return $this->respondSuccessful('Comic Updated');
@@ -84,13 +100,21 @@ class ComicsController extends ApiController {
 	 */
 	public function destroy($id)
 	{
-        $series_id = $this->currentUser->comics()->find($id)['series_id'];
+        /*$series_id = $this->currentUser->comics()->find($id)['series_id'];
         if($series_id) {
             $seriesCount = Series::find($series_id)->comics()->get()->count();
             if ($this->currentUser->comics()->find($id)->delete()) {
                 if ($seriesCount == 0) Series::find($series_id)->delete();
                 return $this->respondSuccessful('Comic Deleted');
             }
+        }*/
+        $comic = $this->currentUser->comics()->find($id);
+        if($comic) {
+            $series_id = $comic['series']['id'];
+            $this->currentUser->comics()->find($id)->delete();
+            $comic_count = Series::find($series_id)->comics()->get()->count();
+            if($comic_count == 0) Series::find($series_id)->delete();
+            return $this->respondSuccessful('Comic Deleted');
         }
         return $this->respondNotFound('No Comic Found');
 

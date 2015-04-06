@@ -13,6 +13,8 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase {
 
 		$app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
+        if(env('DB_DRIVER') == 'sqlite_in_memory') DB::statement('PRAGMA foreign_keys = ON');
+
 		return $app;
 	}
 

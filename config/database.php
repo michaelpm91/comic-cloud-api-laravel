@@ -48,7 +48,7 @@ return [
 
 		'sqlite_in_memory' => [
 			'driver'   => 'sqlite',
-			'database' => ':memory:',//storage_path().'/database.sqlite',
+			'database' => ':memory:',
 			'prefix'   => '',
 		],
 
@@ -69,7 +69,6 @@ return [
 			'prefix'    => '',
 			'strict'    => false,
 		],
-
 		'pgsql' => [
 			'driver'   => 'pgsql',
 			'host'     => env('DB_HOST', 'localhost'),

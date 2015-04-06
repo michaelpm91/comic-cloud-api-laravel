@@ -34,7 +34,6 @@ class SeriesTest extends ApiTester {
         $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
 
     }
-
     public function test_it_can_create_a_new_series_for_a_comic(){
         //arrange
         $comic = Factory::create('App\Comic', [
@@ -212,7 +211,7 @@ class SeriesTest extends ApiTester {
     public function test_it_cannot_fetch_a_series_that_does_not_belong_to_the_user(){
         //arrange
         $comic = Factory::create('App\Comic', [
-            'user_id' => 2,
+            'user_id.id' => 2,
             'series_id.user_id' => 2
         ]);
 
@@ -303,7 +302,7 @@ class SeriesTest extends ApiTester {
     public function test_it_cannot_update_a_series_title_that_does_not_belong_to_the_user(){
         //arrange
         $comic = Factory::create('App\Comic', [
-            'user_id' => 2,
+            'user_id.id' => 2,
             'series_id.user_id' => 2
         ]);
 
@@ -319,7 +318,7 @@ class SeriesTest extends ApiTester {
     public function test_it_cannot_update_a_series_start_year_that_does_not_belong_to_the_user(){
         //arrange
         $comic = Factory::create('App\Comic', [
-            'user_id' => 2,
+            'user_id.id' => 2,
             'series_id.user_id' => 2
         ]);
 
@@ -335,7 +334,7 @@ class SeriesTest extends ApiTester {
     public function test_it_cannot_update_a_series_publisher_that_does_not_belong_to_the_user(){
         //arrange
         $comic = Factory::create('App\Comic', [
-            'user_id' => 2,
+            'user_id.id' => 2,
             'series_id.user_id' => 2
         ]);
 
@@ -362,22 +361,16 @@ class SeriesTest extends ApiTester {
         //assert
         $this->assertResponseOk();
     }
-    /**
-     * @group specific
-     */
     public function test_it_can_delete_a_series_and_associated_comics(){
         //arrange
-        /*$mocked_series = Factory::create('App\Series', ['user_id' => $this->user->id]);
+        $mocked_series = Factory::create('App\Series', ['user_id' => $this->user->id]);
         $mocked_comics = Factory::times(10)->create('App\Comic', [
             'user_id' => $this->user->id,
             'series_id' => $mocked_series->id
         ]);
-        //dd($mocked_comics, $mocked_series->id);
 
         //act
         $response = $this->deleteRequest($this->series_endpoint.$mocked_series->id);
-
-        dd($response = $this->getRequest($this->series_endpoint), $response = $this->getRequest('/comic/'));
 
         //assert
         $this->assertResponseOk();
@@ -387,12 +380,22 @@ class SeriesTest extends ApiTester {
             $this->getRequest('/comic/'.$mocked_comic->id);
             //assert
             $this->assertResponseStatus(404);
-        }*/
+        }
 
 
     }
     public function test_it_cannot_delete_a_series_that_does_not_belong_to_the_user(){
+        //arrange
+        $comic = Factory::create('App\Comic', [
+            'user_id.id' => 2,
+            'series_id.user_id' => 2
+        ]);
 
+        //act
+        $response = $this->deleteRequest($this->series_endpoint.$comic->series->id);
+
+        //assert
+        $this->assertResponseStatus(404);
     }
     public function test_it_cannot_delete_a_series_that_does_not_exist(){
         //arrange

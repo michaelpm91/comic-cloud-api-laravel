@@ -16,6 +16,7 @@ class ComicTest extends ApiTester {
     protected $user;
     protected $auth_header;
     protected $comic_endpoint = "/comic/";
+    protected $series_endpoint = "/series/";
 
     public function setUp(){//runs per test :(
         parent::setUp();
@@ -120,7 +121,7 @@ class ComicTest extends ApiTester {
 
 
     }
-    public function test_it_can_edit_a_comic_comic_issue(){//TODO:Multiple Asserts
+    public function test_it_can_edit_a_comic_comic_issue(){
         //arrange
         $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
 
@@ -139,9 +140,64 @@ class ComicTest extends ApiTester {
         $this->assertEquals(1, json_decode($response, true)['comic']['comic_issue']);
     }
     public function test_it_can_set_a_comic_series_id_to_one_that_exists(){
+        //arrange
+        $comic_a = Factory::create('App\Comic', [
+            'user_id' => $this->user->id,
+            'series_id.user_id' => $this->user->id
+        ]);
+        $comic_b = Factory::create('App\Comic', [
+            'user_id' => $this->user->id,
+            'series_id.user_id' => $this->user->id
+        ]);
+
+        //act
+        $response = $this->patchRequest($this->comic_endpoint.$comic_a->id, [
+            'series_id' => $comic_b->series->id
+        ]);
+
+        //assert
+        $this->assertResponseOk();
+
+        //act
+        $response = $this->getRequest($this->comic_endpoint.$comic_a->id);
+
+        //assert
+        $this->assertEquals($comic_b->series->id, json_decode($response, true)['comic']['series']['id']);
+
+    }
+    public function test_it_cannot_set_a_comic_series_id_to_one_that_the_user_does_not_own(){
+        //arrange
+        $comic = Factory::create('App\Comic', [
+            'user_id' => $this->user->id,
+            'series_id.user_id' => $this->user->id
+        ]);
+        $other_user_comic = Factory::create('App\Comic');
+
+        //act
+        $response = $this->patchRequest($this->comic_endpoint.$comic->id, [
+            'series_id' => $other_user_comic->series->id
+        ]);
+
+        //assert
+        $this->assertResponseStatus(400);
+
 
     }
     public function test_it_cannot_set_a_comic_series_id_to_one_that_does_not_exist(){
+
+        //arrange
+        $comic = Factory::create('App\Comic', [
+            'user_id' => $this->user->id,
+            'series_id.user_id' => $this->user->id
+        ]);
+
+        //act
+        $response = $this->patchRequest($this->comic_endpoint.$comic->id, [
+            'series_id' => str_random(40)
+        ]);
+
+        //assert
+        $this->assertResponseStatus(400);
 
     }
     public function test_it_cannot_edit_another_users_comic(){
@@ -183,9 +239,16 @@ class ComicTest extends ApiTester {
 
     }
     public function test_it_returns_an_appropriate_message_when_no_edit_fields_are_entered(){
+        //arrange
+        $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
+        //act
+        $response = $this->patchRequest($this->comic_endpoint.$comic->id);
+
+        //assert
+        $this->assertResponseStatus(400);
 
     }
-    public function test_it_can_delete_a_comic(){//TODO: Multiple asserts
+    public function test_it_can_delete_a_comic(){
         //arrange
         $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
 
@@ -225,6 +288,29 @@ class ComicTest extends ApiTester {
 
     }
     public function test_it_will_delete_a_series_if_the_last_comic_has_been_deleted(){
+        $comic = Factory::create('App\Comic', [
+            'user_id' => $this->user->id,
+            'series_id.user_id' => $this->user->id
+        ]);
+        $series_id = $comic->series->id;
+
+        //act
+        $response = $this->getRequest($this->series_endpoint.$comic->series->id);
+
+        //assert
+        $this->assertResponseOk();
+
+        //act
+        $response = $this->deleteRequest($this->comic_endpoint.$comic->id);
+
+        //assert
+        $this->assertResponseOk();
+
+        //act
+        $response = $this->getRequest($this->series_endpoint.$series_id);
+
+        //assert
+        $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
 
     }
 }
