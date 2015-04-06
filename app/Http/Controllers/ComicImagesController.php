@@ -31,7 +31,7 @@ class ComicImagesController extends ApiController {
             if(!in_array($comicCbaId, $userCbaIds)) return $this->respondNotFound('No Image Found');
         }
 
-        $img = Storage::disk(env('user_images'))->get($comicImage->image_slug.".jpg");//TODO: Hard coded file type
+        $img = Storage::disk(env('user_images', 'local_user_images'))->get($comicImage->image_slug.".jpg");//TODO: Hard coded file type
         $size = (is_numeric($size)? $size : 500);
 
         $imgCache = Image::cache(function($image) use ($img, $size) {

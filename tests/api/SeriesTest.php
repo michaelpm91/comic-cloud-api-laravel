@@ -34,6 +34,20 @@ class SeriesTest extends ApiTester {
         $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
 
     }
+    public function test_it_does_not_accept_post_requests_to_a_specific_series(){
+        //arrange
+        $comic = Factory::create('App\Comic', [
+            'user_id' => $this->user->id,
+            'series_id.user_id' => $this->user->id
+        ]);
+
+        //act
+        $response = $this->postRequest($this->series_endpoint.$comic->series->id);
+
+        //assert
+        //TODO:Should also assert JSON
+        $this->assertResponseStatus(405);
+    }
     public function test_it_can_create_a_new_series_for_a_comic(){
         //arrange
         $comic = Factory::create('App\Comic', [

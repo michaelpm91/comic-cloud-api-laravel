@@ -109,7 +109,7 @@ class UploadsController extends ApiController {
         $tempPath = $file->getRealPath();
         $fileHash = hash_file('md5', $tempPath);
 
-        Storage::disk(env('user_uploads'))->put($newFileName, File::get($file));
+        Storage::disk(env('user_uploads', 'local_user_uploads'))->put($newFileName, File::get($file));
 
         $process_info = [
             'upload_id' => $upload->id,

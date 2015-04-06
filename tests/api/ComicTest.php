@@ -34,6 +34,14 @@ class ComicTest extends ApiTester {
         $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
 
     }
+    public function test_it_does_not_accept_post_requests(){
+        //act
+        $response = $this->postRequest($this->comic_endpoint);
+
+        //assert
+        //TODO:Should also assert JSON
+        $this->assertResponseStatus(405);
+    }
     public function test_it_fetches_all_comics(){//Retrieve all user comics
         //arrange
         $mocked_comics = Factory::times(10)->create('App\Comic', ['user_id' => $this->user->id]);
