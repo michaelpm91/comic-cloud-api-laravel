@@ -8,6 +8,8 @@ use App\Comic;
 use Validator;
 use Request;
 
+use GuzzleHttp\Client as Guzzle;
+
 
 class ComicsController extends ApiController {
 
@@ -119,5 +121,28 @@ class ComicsController extends ApiController {
         return $this->respondNotFound('No Comic Found');
 
 	}
+
+    /**
+     * Query Comic Vine API
+     *
+     * @param $id
+     */
+    public function getMeta($id){
+        $comic = $this->currentUser->comics()->with('series')->find($id);
+
+        if($comic) {
+
+            $comicTitle = $comic->series->series_title;
+
+            $apikey = env('comic_vine_api_key');
+            //Request::create('');
+            $url = 'http://www.comicvine.com/api/search/?api_key=' . $apikey . '&format=json&resources=volume&limit=20&field_list=name,start_year,publisher,id,image,count_of_issues&query=' . urlencode($comicTitle);
+
+            return $this->respondSuccessful(
+                json_decode((New Guzzle)->get($url)->getBody(), true)
+            );
+        }
+
+    }
 
 }
