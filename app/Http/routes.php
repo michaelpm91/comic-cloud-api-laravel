@@ -25,7 +25,7 @@ Route::group(array('before' => 'oauth'), function() {
     Route::get('comic/{comic_id}/meta', 'ComicsController@getMeta');
 });
 
-Route::post('oauth/access_token', function () {
+Route::post('oauth/access_token', function () {//TODO:Mode to Auth Controller
     return Response::json(Authorizer::issueAccessToken());
 });
 

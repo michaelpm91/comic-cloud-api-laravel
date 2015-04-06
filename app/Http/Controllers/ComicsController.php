@@ -10,11 +10,20 @@ use Request;
 use Input;
 use GuzzleHttp\Client as Guzzle;
 
+use LucaDegasperi\OAuth2Server\Authorizer;
+
 
 class ComicsController extends ApiController {
 
+    protected $guzzle;
 
-	/**
+    public function __construct(Guzzle $guzzle, Authorizer $authorizer)
+    {
+        parent::__construct($authorizer);
+        $this->guzzle = $guzzle;
+    }
+
+    /**
 	 * Display a listing of the resource.
 	 *
 	 * @return Response
@@ -134,7 +143,7 @@ class ComicsController extends ApiController {
 
         if($comic) {
 
-            $guzzle = New Guzzle;
+            $guzzle = $this->guzzle;//New Guzzle;
 
             $comic_vine_api_url = 'http://www.comicvine.com/api/search/';
 
