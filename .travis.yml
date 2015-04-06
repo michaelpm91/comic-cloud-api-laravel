@@ -11,7 +11,6 @@ php:
 sudo: false
 
 before_script:
-  - composer dump-autoload
   - composer install
 
 script: vendor/bin/phpunit

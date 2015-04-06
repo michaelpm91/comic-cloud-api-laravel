@@ -27,7 +27,7 @@
 		"classmap": [
 			"database",
             "database/seeds",
-            "tests/Api/ApiTester.php"
+            "tests/api/ApiTester.php"
 		],
 		"psr-4": {
 			"App\\": "app/"
