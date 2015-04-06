@@ -7,7 +7,7 @@ use App\Comic;
 
 use Validator;
 use Request;
-
+use Input;
 use GuzzleHttp\Client as Guzzle;
 
 
@@ -126,21 +126,51 @@ class ComicsController extends ApiController {
      * Query Comic Vine API
      *
      * @param $id
+     * @param $page
+     * @return mixed
      */
     public function getMeta($id){
         $comic = $this->currentUser->comics()->with('series')->find($id);
 
         if($comic) {
 
-            $comicTitle = $comic->series->series_title;
+            $guzzle = New Guzzle;
 
-            $apikey = env('comic_vine_api_key');
-            //Request::create('');
-            $url = 'http://www.comicvine.com/api/search/?api_key=' . $apikey . '&format=json&resources=volume&limit=20&field_list=name,start_year,publisher,id,image,count_of_issues&query=' . urlencode($comicTitle);
+            $comic_vine_api_url = 'http://www.comicvine.com/api/search/';
 
-            return $this->respondSuccessful(
-                json_decode((New Guzzle)->get($url)->getBody(), true)
-            );
+            $limit = 20; //max is 100
+            $page = (Input::get('page') ? Input::get('page') : 1);
+
+            $response = $guzzle->get($comic_vine_api_url, [
+                'query' => [
+                    'api_key' => env('comic_vine_api_key'),
+                    'format' => 'json',
+                    'resources' => 'volume',
+                    'limit' => $limit,
+                    'page' => $page,
+                    'field_list' => 'name,start_year,publisher,id,image,count_of_issues',
+                    'query' => $comic->series->series_title
+                ]
+            ]);
+            if(json_decode($response->getBody(), true)['status_code'] != 1) {
+                return $this->respondBadRequest('Comic Vine API Error');
+                //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
+            }
+            $comic_vine_query = json_decode($response->getBody(), true)['results'];
+
+            $series = array_map(function($series_entry){
+                return [
+                    'series_title' => $series_entry['name'],
+                    'series_issues' => $series_entry['count_of_issues'],
+                    'series_cover_image' => $series_entry['image']['medium_url'],
+                    'start_year' => $series_entry['start_year'],
+                    'publisher' => $series_entry['publisher']['name']
+                ];
+            }, $comic_vine_query);
+
+            return $this->respond([
+                'series' => $series
+            ]);
         }
 
     }
