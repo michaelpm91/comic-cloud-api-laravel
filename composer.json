@@ -22,7 +22,9 @@
         "fzaninotto/faker": "1.5.*@dev",
 		"phpunit/phpunit": "~4.0",
 		"phpspec/phpspec": "~2.1",
-        "laracasts/testdummy": "2.3.1"
+        "laracasts/testdummy": "2.3.1",
+		"php-vcr/php-vcr": "~1.2",
+        "php-vcr/phpunit-testlistener-vcr": "1.1.5"
 	},
 	"autoload": {
 		"classmap": [

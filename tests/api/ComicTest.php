@@ -10,6 +10,10 @@ use App\Comic;
 use App\User;
 use Laracasts\TestDummy\Factory;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Subscriber\Mock;
+use GuzzleHttp\Message\Response;
+
 
 class ComicTest extends ApiTester {
 
@@ -320,5 +324,23 @@ class ComicTest extends ApiTester {
         //assert
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
 
+    }
+
+    /**
+     * @group specific
+     * @vcr comicvine.yml
+     */
+    public function test_it_can_fetch_meta_data_for_a_comic_that_exists(){
+        //arrange
+        $comic = Factory::create('App\Comic', [
+            'user_id' => $this->user->id,
+            'series_id.user_id' => $this->user->id,
+            'series_id.series_title' => 'All Star Superman'
+        ]);
+        //act
+        $response = $this->getRequest($this->comic_endpoint.$comic->id."/meta");
+
+        //assert
+        $this->assertResponseOk();
     }
 }
