@@ -146,6 +146,9 @@ class ComicsController extends ApiController {
             $guzzle = $this->guzzle;//New Guzzle;
 
             $comic_vine_api_url = 'http://www.comicvine.com/api/search/';
+            //	echo $url = 'http://comicvine.com/api/issues/?api_key='.$apikey.'&format=json&field_list=name,description,issue_number,volume,id,image&filter=volume:'.$volumeid.',issue_number:'.$issue;
+            //OR //	$url= 'http://comicvine.com/api/issues/?api_key='.$apikey.'&format=json&limit=100&field_list=name,description,issue_number,volume,id,image&filter=volume:'.$volumeID.'&offset='.(100*($page-1));
+
 
             $limit = 20; //max is 100
             $page = (Input::get('page') ? Input::get('page') : 1);

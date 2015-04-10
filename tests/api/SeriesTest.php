@@ -420,5 +420,22 @@ class SeriesTest extends ApiTester {
         //assert
         $this->assertResponseStatus(404);
     }
+    /**
+     * @group specific
+     * @vcr comicvine-series.yml
+     */
+    public function test_it_can_fetch_meta_data_for_a_comic_that_exists(){
+        //arrange
+        $comic = Factory::create('App\Comic', [
+            'user_id' => $this->user->id,
+            'series_id.user_id' => $this->user->id,
+            'series_id.series_title' => 'All Star Superman'
+        ]);
+        //act
+        //$response = $this->getRequest($this->series_endpoint.$comic->id."/meta");
+
+        //assert
+        //$this->assertResponseOk();
+    }
 }
  

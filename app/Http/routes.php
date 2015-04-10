@@ -22,9 +22,11 @@ Route::group(array('before' => 'oauth'), function() {
     Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
     Route::resource('comic','ComicsController', array('only' => array('index', 'show', 'update', 'destroy')));
     Route::get('image/{image_set_key}/{size?}', 'ComicImagesController@show');
+    Route::get('series/{series_id}/meta', 'SeriesController@getMeta');
     Route::get('comic/{comic_id}/meta', 'ComicsController@getMeta');
 });
 
+Route::post('auth/register', 'AuthController@store');
 Route::post('oauth/access_token', function () {//TODO:Mode to Auth Controller
     return Response::json(Authorizer::issueAccessToken());
 });
@@ -33,5 +35,3 @@ Route::post('oauth/access_token', function () {//TODO:Mode to Auth Controller
     'auth' => 'Auth\AuthController',
     //'password' => 'Auth\PasswordController' //temporarily disabled
 ]);*/
-
-Route::post('auth/register', 'AuthController@store');
