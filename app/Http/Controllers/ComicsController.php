@@ -140,31 +140,34 @@ class ComicsController extends ApiController {
      */
     public function getMeta($id){
         $comic = $this->currentUser->comics()->with('series')->find($id);
+        //TODO: Check if comic's parent series has a comic vine volume id. If it does use it for this query.
 
         if($comic) {
 
             $guzzle = $this->guzzle;//New Guzzle;
 
-            $comic_vine_api_url = 'http://www.comicvine.com/api/search/';
+            $comic_vine_api_url = 'http://comicvine.com/api/issues/';
             //	echo $url = 'http://comicvine.com/api/issues/?api_key='.$apikey.'&format=json&field_list=name,description,issue_number,volume,id,image&filter=volume:'.$volumeid.',issue_number:'.$issue;
             //OR //	$url= 'http://comicvine.com/api/issues/?api_key='.$apikey.'&format=json&limit=100&field_list=name,description,issue_number,volume,id,image&filter=volume:'.$volumeID.'&offset='.(100*($page-1));
 
 
             $limit = 20; //max is 100
             $page = (Input::get('page') ? Input::get('page') : 1);
+            $issue = (Input::get('issue') ? Input::get('issue') : '');
 
             $response = $guzzle->get($comic_vine_api_url, [
                 'query' => [
                     'api_key' => env('comic_vine_api_key'),
                     'format' => 'json',
-                    'resources' => 'volume',
+                    'filter'=> 'volume:'.'18139'.',',//.'issue_number:',
                     'limit' => $limit,
-                    'page' => $page,
-                    'field_list' => 'name,start_year,publisher,id,image,count_of_issues',
-                    'query' => $comic->series->series_title
+                    'offset' => $page,
+                    'field_list' => 'name,description,issue_number,volume,id,image',
                 ]
-            ]);
-            if(json_decode($response->getBody(), true)['status_code'] != 1) {
+            ])->getBody();
+
+            return (json_decode($response, true));
+            /*if(json_decode($response->getBody(), true)['status_code'] != 1) {
                 return $this->respondBadRequest('Comic Vine API Error');
                 //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
             }
@@ -182,7 +185,7 @@ class ComicsController extends ApiController {
 
             return $this->respond([
                 'series' => $series
-            ]);
+            ]);*/
         }
         return $this->respondNotFound('No Comic Found');
 
