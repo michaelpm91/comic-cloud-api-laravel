@@ -4,9 +4,14 @@ use App\Http\Controllers\Controller;
 
 use Request;
 use Validator;
+use Input;
+use Cache;
 
 use App\Series;
 use App\Comic;
+
+
+use GuzzleHttp\Client as Guzzle;
 
 class SeriesController extends ApiController {
 
@@ -138,52 +143,56 @@ class SeriesController extends ApiController {
      * Query Comic Vine API
      *
      * @param $id
-     * @param $page
      * @return mixed
      */
     public function getMeta($id){
-        $comic = $this->currentUser->comics()->with('series')->find($id);
+        $series = $this->currentUser->series()->find($id);
 
-        if($comic) {
+        if($series) {
 
-            $guzzle = $this->guzzle;//New Guzzle;
+            $guzzle = New Guzzle;
 
             $comic_vine_api_url = 'http://www.comicvine.com/api/search/';
 
             $limit = 20; //max is 100
             $page = (Input::get('page') ? Input::get('page') : 1);
+            $response = Cache::remember($series->series_title.'_page_'.$page, 10, function() use($guzzle, $comic_vine_api_url, $limit, $page, $series) {//TODO:Consider Cache time
+                $guzzle_response = $guzzle->get($comic_vine_api_url, [
+                    'query' => [
+                        'api_key' => env('comic_vine_api_key'),
+                        'format' => 'json',
+                        'resources' => 'volume',
+                        'limit' => $limit,
+                        'page' => $page,
+                        'field_list' => 'name,start_year,publisher,id,image,count_of_issues',
+                        'query' => $series->series_title
+                    ]
+                ])->getBody();
+                return (json_decode($guzzle_response, true));
+            });
 
-            $response = $guzzle->get($comic_vine_api_url, [
-                'query' => [
-                    'api_key' => env('comic_vine_api_key'),
-                    'format' => 'json',
-                    'resources' => 'volume',
-                    'limit' => $limit,
-                    'page' => $page,
-                    'field_list' => 'name,start_year,publisher,id,image,count_of_issues',
-                    'query' => $comic->series->series_title
-                ]
-            ]);
-            if(json_decode($response->getBody(), true)['status_code'] != 1) {
+            if($response['status_code'] != 1) {
                 return $this->respondBadRequest('Comic Vine API Error');
                 //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
             }
-            $comic_vine_query = json_decode($response->getBody(), true)['results'];
+            $comic_vine_query = $response['results'];
 
-            $series = array_map(function($series_entry){
+            $series_response = array_map(function($series_entry){
                 return [
                     'series_title' => $series_entry['name'],
                     'series_issues' => $series_entry['count_of_issues'],
                     'series_cover_image' => $series_entry['image']['medium_url'],
                     'start_year' => $series_entry['start_year'],
-                    'publisher' => $series_entry['publisher']['name']
+                    'publisher' => $series_entry['publisher']['name'],
+                    'comic_vine_series_id' => $series_entry['id']
                 ];
             }, $comic_vine_query);
 
             return $this->respond([
-                'series' => $series
+                'series' => $series_response
             ]);
         }
+        return $this->respondNotFound('No Series Found');
 
     }
 

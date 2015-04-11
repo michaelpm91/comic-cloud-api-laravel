@@ -184,6 +184,7 @@ class ComicsController extends ApiController {
                 'series' => $series
             ]);
         }
+        return $this->respondNotFound('No Comic Found');
 
     }
 
