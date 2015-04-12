@@ -1,6 +1,6 @@
 branches:
   only:
-    - L5
+    - develop
 language: php
 
 php:

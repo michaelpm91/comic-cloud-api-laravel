@@ -150,7 +150,8 @@ return [
          */
         'LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider',
         'LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider',
-        'Intervention\Image\ImageServiceProvider'
+        'Intervention\Image\ImageServiceProvider',
+        'GrahamCampbell\Throttle\ThrottleServiceProvider'
 
 	],
 
@@ -202,7 +203,8 @@ return [
 
         'Authorizer' => 'LucaDegasperi\OAuth2Server\Facades\AuthorizerFacade',
         'Carbon'    => 'Carbon\Carbon',
-        'Image' => 'Intervention\Image\Facades\Image'
+        'Image' => 'Intervention\Image\Facades\Image',
+        'Throttle' => 'GrahamCampbell\Throttle\Facades\Throttle'
 
 	],
 
