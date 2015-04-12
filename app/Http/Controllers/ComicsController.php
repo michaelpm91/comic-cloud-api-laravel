@@ -187,7 +187,7 @@ class ComicsController extends ApiController {
             });
 
             return $this->respond([
-                'issue'.(count($issues) > 1 ? 's' : '') => $issues
+                'issue'.(count($issues) > 1 ? 's' : '') => $issues //TODO: Should probably just be issues plural.
             ]);
         }
         return $this->respondNotFound('No Comic Found');
