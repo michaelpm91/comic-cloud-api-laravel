@@ -106,7 +106,8 @@ class SeriesController extends ApiController {
         if($series){
 
             $validator = Validator::make($data = Request::all(), [
-                'series_start_year' => 'date_format:Y'
+                'series_start_year' => 'date_format:Y',
+                'comic_vine_series_id' => 'numeric'
             ]);
 
             if ($validator->fails()) return $this->respondBadRequest($validator->errors());
@@ -116,6 +117,7 @@ class SeriesController extends ApiController {
             if (isset($data['series_title'])) $series->series_title = $data['series_title'];
             if (isset($data['series_start_year'])) $series->series_start_year = $data['series_start_year'];
             if (isset($data['series_publisher'])) $series->series_publisher = $data['series_publisher'];
+            if (isset($data['comic_vine_series_id'])) $series->comic_vine_series_id = $data['comic_vine_series_id'];
             $series->save();
 
             return $this->respondSuccessful('Series Updated');

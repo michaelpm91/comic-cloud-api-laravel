@@ -83,7 +83,8 @@ class ComicsController extends ApiController {
 
             $validator = Validator::make($data = Request::all(), [
                 'comic_issue' => 'numeric',
-                'series_id' => 'user_series|alpha_num|min:40|max:40'
+                'series_id' => 'user_series|alpha_num|min:40|max:40',
+                'comic_vine_issue_id' => 'numeric'
             ], $messages);
 
             if ($validator->fails()) return $this->respondBadRequest($validator->errors());
@@ -93,6 +94,7 @@ class ComicsController extends ApiController {
             if(isset($data['comic_issue'])) $comic->comic_issue = $data['comic_issue'];
             if(isset($data['comic_writer'])) $comic->comic_writer = $data['comic_writer'];
             if(isset($data['series_id'])) $comic->series_id = $data['series_id'];
+            if(isset($data['comic_vine_issue_id'])) $comic->comic_vine_issue_id = $data['comic_vine_issue_id'];
             $comic->save();
 
             return $this->respondSuccessful('Comic Updated');
@@ -112,14 +114,7 @@ class ComicsController extends ApiController {
 	 */
 	public function destroy($id)
 	{
-        /*$series_id = $this->currentUser->comics()->find($id)['series_id'];
-        if($series_id) {
-            $seriesCount = Series::find($series_id)->comics()->get()->count();
-            if ($this->currentUser->comics()->find($id)->delete()) {
-                if ($seriesCount == 0) Series::find($series_id)->delete();
-                return $this->respondSuccessful('Comic Deleted');
-            }
-        }*/
+
         $comic = $this->currentUser->comics()->find($id);
         if($comic) {
             $series_id = $comic['series']['id'];
@@ -136,7 +131,6 @@ class ComicsController extends ApiController {
      * Query Comic Vine API
      *
      * @param $id
-     * @param $page
      * @return mixed
      */
     public function getMeta($id){
@@ -154,7 +148,7 @@ class ComicsController extends ApiController {
 
             $limit = 20; //max is 100
             $offset = $limit * (Input::get('offset') ? (Input::get('offset') - 1): 0);
-            $issue = (Input::get('issue') ? Input::get('issue') : '');
+            $issue = (Input::get('issue') ? Input::get('issue') : '');//Should use issue data from db somehow//($comic->issue ? $comic->issue : ''));
             $comic_vine_volume_id = $comic->series->comic_vine_series_id;
 
             $response = Cache::remember('comic_vine_issue_query_'.$comic_vine_volume_id.'_offset_'.$offset.= ($issue ? '_issue_'.$issue : ''), 10, function() use($guzzle, $comic_vine_api_url, $limit, $offset, $issue, $comic_vine_volume_id) {//TODO:Consider Cache time

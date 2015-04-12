@@ -14,7 +14,7 @@ class AddComicVineMetaDataToSeriesTable extends Migration {
 	{
 		Schema::table('series', function(Blueprint $table)
 		{
-            $table->integer('comic_vine_series_id')->after('series_publisher');
+            $table->integer('comic_vine_series_id')->nullable()->after('series_publisher');
 		});
 	}
 

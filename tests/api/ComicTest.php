@@ -325,5 +325,47 @@ class ComicTest extends ApiTester {
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
 
     }
+    /**
+     * @vcr comicvine-comic.yml
+     */
+    public function test_it_can_fetch_meta_data_for_a_comic_that_exists(){
+        $this->markTestIncomplete('This test has not been implemented yet.');
+        //arrange
+        $comic = Factory::create('App\Comic', [
+            'user_id' => $this->user->id,
+            'series_id.user_id' => $this->user->id,
+            'series_id.series_title' => 'All Star Superman',
+            'series_id.comic_vine_series_id' => '18139'
+        ]);
+        //act
+        $response = $this->getRequest($this->comic_endpoint.$comic->id."/meta");
+
+        //assert
+        $this->assertResponseOk();
+    }
+    /**
+     * @vcr comicvine-comic.yml
+     */
+    public function test_it_cannot_fetch_meta_data_for_a_comic_that_does_not_exist(){
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+    /**
+     * @vcr comicvine-comic.yml
+     */
+    public function test_it_can_set_a_comic_vine_comic_id_on_a_comic_that_exists(){
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+    /**
+     * @vcr comicvine-comic.yml
+     */
+    public function test_it_cannot_set_a_comic_vine_comic_id_on_a_comic_that_does_not_exist(){
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
+    /**
+     * @vcr comicvine-series.yml
+     */
+    public function test_it_cannot_query_meta_data_if_a_comic_vine_series_id_is_not_set_on_the_parent_series(){
+        $this->markTestIncomplete('This test has not been implemented yet.');
+    }
 
 }

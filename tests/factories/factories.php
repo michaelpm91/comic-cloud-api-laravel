@@ -52,6 +52,7 @@ $factory('App\Comic', function($faker){
         ]),
         'user_id' => 'factory:App\User',
         'series_id' => 'factory:App\Series',
+        'comic_vine_issue_id' => '',
         'comic_book_archive_id' => 'factory:App\ComicBookArchive',
         'comic_status' => 1
     ];
@@ -64,6 +65,7 @@ $factory('App\Series', function($faker){
         'series_title' => $faker->sentence(),
         'series_start_year' => rand(1900, 2015),
         'series_publisher' => 'Unknown',
+        'comic_vine_series_id' => '',
         'user_id' => 'factory:App\User'
     ];
 });
