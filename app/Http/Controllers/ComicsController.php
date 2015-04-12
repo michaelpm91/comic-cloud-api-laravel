@@ -8,6 +8,7 @@ use App\Comic;
 use Validator;
 use Request;
 use Input;
+use Cache;
 use GuzzleHttp\Client as Guzzle;
 
 use LucaDegasperi\OAuth2Server\Authorizer;
@@ -140,52 +141,60 @@ class ComicsController extends ApiController {
      */
     public function getMeta($id){
         $comic = $this->currentUser->comics()->with('series')->find($id);
-        //TODO: Check if comic's parent series has a comic vine volume id. If it does use it for this query.
 
         if($comic) {
+
+            if(!$comic->series->comic_vine_series_id){
+                return $this->respondBadRequest('No Comic Vine Series ID set on parent series');
+            }
 
             $guzzle = $this->guzzle;//New Guzzle;
 
             $comic_vine_api_url = 'http://comicvine.com/api/issues/';
-            //	echo $url = 'http://comicvine.com/api/issues/?api_key='.$apikey.'&format=json&field_list=name,description,issue_number,volume,id,image&filter=volume:'.$volumeid.',issue_number:'.$issue;
-            //OR //	$url= 'http://comicvine.com/api/issues/?api_key='.$apikey.'&format=json&limit=100&field_list=name,description,issue_number,volume,id,image&filter=volume:'.$volumeID.'&offset='.(100*($page-1));
-
 
             $limit = 20; //max is 100
-            $page = (Input::get('page') ? Input::get('page') : 1);
+            $offset = $limit * (Input::get('offset') ? (Input::get('offset') - 1): 0);
             $issue = (Input::get('issue') ? Input::get('issue') : '');
+            $comic_vine_volume_id = $comic->series->comic_vine_series_id;
 
-            $response = $guzzle->get($comic_vine_api_url, [
-                'query' => [
-                    'api_key' => env('comic_vine_api_key'),
-                    'format' => 'json',
-                    'filter'=> 'volume:'.'18139'.',',//.'issue_number:',
-                    'limit' => $limit,
-                    'offset' => $page,
-                    'field_list' => 'name,description,issue_number,volume,id,image',
-                ]
-            ])->getBody();
+            $response = Cache::remember('comic_vine_issue_query_'.$comic_vine_volume_id.'_offset_'.$offset.= ($issue ? '_issue_'.$issue : ''), 10, function() use($guzzle, $comic_vine_api_url, $limit, $offset, $issue, $comic_vine_volume_id) {//TODO:Consider Cache time
 
-            return (json_decode($response, true));
-            /*if(json_decode($response->getBody(), true)['status_code'] != 1) {
+                $guzzle_response = $guzzle->get($comic_vine_api_url, [
+                    'query' => [
+                        'api_key' => env('comic_vine_api_key'),
+                        'format' => 'json',
+                        'filter' => 'volume:' . $comic_vine_volume_id .= ($issue ? ',' . 'issue_number:' . $issue : ''),
+                        'limit' => $limit,
+                        'offset' => $offset,
+                        'field_list' => 'name,description,issue_number,volume,id,image',
+                    ]
+                ])->getBody();
+
+                return (json_decode($guzzle_response, true));
+            });
+
+            if($response['status_code'] != 1) {
                 return $this->respondBadRequest('Comic Vine API Error');
                 //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
             }
-            $comic_vine_query = json_decode($response->getBody(), true)['results'];
+            $comic_vine_query = $response['results'];
 
-            $series = array_map(function($series_entry){
+            $issues = array_map(function($issue_entry){
                 return [
-                    'series_title' => $series_entry['name'],
-                    'series_issues' => $series_entry['count_of_issues'],
-                    'series_cover_image' => $series_entry['image']['medium_url'],
-                    'start_year' => $series_entry['start_year'],
-                    'publisher' => $series_entry['publisher']['name']
+                    'issue_description' => strip_tags($issue_entry['description']),
+                    'issue_name' => $issue_entry['name'],
+                    'issue_number' => $issue_entry['issue_number'],
+                    'comic_vine_issue_id' => $issue_entry['id']
                 ];
             }, $comic_vine_query);
 
+            usort($issues, function($a, $b) {
+                return $a['issue_number'] - $b['issue_number'];
+            });
+
             return $this->respond([
-                'series' => $series
-            ]);*/
+                'issue'.(count($issues) > 1 ? 's' : '') => $issues
+            ]);
         }
         return $this->respondNotFound('No Comic Found');
 

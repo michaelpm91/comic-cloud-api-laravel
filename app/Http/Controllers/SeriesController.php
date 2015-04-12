@@ -156,7 +156,7 @@ class SeriesController extends ApiController {
 
             $limit = 20; //max is 100
             $page = (Input::get('page') ? Input::get('page') : 1);
-            $response = Cache::remember($series->series_title.'_page_'.$page, 10, function() use($guzzle, $comic_vine_api_url, $limit, $page, $series) {//TODO:Consider Cache time
+            $response = Cache::remember('comic_vine_series_query_'.$series->series_title.'_page_'.$page, 10, function() use($guzzle, $comic_vine_api_url, $limit, $page, $series) {//TODO:Consider Cache time
                 $guzzle_response = $guzzle->get($comic_vine_api_url, [
                     'query' => [
                         'api_key' => env('comic_vine_api_key'),
