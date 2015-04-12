@@ -14,14 +14,17 @@
         "Chumper/Zipper": "0.6.x",
         "guzzlehttp/guzzle": "5.2.0",
         "lucadegasperi/oauth2-server-laravel": "4.0.x@dev",
-        "league/flysystem-aws-s3-v2": "1.0.1"
+        "league/flysystem-aws-s3-v2": "1.0.1",
+        "graham-campbell/throttle": "~3.0"
 
 	},
 	"require-dev": {
         "fzaninotto/faker": "1.5.*@dev",
 		"phpunit/phpunit": "~4.0",
 		"phpspec/phpspec": "~2.1",
-        "laracasts/testdummy": "2.3.1"
+        "laracasts/testdummy": "2.3.1",
+		"php-vcr/php-vcr": "~1.2",
+        "php-vcr/phpunit-testlistener-vcr": "1.1.5"
 	},
 	"autoload": {
 		"classmap": [

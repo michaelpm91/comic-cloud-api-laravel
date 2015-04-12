@@ -1,6 +1,5 @@
 <?php namespace App\Http\Controllers;
 
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Contracts\Auth\Guard;
@@ -41,5 +40,9 @@ class AuthController extends ApiController {
         $this->registrar->create($request->all());
         return $this->respondCreated('Registration Successful');
 	}
+
+    public function oauthStore(){
+
+    }
 
 }

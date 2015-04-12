@@ -10,6 +10,10 @@ use App\Comic;
 use App\User;
 use Laracasts\TestDummy\Factory;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Subscriber\Mock;
+use GuzzleHttp\Message\Response;
+
 
 class ComicTest extends ApiTester {
 
@@ -321,4 +325,101 @@ class ComicTest extends ApiTester {
         $this->assertResponseStatus(404);//TODO: This will need to be updated when API returns are made more consistent
 
     }
+    /**
+     * @vcr comicvine-comic.yml
+     */
+    public function test_it_can_fetch_meta_data_for_a_comic_that_exists(){
+        //arrange
+        $comic = Factory::create('App\Comic', [
+            'user_id' => $this->user->id,
+            'series_id.user_id' => $this->user->id,
+            'series_id.series_title' => 'All Star Superman',
+            'series_id.comic_vine_series_id' => '18139'
+        ]);
+        //act
+        $response = $this->getRequest($this->comic_endpoint.$comic->id."/meta");
+
+        //assert
+        $this->assertResponseOk();
+    }
+    /**
+     * @vcr comicvine-comic.yml
+     */
+    public function test_it_cannot_fetch_meta_data_for_a_comic_that_does_not_exist(){
+        //arrange
+        $comic_id = str_random(40);
+        //act
+        $response = $this->getRequest($this->comic_endpoint.$comic_id."/meta");
+
+        //assert
+        $this->assertResponseStatus(404);
+    }
+    /**
+     * @vcr comicvine-comic.yml
+     */
+    public function test_it_can_set_a_comic_vine_comic_id_on_a_comic_that_exists(){
+        //arrange
+        $comic = Factory::create('App\Comic', [
+            'user_id' => $this->user->id,
+            'series_id.user_id' => $this->user->id,
+            'series_id.series_title' => 'All Star Superman',
+            'series_id.comic_vine_series_id' => '18139'
+        ]);
+        //act
+        $response = $this->getRequest($this->comic_endpoint.$comic->id."/meta");
+        $comic_vine_issue_id = json_decode($response, true)['issues'][0]['comic_vine_issue_id'];
+
+        //assert
+        $this->assertResponseOk();
+
+        //act
+        $response = $this->patchRequest($this->comic_endpoint.$comic->id, [
+            'comic_vine_issue_id' => $comic_vine_issue_id
+        ]);
+
+        //assert
+        $this->assertResponseOk();
+
+        //act
+        $response = $this->getRequest($this->comic_endpoint.$comic->id);
+
+        //assert
+        $this->assertEquals($comic_vine_issue_id, json_decode($response, true)['comic']['comic_vine_issue_id']);
+    }
+    /**
+     * @vcr comicvine-comic.yml
+     */
+    public function test_it_cannot_set_a_comic_vine_comic_id_on_a_comic_that_does_not_exist(){
+        //arrange
+        $comic_id = str_random(40);
+        $comic_vine_issue_id = rand(10000, 99999);
+
+        //act
+        $response = $this->patchRequest($this->comic_endpoint.$comic_id, [
+            'comic_vine_issue_id' => $comic_vine_issue_id
+        ]);
+
+        //assert
+        $this->assertResponseStatus(404);
+
+    }
+    /**
+     * @vcr comicvine-series.yml
+     */
+    public function test_it_cannot_query_meta_data_if_a_comic_vine_series_id_is_not_set_on_the_parent_series(){
+        //arrange
+        $comic = Factory::create('App\Comic', [
+            'user_id' => $this->user->id,
+            'series_id.user_id' => $this->user->id,
+            'series_id.series_title' => 'All Star Superman',
+            'series_id.comic_vine_series_id' => ''
+        ]);
+        //act
+        $response = $this->getRequest($this->comic_endpoint.$comic->id."/meta");
+
+        //assert
+        $this->assertResponseStatus(400);
+
+    }
+
 }
