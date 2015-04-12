@@ -355,7 +355,6 @@ class ComicTest extends ApiTester {
         $this->assertResponseStatus(404);
     }
     /**
-     * @group specific
      * @vcr comicvine-comic.yml
      */
     public function test_it_can_set_a_comic_vine_comic_id_on_a_comic_that_exists(){
@@ -368,7 +367,6 @@ class ComicTest extends ApiTester {
         ]);
         //act
         $response = $this->getRequest($this->comic_endpoint.$comic->id."/meta");
-        dd($response);
         $comic_vine_issue_id = json_decode($response, true)['issues'][0]['comic_vine_issue_id'];
 
         //assert
