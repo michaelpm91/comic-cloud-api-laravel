@@ -11,12 +11,26 @@ before_script:
 - composer install
 script: vendor/bin/phpunit
 deploy:
-  - provider: s3
-    access_key_id: AKIAICX4EQAQ2SP3PGGA
-    secret_access_key: &1
-      secure: Lfj+Y25NM1648z/tPtkG45BDDGPbZU6ecgyou1P7fkDjy1CPxUO5mwlFtevEsb4SuAZx9XVmfqdRK496R5Pnvw93B916xYKhsD8WduerMAw4mLv1HuBwZ8ZciFEQTA4PY75IU59YeLkBrTCp8bBT2pyi+oh2BG0pc2He8jKuHjs=
-    bucket: "comicclouddeploy"
-    skip_cleanup: true
-    upload-dir: travis-builds
-    on:
-      branch: develop
+- provider: s3
+  access_key_id: AKIAICX4EQAQ2SP3PGGA
+  secret_access_key: &1
+    secure: n9GIsu4WK7YiwdnZcfKpGQH+rrdV42n7FWJT1dF6oPRUO1bUKgsAYPMh0M5S4wA4A//QzA0iS7uE7/rVSPUyZmX7A8KtQOeLHkJL4tO5IZMMsRrBJFncOBFJVagoB764QrTjKd+mC113LXMJec9zhwr+aOHeTD/MzlFhKAPaS8g=
+  local_dir: dpl_cd_upload
+  skip_cleanup: true
+  on: &2
+    repo: kidshenlong/Comic-Cloud-API
+    branch: develop
+  bucket: comicclouddeploy
+  upload_dir: latest
+- provider: codedeploy
+  access_key_id: AKIAICX4EQAQ2SP3PGGA
+  secret_access_key: *1
+  bucket: comicclouddeploy
+  key: latest/TestComicCloud.zip
+  bundle_type: zip
+  application: TestComicCloud
+  deployment_group: TestComicCloudDeploymentGroup
+  on: *2
+before_deploy:
+- mkdir -p dpl_cd_upload
+- mv TestComicCloud.zip dpl_cd_upload/TestComicCloud.zip
