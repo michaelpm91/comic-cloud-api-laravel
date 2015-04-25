@@ -26,11 +26,11 @@ deploy:
   access_key_id: AKIAICX4EQAQ2SP3PGGA
   secret_access_key: *1
   bucket: comicclouddeploy
-  key: latest/TestComicCloud.zip
+  key: latest/Comic-Cloud-API.zip
   bundle_type: zip
   application: TestComicCloud
   deployment_group: TestComicCloudDeploymentGroup
   on: *2
 before_deploy:
 - mkdir -p dpl_cd_upload
-- mv TestComicCloud.zip dpl_cd_upload/TestComicCloud.zip
+- mv Comic-Cloud-API.zip dpl_cd_upload/Comic-Cloud-API.zip
