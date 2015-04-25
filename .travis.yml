@@ -12,9 +12,8 @@ before_script:
 script: vendor/bin/phpunit
 deploy:
   provider: codedeploy
-  access_key_id: &1
-    secure: GyEN4qmJ444OMkL8MvpbVWNlXVYhMVdXxY9o7hXhJnKMRk9gRT+BYXHe23oWjc9d33v3ZdMEJyWC32LgnYpLOqCOOIBEq5qR6rPuZSevCCqIE7Pj2ElVUIIpAhtx7NfLUJDapctrq75nsJmp1O01tVXe0SbiZtMFCLDHmuqq3AU=
-  secret_access_key: &2
+  access_key_id: AKIAICX4EQAQ2SP3PGGA
+  secret_access_key: &1
     secure: Lfj+Y25NM1648z/tPtkG45BDDGPbZU6ecgyou1P7fkDjy1CPxUO5mwlFtevEsb4SuAZx9XVmfqdRK496R5Pnvw93B916xYKhsD8WduerMAw4mLv1HuBwZ8ZciFEQTA4PY75IU59YeLkBrTCp8bBT2pyi+oh2BG0pc2He8jKuHjs=
   bucket: "comicclouddeploy"
   key: latest/MyApp.zip
