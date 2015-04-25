@@ -17,7 +17,7 @@ deploy:
     secure: Lfj+Y25NM1648z/tPtkG45BDDGPbZU6ecgyou1P7fkDjy1CPxUO5mwlFtevEsb4SuAZx9XVmfqdRK496R5Pnvw93B916xYKhsD8WduerMAw4mLv1HuBwZ8ZciFEQTA4PY75IU59YeLkBrTCp8bBT2pyi+oh2BG0pc2He8jKuHjs=
   bucket: "comicclouddeploy"
   key: latest/MyApp.zip
-  application: MyApp
-  deployment_group: MyDeploymentGroup
+  application: TestComicCloud
+  deployment_group: TestComicCloudDeploymentGroup
   on:
     branch: develop
