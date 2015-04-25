@@ -1,16 +1,37 @@
 branches:
   only:
-    - develop
+  - develop
 language: php
-
 php:
-  - 5.4
-  - 5.5
-  - 5.6
-
+- 5.4
+- 5.5
+- 5.6
 sudo: false
-
 before_script:
-  - composer install
-
+- composer install
 script: vendor/bin/phpunit
+deploy:
+- provider: s3
+  access_key_id: &1
+    secure: "GyEN4qmJ444OMkL8MvpbVWNlXVYhMVdXxY9o7hXhJnKMRk9gRT+BYXHe23oWjc9d33v3ZdMEJyWC32LgnYpLOqCOOIBEq5qR6rPuZSevCCqIE7Pj2ElVUIIpAhtx7NfLUJDapctrq75nsJmp1O01tVXe0SbiZtMFCLDHmuqq3AU="
+  secret_access_key: &2
+    secure: Lfj+Y25NM1648z/tPtkG45BDDGPbZU6ecgyou1P7fkDjy1CPxUO5mwlFtevEsb4SuAZx9XVmfqdRK496R5Pnvw93B916xYKhsD8WduerMAw4mLv1HuBwZ8ZciFEQTA4PY75IU59YeLkBrTCp8bBT2pyi+oh2BG0pc2He8jKuHjs=
+  local_dir: dpl_cd_upload
+  skip_cleanup: true
+  on: &3
+    repo: kidshenlong/Comic-Cloud-API
+    branch: develop
+  bucket: comicclouddeploy
+  upload_dir: latest
+- provider: codedeploy
+  access_key_id: *1
+  secret_access_key: *2
+  bucket: comicclouddeploy
+  key: latest/MyApp.zip
+  bundle_type: zip
+  application: Comic-Cloud-API
+  deployment_group: MyDeploymentGroup
+  on: *3
+before_deploy:
+- mkdir -p dpl_cd_upload
+- mv MyApp.zip dpl_cd_upload/MyApp.zip
