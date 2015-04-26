@@ -17,8 +17,8 @@ deploy:
     secure: n9GIsu4WK7YiwdnZcfKpGQH+rrdV42n7FWJT1dF6oPRUO1bUKgsAYPMh0M5S4wA4A//QzA0iS7uE7/rVSPUyZmX7A8KtQOeLHkJL4tO5IZMMsRrBJFncOBFJVagoB764QrTjKd+mC113LXMJec9zhwr+aOHeTD/MzlFhKAPaS8g=
   bucket: comicclouddeploy
   revision_type: github
-  application: TestComicCloud
-  deployment_group: TestComicCloudDeploymentGroup
+  application: test_comic_cloud_deploy
+  deployment_group: test_comic_cloud_deployment_group
   on:
     repo: kidshenlong/Comic-Cloud-API
     branch: develop
