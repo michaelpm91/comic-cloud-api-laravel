@@ -5,4 +5,4 @@ files:
     destination: /var/www/api.comiccloud.io
 hooks:
   AfterInstall:
-    - location: /var/www/api.comiccloud.io/install.sh
+    - location: install.sh
