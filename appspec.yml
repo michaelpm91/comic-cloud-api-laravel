@@ -10,3 +10,5 @@ permissions:
   - object: /var/www/
     owner: ec2-user
     mode: 775
+    type:
+        - directory
