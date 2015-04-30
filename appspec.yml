@@ -6,7 +6,10 @@ files:
 hooks:
   AfterInstall:
     - location: install.sh
-      runas: root
+  ApplicationStart:
+    - location: install.sh
+  ValidateService:
+    - location: install.sh
 permissions:
   - object: /var/www/
     owner: ec2-user
