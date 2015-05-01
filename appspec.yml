@@ -4,8 +4,6 @@ files:
   - source: /
     destination: /var/www/api.comiccloud.io
 hooks:
-  AfterInstall:
-    - location: install.sh
   ApplicationStart:
     - location: install.sh
   ValidateService:
