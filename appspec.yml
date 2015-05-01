@@ -6,9 +6,6 @@ files:
 hooks:
   ApplicationStart:
     - location: install.sh
-      runas: ec2-user
-  ValidateService:
-    - location: install.sh
 permissions:
   - object: /var/www/
     owner: ec2-user
