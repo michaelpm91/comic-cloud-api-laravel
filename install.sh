@@ -1,2 +1,2 @@
 #!/bin/bash
-composer install
+/usr/local/bin/composer install
