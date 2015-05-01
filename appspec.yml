@@ -6,6 +6,7 @@ files:
 hooks:
   ApplicationStart:
     - location: install.sh
+    timeout: 180
 permissions:
   - object: /var/www/
     owner: ec2-user
