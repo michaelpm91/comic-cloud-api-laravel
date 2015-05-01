@@ -13,7 +13,7 @@
 
 Route::get('/', function()
 {
-    return View::make('home');
+    return "<h1 style='font-family:Arial;'>".env('APP_URL')."-".env('APP_API_VERSION')."</h1>";
 
 });
 
