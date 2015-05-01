@@ -1,4 +1,7 @@
 #!/bin/bash
-cd /var/www/api.comiccloud.io
+#cd /var/www/api.comiccloud.io
+#curl -sS https://getcomposer.org/installer | php
+#php composer.phar install
 curl -sS https://getcomposer.org/installer | php
-php composer.phar install
+mv composer.phar /usr/local/bin/composer
+composer install
