@@ -39,6 +39,7 @@
                                 "php56": [],
                                 "php56-mcrypt": [],
                                 "php56-mbstring": [],
+                                "php56-pdo": [],
                                 "php-pear": [],
                                 "php56-devel": [],
                                 "gcc": [],
