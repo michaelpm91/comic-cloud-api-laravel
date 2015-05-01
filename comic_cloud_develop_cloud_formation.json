@@ -21,7 +21,15 @@
             "Default": "ComicCloudDeploy",
             "AllowedPattern": "[\\x20-\\x7E]*",
             "ConstraintDescription": "Can contain only ASCII characters."
+        },
+        "AttachElasticIP": {
+            "Description": "Attach instance to Elastic IP",
+            "Type": "String",
+            "Default": "true"
         }
+    },
+    "Conditions": {
+        "AttachElasticIPCondition" : {"Fn::Equals" : [{"Ref" : "AttachElasticIP"}, "true"]}
     },
     "Resources": {
         "WebServerInstance": {
@@ -35,6 +43,7 @@
                     "Install": {
                         "packages": {
                             "yum": {
+                                "git": [],
                                 "aws-cli": [],
                                 "php56": [],
                                 "php56-mcrypt": [],
@@ -191,7 +200,18 @@
                     "Timeout": "PT5M"
                 }
             }
+        },
+        "ElasticIPAssociation": {
+            "Type": "AWS::EC2::EIPAssociation",
+            "Condition" : "AttachElasticIPCondition",
+            "Properties": {
+                "AllocationId": "eipalloc-cb3c49ae",
+                "InstanceId": {
+                    "Ref" : "WebServerInstance"
+                }
+            }
         }
+
     },
     "Outputs": {
         "WebsiteURL": {
@@ -205,6 +225,23 @@
                             "Fn::GetAtt": [
                                 "WebServerInstance",
                                 "PublicDnsName"
+                            ]
+                        }
+                    ]
+                ]
+            }
+        },
+        "SSHShortCut": {
+            "Description": "SSH Command",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "ssh ec2-user@",
+                        {
+                            "Fn::GetAtt": [
+                                "WebServerInstance",
+                                "PublicIp"
                             ]
                         }
                     ]

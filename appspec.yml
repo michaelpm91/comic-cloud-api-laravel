@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/www/api.comiccloud.io
+    destination: /var/www/dev.api.comiccloud.io
 hooks:
   ApplicationStart:
   - location: install.sh
