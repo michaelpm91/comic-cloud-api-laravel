@@ -53,7 +53,8 @@
                                 "php-pear": [],
                                 "php56-devel": [],
                                 "gcc": [],
-                                "gcc-c++": []
+                                "gcc-c++": [],
+                                "python-pip": []
                             }
                         },
 
@@ -174,12 +175,15 @@
                                     "Ref": "AWS::Region"
                                 },
                                 "\n",
+                                "# Install Composer\n",
                                 "curl -sS https://getcomposer.org/installer | php \n",
                                 "mv composer.phar /usr/local/bin/composer \n",
+                                "# Install PHP RAR\n",
                                 "pecl channel-update pecl.php.net \n",
                                 "pecl -v install rar \n",
                                 "echo '<?php phpinfo();?>' >> /var/www/html/index.php \n",
                                 "echo 'extension=rar.so' >> /etc/php.ini \n",
+                                "# Setup Virtual Host Entry for api.dev.comiccloud.io\n",
                                 "cat > /etc/httpd/conf.d/dev.api.comiccloud.io.conf <<EOF\n",
                                 "<VirtualHost *:80>\n",
                                 "\tServerName api.dev.comiccloud.io\n",
@@ -189,16 +193,21 @@
                                 "\t</Directory>\n",
                                 "</VirtualHost>\n",
                                 "EOF\n",
-                                "service httpd restart \n",
+                                "# Setup swap file\n",
                                 "dd if=/dev/zero of=/swapfile bs=1024 count=512k\n",
                                 "mkswap /swapfile\n",
                                 "swapon /swapfile\n",
                                 "chown root:root /swapfile\n",
                                 "chmod 0600 /swapfile\n",
+                                "#Update php.ini\n",
                                 "upload_max_filesize=250M\n",
                                 "sed -i \"s/upload_max_filesize = .*/upload_max_filesize = ${upload_max_filesize}\" /etc/php.ini\n",
                                 "post_max_size=250M\n",
-                                "sed -i \"s/post_max_size = .*/post_max_size = ${post_max_size}/\" /etc/php.ini\n"
+                                "sed -i \"s/post_max_size = .*/post_max_size = ${post_max_size}/\" /etc/php.ini\n",
+                                "service httpd restart \n",
+                                "#Install Supervisor\n",
+                                "pip install supervisor\n"
+
                             ]
                         ]
                     }
