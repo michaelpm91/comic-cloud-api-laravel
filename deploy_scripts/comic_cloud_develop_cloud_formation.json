@@ -49,6 +49,7 @@
                                 "php56-mcrypt": [],
                                 "php56-mbstring": [],
                                 "php56-pdo": [],
+                                "php56-mysqlnd": [],
                                 "php-pear": [],
                                 "php56-devel": [],
                                 "gcc": [],
@@ -193,7 +194,11 @@
                                 "mkswap /swapfile\n",
                                 "swapon /swapfile\n",
                                 "chown root:root /swapfile\n",
-                                "chmod 0600 /swapfile\n"
+                                "chmod 0600 /swapfile\n",
+                                "upload_max_filesize=250M\n",
+                                "sed -i \"s/upload_max_filesize = .*/upload_max_filesize = ${upload_max_filesize}\" /etc/php.ini\n",
+                                "post_max_size=250M\n",
+                                "sed -i \"s/post_max_size = .*/post_max_size = ${post_max_size}/\" /etc/php.ini\n"
                             ]
                         ]
                     }
