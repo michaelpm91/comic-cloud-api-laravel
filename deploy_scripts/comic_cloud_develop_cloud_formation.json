@@ -179,7 +179,21 @@
                                 "pecl -v install rar \n",
                                 "echo '<?php phpinfo();?>' >> /var/www/html/index.php \n",
                                 "echo 'extension=rar.so' >> /etc/php.ini \n",
-                                "service httpd restart \n"
+                                "cat > /etc/httpd/conf.d/dev.api.comiccloud.io.conf <<EOF\n",
+                                "<VirtualHost *:80>\n",
+                                "\tServerName api.dev.comiccloud.io\n",
+                                "\tDocumentRoot /var/www/api.dev.comiccloud.io/public\n",
+                                "\t<Directory \"/var/www/api.devcomiccloud.io/public\">\n",
+                                "\t\tAllowOverride all\n",
+                                "\t</Directory>\n",
+                                "</VirtualHost>\n",
+                                "EOF\n",
+                                "service httpd restart \n",
+                                "dd if=/dev/zero of=/swapfile bs=1024 count=512k\n",
+                                "mkswap /swapfile\n",
+                                "swapon /swapfile\n",
+                                "chown root:root /swapfile\n",
+                                "chmod 0600 /swapfile\n"
                             ]
                         ]
                     }

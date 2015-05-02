@@ -5,7 +5,7 @@ files:
     destination: /var/www/api.dev.comiccloud.io
 hooks:
   ApplicationStart:
-  - location: install.sh
+  - location: deploy_scripts/install.sh
     timeout: 180
 permissions:
   - object: /var/www/
