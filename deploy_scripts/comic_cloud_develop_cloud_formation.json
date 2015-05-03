@@ -53,8 +53,7 @@
                                 "php-pear": [],
                                 "php56-devel": [],
                                 "gcc": [],
-                                "gcc-c++": [],
-                                "python-pip": []
+                                "gcc-c++": []
                             }
                         },
 
@@ -206,7 +205,7 @@
                                 "sed -i \"s/post_max_size = .*/post_max_size = ${post_max_size}/\" /etc/php.ini\n",
                                 "service httpd restart \n",
                                 "#Install Supervisor\n",
-                                "pip install supervisor\n"
+                                "#pip install supervisor\n"
 
                             ]
                         ]
