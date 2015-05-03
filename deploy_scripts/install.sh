@@ -26,5 +26,5 @@ autorestart=true
 stderr_logfile=/var/log/laraqueue.err.log
 stdout_logfile=/var/log/laraqueue.out.log
 EOF
-supervisorctl reread
-supervisorctl update
+/usr/local/bin/supervisorctl reread
+/usr/local/bin/supervisorctl update
