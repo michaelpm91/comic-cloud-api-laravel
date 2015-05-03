@@ -14,8 +14,6 @@ COMPOSER_HOME="~/" /usr/local/bin/composer install
 php /var/www/api.dev.comiccloud.io/artisan genenvvar --env =  develop
 
 #Supervisor Queue Scripts
-mkdir /etc/supervisor
-mkdir /etc/supervisor/conf.d
 echo -e '#!/bin/bash \n php /var/www/api.dev.comiccloud.io/artisan queue:listen --timeout=0' > /usr/local/run_queue.sh
 chmod +x /usr/local/run_queue.sh
 cat > /etc/supervisor/conf.d/laravel_queue.conf <<EOF
