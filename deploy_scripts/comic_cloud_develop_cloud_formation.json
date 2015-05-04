@@ -200,15 +200,25 @@
                                 "chmod 0600 /swapfile\n",
                                 "#Update php.ini\n",
                                 "upload_max_filesize=250M\n",
-                                "sed -i \"s/upload_max_filesize = .*/upload_max_filesize = ${upload_max_filesize}\" /etc/php.ini\n",
+                                "sed -i \"s/upload_max_filesize = .*/upload_max_filesize = ${upload_max_filesize}/\" /etc/php.ini\n",
                                 "post_max_size=250M\n",
                                 "sed -i \"s/post_max_size = .*/post_max_size = ${post_max_size}/\" /etc/php.ini\n",
                                 "service httpd restart \n",
                                 "#Install Supervisor\n",
-                                "#pip install supervisor\n",
+                                "cd /home/ec2-user/\n",
+                                "wget https://pypi.python.org/packages/source/s/supervisor/supervisor-3.1.3.tar.gz\n",
+                                "tar -zxf supervisor-3.1.3.tar.gz\n",
+                                "cd supervisor-3.1.3\n",
+                                "python setup.py install\n",
+                                "cd /home/ec2-user/\n",
+                                "/usr/local/bin/echo_supervisord_conf > /etc/supervisord.conf\n",
                                 "mkdir /etc/supervisor\n",
-                                "mkdir /etc/supervisor/conf.d\n"
-
+                                "mkdir /etc/supervisor/conf.d\n",
+                                "cat >>  /etc/supervisord.conf  <<EOF\n",
+                                "[include]\n",
+                                "files = /etc/supervisor/conf.d/*.conf\n",
+                                "EOF\n",
+                                "/usr/local/bin/supervisord/start\n"
                             ]
                         ]
                     }
