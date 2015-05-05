@@ -50,6 +50,7 @@
                                 "php56-mbstring": [],
                                 "php56-pdo": [],
                                 "php56-mysqlnd": [],
+                                "php56-gd": [],
                                 "php-pear": [],
                                 "php56-devel": [],
                                 "gcc": [],
@@ -187,7 +188,7 @@
                                 "<VirtualHost *:80>\n",
                                 "\tServerName api.dev.comiccloud.io\n",
                                 "\tDocumentRoot /var/www/api.dev.comiccloud.io/public\n",
-                                "\t<Directory \"/var/www/api.devcomiccloud.io/public\">\n",
+                                "\t<Directory \"/var/www/api.dev.comiccloud.io/public\">\n",
                                 "\t\tAllowOverride all\n",
                                 "\t</Directory>\n",
                                 "</VirtualHost>\n",
@@ -205,12 +206,8 @@
                                 "sed -i \"s/post_max_size = .*/post_max_size = ${post_max_size}/\" /etc/php.ini\n",
                                 "service httpd restart \n",
                                 "#Install Supervisor\n",
-                                "cd /home/ec2-user/\n",
-                                "wget https://pypi.python.org/packages/source/s/supervisor/supervisor-3.1.3.tar.gz\n",
-                                "tar -zxf supervisor-3.1.3.tar.gz\n",
-                                "cd supervisor-3.1.3\n",
-                                "python setup.py install\n",
-                                "cd /home/ec2-user/\n",
+                                "yum install -y python-pip\n",
+                                "pip install supervisor\n",
                                 "/usr/local/bin/echo_supervisord_conf > /etc/supervisord.conf\n",
                                 "mkdir /etc/supervisor\n",
                                 "mkdir /etc/supervisor/conf.d\n",
@@ -218,7 +215,10 @@
                                 "[include]\n",
                                 "files = /etc/supervisor/conf.d/*.conf\n",
                                 "EOF\n",
-                                "/usr/local/bin/supervisord/start\n"
+                                "curl https://gist.githubusercontent.com/kidshenlong/561791200f017b146299/raw/e242b0f43021a63459f75344421ae39903344385/supervisord.sh > /etc/init.d/supervisord\n",
+                                "chmod +x /etc/init.d/supervisord\n",
+                                "chkconfig --add supervisord\n",
+                                "service supervisord start\n"
                             ]
                         ]
                     }
@@ -245,9 +245,7 @@
             "Condition" : "AttachElasticIPCondition",
             "Properties": {
                 "AllocationId": "eipalloc-cb3c49ae",
-                "InstanceId": {
-                    "Ref" : "WebServerInstance"
-                }
+                "InstanceId": {"Ref" : "WebServerInstance"}
             }
         }
 
