@@ -139,6 +139,7 @@
                             "",
                             [
                                 "#!/bin/bash -xe\n",
+                                "yum update\n",
                                 "yum update -y aws-cfn-bootstrap\n",
                                 "# Helper function.\n",
                                 "function error_exit\n",
