@@ -55,9 +55,8 @@ class UploadsController extends ApiController {
     public function show($id)
     {
         $currentUser = $this->currentUser;
-        $upload = $this->currentUser->uploads()->find($id);
 
-        $upload = Cache::remember('_show_'.$id.'_upload_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
+        $upload = Cache::remember('_show_upload_id_'.$id.'user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
             return $currentUser->uploads()->find($id);
         });
 

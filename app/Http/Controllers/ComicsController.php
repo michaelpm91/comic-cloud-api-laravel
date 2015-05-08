@@ -120,7 +120,11 @@ class ComicsController extends ApiController {
             $series_id = $comic['series']['id'];
             $this->currentUser->comics()->find($id)->delete();
             $comic_count = Series::find($series_id)->comics()->get()->count();
-            if($comic_count == 0) Series::find($series_id)->delete();
+            if($comic_count == 0) {
+                Series::find($series_id)->delete();
+                Cache::forget('_index_series_user_id_'.$this->currentUser['id']);
+                Cache::forget('_show_series_id_'.$series_id.'_user_id_'.$this->currentUser['id']);
+            }
             return $this->respondSuccessful('Comic Deleted');
         }
         return $this->respondNotFound('No Comic Found');
