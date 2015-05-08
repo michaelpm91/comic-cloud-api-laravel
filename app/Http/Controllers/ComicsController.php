@@ -30,7 +30,11 @@ class ComicsController extends ApiController {
 	 * @return Response
 	 */
 	public function index(){
-        $comics = $this->currentUser->comics()->with('series')->get();
+        $currentUser = $this->currentUser;
+
+        $comics = Cache::remember('_index_comics_user_id_'.$currentUser['id'], env('route_cache_time', 10080), function() use ($currentUser) {
+            return $currentUser->comics()->with('series')->get();
+        });
 
         if(!$comics) return $this->respondNotFound('No Comics Found');
 
@@ -48,7 +52,11 @@ class ComicsController extends ApiController {
      */
     public function show($id)
     {
-        $comic = $this->currentUser->comics()->with('series')->find($id);
+        $currentUser = $this->currentUser;
+
+        $comic = Cache::remember('_show_comic_id_'.$id.'_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
+            return $currentUser->comics()->with('series')->find($id);
+        });
 
         if(!$comic) return $this->respondNotFound('Comic Not Found');
 
@@ -97,6 +105,9 @@ class ComicsController extends ApiController {
             if(isset($data['comic_vine_issue_id'])) $comic->comic_vine_issue_id = $data['comic_vine_issue_id'];
             $comic->save();
 
+            Cache::forget('_index_comics_user_id_'.$this->currentUser['id']);
+            Cache::forget('_show_comic_id_'.$id.'_user_id_'.$this->currentUser['id']);
+
             return $this->respondSuccessful('Comic Updated');
 
         }else{
@@ -120,7 +131,15 @@ class ComicsController extends ApiController {
             $series_id = $comic['series']['id'];
             $this->currentUser->comics()->find($id)->delete();
             $comic_count = Series::find($series_id)->comics()->get()->count();
-            if($comic_count == 0) Series::find($series_id)->delete();
+            if($comic_count == 0) {
+                Series::find($series_id)->delete();
+                Cache::forget('_index_series_user_id_'.$this->currentUser['id']);
+                Cache::forget('_show_series_id_'.$series_id.'_user_id_'.$this->currentUser['id']);
+            }
+
+            Cache::forget('_index_comics_user_id_'.$this->currentUser['id']);
+            Cache::forget('_show_comic_id_'.$id.'_user_id_'.$this->currentUser['id']);
+
             return $this->respondSuccessful('Comic Deleted');
         }
         return $this->respondNotFound('No Comic Found');
@@ -151,7 +170,7 @@ class ComicsController extends ApiController {
             $issue = (Input::get('issue') ? Input::get('issue') : '');//Should use issue data from db somehow//($comic->issue ? $comic->issue : ''));
             $comic_vine_volume_id = $comic->series->comic_vine_series_id;
 
-            $response = Cache::remember('comic_vine_issue_query_'.$comic_vine_volume_id.'_offset_'.$offset.= ($issue ? '_issue_'.$issue : ''), 10, function() use($guzzle, $comic_vine_api_url, $limit, $offset, $issue, $comic_vine_volume_id) {//TODO:Consider Cache time
+            $response = Cache::remember('_comic_vine_issue_query_'.$comic_vine_volume_id.'_offset_'.$offset.= ($issue ? '_issue_'.$issue : ''), 10, function() use($guzzle, $comic_vine_api_url, $limit, $offset, $issue, $comic_vine_volume_id) {//TODO:Consider Cache time
 
                 $guzzle_response = $guzzle->get($comic_vine_api_url, [
                     'query' => [
