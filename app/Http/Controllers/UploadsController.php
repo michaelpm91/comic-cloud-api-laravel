@@ -33,7 +33,7 @@ class UploadsController extends ApiController {
 
         $currentUser = $this->currentUser;
 
-        $uploads = Cache::rememberForever('_index_upload_user_id_'.$currentUser['id'], function() use ($currentUser) {
+        $uploads = Cache::remember('_index_upload_user_id_'.$currentUser['id'], env('route_cache_time', 10080), function() use ($currentUser) {
             return $currentUser->uploads()->get();
         });
 
@@ -57,7 +57,7 @@ class UploadsController extends ApiController {
         $currentUser = $this->currentUser;
         $upload = $this->currentUser->uploads()->find($id);
 
-        $upload = Cache::rememberForever('_show_'.$id.'_upload_user_id_'.$currentUser['id'], function() use ($currentUser, $id) {
+        $upload = Cache::remember('_show_'.$id.'_upload_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
             return $currentUser->uploads()->find($id);
         });
 
