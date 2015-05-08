@@ -38,12 +38,11 @@ class UploadsController extends ApiController {
 
         $page = (Input::get('page') ? Input::get('page'): 1);
 
-        /*$uploads = Cache::remember('_index_upload_user_id_'.$currentUser['id'], env('route_cache_time', 10080), function() use ($currentUser) {
-            return $currentUser->uploads()->get();
-        });*/
-        $uploads = $currentUser->uploads()->paginate(env('paginate_per_page'))->toArray();
+        $uploads = Cache::remember('_index_upload_user_id_'.$currentUser['id'].'_page_'.$page, env('route_cache_time', 10080), function() use ($currentUser) {
+            return $currentUser->uploads()->paginate(env('paginate_per_page'))->toArray();
+        });
 
-        if(!$uploads){
+        if(!$uploads['total']){
             return $this->respondNotFound('No Uploads Found');
         }
 
@@ -69,7 +68,7 @@ class UploadsController extends ApiController {
         }
 
         return $this->respond([
-            'upload' => $upload
+            'data' => $upload
         ]);
     }
 
