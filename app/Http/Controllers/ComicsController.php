@@ -30,7 +30,11 @@ class ComicsController extends ApiController {
 	 * @return Response
 	 */
 	public function index(){
-        $comics = $this->currentUser->comics()->with('series')->get();
+        $currentUser = $this->currentUser;
+
+        $comics = Cache::remember('_index_comics_user_id_'.$currentUser['id'], env('route_cache_time', 10080), function() use ($currentUser) {
+            return $currentUser->comics()->with('series')->get();
+        });
 
         if(!$comics) return $this->respondNotFound('No Comics Found');
 
@@ -48,7 +52,11 @@ class ComicsController extends ApiController {
      */
     public function show($id)
     {
-        $comic = $this->currentUser->comics()->with('series')->find($id);
+        $currentUser = $this->currentUser;
+
+        $comic = Cache::remember('_show_comic_id_'.$id.'_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
+            return $currentUser->comics()->with('series')->find($id);
+        });
 
         if(!$comic) return $this->respondNotFound('Comic Not Found');
 
@@ -97,6 +105,9 @@ class ComicsController extends ApiController {
             if(isset($data['comic_vine_issue_id'])) $comic->comic_vine_issue_id = $data['comic_vine_issue_id'];
             $comic->save();
 
+            Cache::forget('_index_comics_user_id_'.$this->currentUser['id']);
+            Cache::forget('_show_comic_id_'.$id.'_user_id_'.$this->currentUser['id']);
+
             return $this->respondSuccessful('Comic Updated');
 
         }else{
@@ -125,6 +136,10 @@ class ComicsController extends ApiController {
                 Cache::forget('_index_series_user_id_'.$this->currentUser['id']);
                 Cache::forget('_show_series_id_'.$series_id.'_user_id_'.$this->currentUser['id']);
             }
+
+            Cache::forget('_index_comics_user_id_'.$this->currentUser['id']);
+            Cache::forget('_show_comic_id_'.$id.'_user_id_'.$this->currentUser['id']);
+
             return $this->respondSuccessful('Comic Deleted');
         }
         return $this->respondNotFound('No Comic Found');
