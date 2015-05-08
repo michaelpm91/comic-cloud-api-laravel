@@ -14,6 +14,9 @@ use File;
 use Auth;
 use Validator;
 use Cache;
+use Input;
+
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class UploadsController extends ApiController {
 
@@ -33,17 +36,18 @@ class UploadsController extends ApiController {
 
         $currentUser = $this->currentUser;
 
-        $uploads = Cache::remember('_index_upload_user_id_'.$currentUser['id'], env('route_cache_time', 10080), function() use ($currentUser) {
+        $page = (Input::get('page') ? Input::get('page'): 1);
+
+        /*$uploads = Cache::remember('_index_upload_user_id_'.$currentUser['id'], env('route_cache_time', 10080), function() use ($currentUser) {
             return $currentUser->uploads()->get();
-        });
+        });*/
+        $uploads = $currentUser->uploads()->paginate(env('paginate_per_page'))->toArray();
 
         if(!$uploads){
             return $this->respondNotFound('No Uploads Found');
         }
 
-        return $this->respond([
-            'uploads' => $uploads
-        ]);
+        return $this->respond($uploads);
     }
 
     /**
