@@ -13,6 +13,7 @@ use Queue;
 use File;
 use Auth;
 use Validator;
+use Cache;
 
 class UploadsController extends ApiController {
 
@@ -30,7 +31,12 @@ class UploadsController extends ApiController {
      */
     public function index(){
 
-        $uploads = $this->currentUser->uploads()->get();
+        $currentUser = $this->currentUser;
+
+        $uploads = Cache::rememberForever('_index_upload_user_id_'.$currentUser['id'], function() use ($currentUser) {
+            return $currentUser->uploads()->get();
+        });
+
         if(!$uploads){
             return $this->respondNotFound('No Uploads Found');
         }
@@ -48,7 +54,12 @@ class UploadsController extends ApiController {
      */
     public function show($id)
     {
+        $currentUser = $this->currentUser;
         $upload = $this->currentUser->uploads()->find($id);
+
+        $upload = Cache::rememberForever('_show_'.$id.'_upload_user_id_'.$currentUser['id'], function() use ($currentUser, $id) {
+            return $currentUser->uploads()->find($id);
+        });
 
         if(!$upload){
             return $this->respondNotFound('No Upload Found');
@@ -123,6 +134,8 @@ class UploadsController extends ApiController {
         ];
 
         Queue::push(new ProcessComicBookArchiveCommand($process_info));
+
+        Cache::forget('_index_upload_user_id_'.$this->currentUser['id']);
 
         return $this->respondCreated('Upload Successful');
 
