@@ -98,6 +98,18 @@ class ApiController extends Controller {
         ]);
     }
 
+
+    /**
+     * @param $message
+     * @return mixed
+     */
+    protected function respondNoContent($message)
+    {
+        return $this->setStatusCode(IlluminateResponse::HTTP_NO_CONTENT)->respond([
+            'message' => $message
+        ]);
+    }
+
     /**
      * @param $data
      * @param array $headers

@@ -17,6 +17,12 @@ Route::get('/', function()
 
 });
 
+Route::get('/status', function()
+{
+    return json_encode('OK');
+
+});
+
 Route::group(array('before' => 'oauth'), function() {
     Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show')));
     Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
