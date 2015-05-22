@@ -49,7 +49,8 @@ class UploadsController extends ApiController {
             return $this->respondNoContent('No Uploads Found');
         }
 
-        return $this->respond($uploads);
+        //return $this->respond($uploads);
+        return $this->respondSuccessful($uploads);
     }
 
     /**

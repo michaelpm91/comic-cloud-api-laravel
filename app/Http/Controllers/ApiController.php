@@ -12,8 +12,6 @@ use LucaDegasperi\OAuth2Server\Authorizer;
 use App\User;
 
 class ApiController extends Controller {
-    //const HTTP_NOT_FOUND = 404;
-    //self::HTTP_NOT_FOUND
 
     protected $currentUser;
     protected $authorizer;
@@ -32,6 +30,8 @@ class ApiController extends Controller {
      * @var int
      */
     protected $statusCode = 200;
+    protected $statusMessage = 'success';
+    protected $message = null;
 
     /**
      * @param mixed $statusCode
@@ -49,6 +49,27 @@ class ApiController extends Controller {
     public function getStatusCode()
     {
         return $this->statusCode;
+    }
+    public function setStatusMessage($statusMessage)
+    {
+        $this->statusMessage = $statusMessage;
+        return $this;
+    }
+
+    public function getStatusMessage()
+    {
+        return $this->statusMessage;
+    }
+
+    public function setMessage($message)
+    {
+        $this->statusMessage = $message;
+        return $this;
+    }
+
+    public function getMessage()
+    {
+        return $this->message;
     }
 
     /**
@@ -80,11 +101,16 @@ class ApiController extends Controller {
      * @param $message
      * @return mixed
      */
-    protected function respondSuccessful($message)
+    protected function respondSuccessful($data, $message = null)
     {
-        return $this->setStatusCode(IlluminateResponse::HTTP_OK)->respond([
+        /*return $this->setStatusCode(IlluminateResponse::HTTP_OK)->respond([
+            'status' => 'success',
+            'data' => $data,
             'message' => $message
-        ]);
+        ]);*/
+        return $this->setStatusCode(IlluminateResponse::HTTP_OK)
+                    ->setStatusMessage("flip-flop")
+                    ->respond($data);
     }
 
     /**
@@ -111,15 +137,6 @@ class ApiController extends Controller {
     }
 
     /**
-     * @param $data
-     * @param array $headers
-     * @return mixed
-     */
-    public function respond($data, $headers = []){
-        return response()->json($data, $this->getStatusCode(), $headers);
-    }
-
-    /**
      * @param $message
      * @return mixed
      */
@@ -131,5 +148,20 @@ class ApiController extends Controller {
             ]
         ]);
     }
+
+
+    /**
+     * @param $data
+     * @param array $headers
+     * @return mixed
+     */
+    public function respond($data, $headers = []){
+        return response()->json([
+            'status' => $this->getStatusMessage(),
+            'data' => $data,
+            'message' => $this->getMessage(),
+        ], $this->getStatusCode(), $headers);
+    }
+
 
 }
