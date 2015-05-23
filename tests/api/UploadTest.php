@@ -16,7 +16,7 @@ class UploadTest extends ApiTester {
 
     protected $user;
     protected $auth_header;
-    protected $upload_endpoint = "/upload/";
+    protected $upload_endpoint = "/uploads/";
 
     public function setUp(){//runs per test :(
         parent::setUp();
@@ -250,8 +250,8 @@ class UploadTest extends ApiTester {
 
         //assert
         $this->assertResponseOk();
-        $this->assertEquals($upload->id, json_decode($response, true)['upload']['id']);
-        $this->assertEquals($upload->file_original_name, json_decode($response, true)['upload']['file_original_name']);
+        $this->assertEquals($upload->id, json_decode($response, true)['uploads']['id']);
+        $this->assertEquals($upload->file_original_name, json_decode($response, true)['uploads']['file_original_name']);
 
     }
     public function test_it_cannot_fetch_an_upload_that_does_not_exist(){

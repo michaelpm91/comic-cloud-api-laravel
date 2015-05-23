@@ -112,12 +112,9 @@ class ApiController extends Controller {
      * @param $message
      * @return mixed
      */
-    public function respondWithError($message){
+    public function respondWithError($errors_object){
         return $this->respond([
-            'error' => [
-                'message' => $message,
-                'status_code' => $this->getStatusCode()
-            ]
+            'errors' => $errors_object
         ]);
     }
 

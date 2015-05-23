@@ -19,7 +19,7 @@ class ComicTest extends ApiTester {
 
     protected $user;
     protected $auth_header;
-    protected $comic_endpoint = "/comic/";
+    protected $comic_endpoint = "/comics/";
     protected $series_endpoint = "/series/";
 
     public function setUp(){//runs per test :(

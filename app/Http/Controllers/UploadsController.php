@@ -18,6 +18,8 @@ use Input;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 
+use Rhumsaa\Uuid\Uuid;
+
 class UploadsController extends ApiController {
 
     //protected $user;
@@ -50,7 +52,7 @@ class UploadsController extends ApiController {
         }
 
         //return $this->respond($uploads);
-        return $this->respondSuccessful($uploads);
+        return $this->respond($uploads);
     }
 
     /**
@@ -72,7 +74,7 @@ class UploadsController extends ApiController {
         }
 
         return $this->respond([
-            'upload' => $upload
+            'uploads' => $upload
         ]);
     }
 
@@ -92,23 +94,43 @@ class UploadsController extends ApiController {
                 return false;
             }
         });
+        Validator::extend('valid_uuid', function($attribute, $value, $parameters) {
+            if (preg_match('/^\{?[A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}\}?$/', $value)) {
+                return true;
+            } else {
+                return false;
+            }
+        });
 
         $messages = [
-            'file.valid_cba' => 'Not a valid File',
+            'file.valid_cba' => 'Not a valid File.',
+            'series_id.valid_uuid' => 'The :attribute field is not a valid ID.',
+            'comic_id.valid_uuid' => 'The :attribute field is not a valid ID.'
         ];
 
         $validator = Validator::make(Request::all(), [
             'file' => 'required|valid_cba|between:1,150000',
-            "exists" => 'required|boolean',
-            "series_id" => 'required|alpha_num|min:40|max:40',
-            "comic_id" => 'required|alpha_num|min:40|max:40',
-            "series_title" => 'required',
-            "series_start_year" => 'required|numeric',
-            "comic_issue" => 'required|numeric',
+            'exists' => 'required|boolean',
+            'series_id' => 'required|valid_uuid',
+            'comic_id' => 'required|valid_uuid',
+            'series_title' => 'required',
+            'series_start_year' => 'required|numeric',
+            'comic_issue' => 'required|numeric',
         ], $messages);
 
         if ($validator->fails()){
-            return $this->respondBadRequest($validator->errors());
+            $pretty_errors = array_map(function($item){
+                return [
+                    'id' => '',
+                    'detail' => $item,
+                    'status' => '',
+                    'code' => '',
+                    'title' => '',
+
+                ];
+            }, $validator->errors()->all());
+
+            return $this->respondWithError($pretty_errors);
         }
 
         $file = Request::file('file');
@@ -116,7 +138,7 @@ class UploadsController extends ApiController {
         $upload = new Upload;
         $upload->file_original_name = $file->getClientOriginalName();
         $upload->file_size = $file->getSize();
-        $newFileNameWithNoExtension = $upload->file_random_upload_id = str_random(40);
+        $newFileNameWithNoExtension = $upload->file_random_upload_id = Uuid::uuid4();
         $upload->file_upload_name = $newFileName = $newFileNameWithNoExtension . '.' . $file->getClientOriginalExtension();
         $upload->file_original_file_type = $file->getClientOriginalExtension();
         $upload->user_id = $this->currentUser->id;
