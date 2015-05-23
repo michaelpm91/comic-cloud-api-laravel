@@ -85,17 +85,39 @@ class ComicsController extends ApiController {
                 }
             });
 
+            Validator::extend('valid_uuid', function($attribute, $value, $parameters) {
+                if(preg_match("/^(\{)?[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}(?(1)\})$/i", $value)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
             $messages = [
                 'series_id.user_series' => 'Not a valid Series ID',
+                'series_id.valid_uuid' => 'The :attribute field is not a valid ID.'
             ];
 
             $validator = Validator::make($data = Request::all(), [
                 'comic_issue' => 'numeric',
-                'series_id' => 'user_series|alpha_num|min:40|max:40',
+                'series_id' => 'user_series|valid_uuid',
                 'comic_vine_issue_id' => 'numeric'
             ], $messages);
 
-            if ($validator->fails()) return $this->respondBadRequest($validator->errors());
+            if ($validator->fails()){//TODO Finish Error Array
+                $pretty_errors = array_map(function($item){
+                    return [
+                        'id' => '',
+                        'detail' => $item,
+                        'status' => '',
+                        'code' => '',
+                        'title' => '',
+
+                    ];
+                }, $validator->errors()->all());
+
+                return $this->respondBadRequest($pretty_errors);
+            }
 
             if(empty($data)) return $this->respondBadRequest("No Data Sent");
 

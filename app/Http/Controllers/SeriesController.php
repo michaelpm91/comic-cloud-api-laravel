@@ -66,17 +66,43 @@ class SeriesController extends ApiController {
      * @return Response
      */
     public function store(){
+
+        Validator::extend('valid_uuid', function($attribute, $value, $parameters) {
+            if(preg_match("/^(\{)?[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}(?(1)\})$/i", $value)) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        $messages = [
+            'id.valid_uuid' => 'The :attribute field is not a valid ID.',
+            'comic_id.valid_uuid' => 'The :attribute field is not a valid ID.'
+        ];
+
+
         $validator = Validator::make($data = Request::all(), [
-            'id' => 'required|alpha_num|min:40|max:40',
-            'comic_id' => 'required|alpha_num|min:40|max:40',
+            'id' => 'required|valid_uuid',
+            'comic_id' => 'required|valid_uuid',
             'series_title' => 'required',
             'series_start_year' => 'date_format:Y'
-        ]);
+        ], $messages);
 
-        if ($validator->fails())
-        {
-            return $this->respondBadRequest($validator->errors());
+        if ($validator->fails()){//TODO Finish Error Array
+            $pretty_errors = array_map(function($item){
+                return [
+                    'id' => '',
+                    'detail' => $item,
+                    'status' => '',
+                    'code' => '',
+                    'title' => '',
+
+                ];
+            }, $validator->errors()->all());
+
+            return $this->respondBadRequest($pretty_errors);
         }
+
         if(Series::find($data['id'])) return $this->respondBadRequest("Duplicate ID Error");//TODO: Better Solution please
         $comic = $this->currentUser->comics()->find($data['comic_id']);
         if($comic) {

@@ -91,6 +91,7 @@ class UploadsController extends ApiController {
                 return false;
             }
         });
+
         Validator::extend('valid_uuid', function($attribute, $value, $parameters) {
             if(preg_match("/^(\{)?[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}(?(1)\})$/i", $value)) {
                 return true;
@@ -115,7 +116,7 @@ class UploadsController extends ApiController {
             'comic_issue' => 'required|numeric',
         ], $messages);
 
-        if ($validator->fails()){
+        if ($validator->fails()){//TODO Finish Error Array
             $pretty_errors = array_map(function($item){
                 return [
                     'id' => '',

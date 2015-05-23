@@ -11,6 +11,8 @@ use Laracasts\TestDummy\Factory;
 use App\User;
 use App\Series;
 
+use Rhumsaa\Uuid\Uuid;
+
 class SeriesTest extends ApiTester {
 
 
@@ -56,7 +58,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $newSeriesId = str_random(40);
+        $newSeriesId = Uuid::uuid4();
         $response = $this->postRequest($this->series_endpoint, [
             'id' => $newSeriesId,
             'comic_id' => $comic->id,
@@ -142,7 +144,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $newSeriesId = str_random(40);
+        $newSeriesId = Uuid::uuid4();
         $response = $this->postRequest($this->series_endpoint, [
             'id' => $newSeriesId,
             'comic_id' => $comic->id,
@@ -162,7 +164,7 @@ class SeriesTest extends ApiTester {
         ]);
 
         //act
-        $newSeriesId = str_random(40);
+        $newSeriesId = Uuid::uuid4();
         $response = $this->postRequest($this->series_endpoint, [
             'id' => $newSeriesId,
             'comic_id' => $comic->id,
