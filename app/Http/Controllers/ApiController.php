@@ -50,28 +50,6 @@ class ApiController extends Controller {
     {
         return $this->statusCode;
     }
-    public function setStatusMessage($statusMessage)
-    {
-        $this->statusMessage = $statusMessage;
-        return $this;
-    }
-
-    public function getStatusMessage()
-    {
-        return $this->statusMessage;
-    }
-
-    public function setMessage($message)
-    {
-        $this->statusMessage = $message;
-        return $this;
-    }
-
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
     /**
      * @param string $message
      * @return mixed
@@ -96,21 +74,15 @@ class ApiController extends Controller {
         return $this->setStatusCode(IlluminateResponse::HTTP_BAD_REQUEST)->respondWithError($message);
     }
 
-
     /**
      * @param $message
      * @return mixed
      */
-    protected function respondSuccessful($data, $message = null)
+    protected function respondSuccessful($message)
     {
-        /*return $this->setStatusCode(IlluminateResponse::HTTP_OK)->respond([
-            'status' => 'success',
-            'data' => $data,
+        return $this->setStatusCode(IlluminateResponse::HTTP_OK)->respond([
             'message' => $message
-        ]);*/
-        return $this->setStatusCode(IlluminateResponse::HTTP_OK)
-                    ->setStatusMessage("flip-flop")
-                    ->respond($data);
+        ]);
     }
 
     /**
@@ -156,12 +128,9 @@ class ApiController extends Controller {
      * @return mixed
      */
     public function respond($data, $headers = []){
-        return response()->json([
-            'status' => $this->getStatusMessage(),
-            'data' => $data,
-            'message' => $this->getMessage(),
-        ], $this->getStatusCode(), $headers);
+        return response()->json($data, $this->getStatusCode(), $headers);
     }
+
 
 
 }

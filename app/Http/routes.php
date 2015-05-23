@@ -24,12 +24,12 @@ Route::get('/status', function()
 });
 
 Route::group(array('before' => 'oauth'), function() {
-    Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show')));
+    Route::resource('uploads','UploadsController', array('only' => array('index', 'store', 'show')));
     Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
-    Route::resource('comic','ComicsController', array('only' => array('index', 'show', 'update', 'destroy')));
+    Route::resource('comics','ComicsController', array('only' => array('index', 'show', 'update', 'destroy')));
     Route::get('image/{image_set_key}/{size?}', 'ComicImagesController@show');
     Route::get('series/{series_id}/meta', 'SeriesController@getMeta');
-    Route::get('comic/{comic_id}/meta', 'ComicsController@getMeta');
+    Route::get('comics/{comic_id}/meta', 'ComicsController@getMeta');
 });
 
 Route::post('auth/register', 'AuthController@store');
