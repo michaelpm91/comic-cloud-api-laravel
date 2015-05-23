@@ -21,22 +21,13 @@ class OAuthExceptionHandlerMiddleware extends ApiController {
             return $next($request);
 
         } catch (OAuthException $e) {
-
-            /*return new JsonResponse([
-                    'error'             => $e->errorType,
-                    'error_description' => $e->getMessage()
-                ],
-                $e->httpStatusCode,
-                $e->getHttpHeaders()
-            );*/
-
-            return $this->setStatusCode($e->httpStatusCode)->respondWithError([
+            return $this->setStatusCode($e->httpStatusCode)->respondWithError([[//TODO: Fix nested arrays for JSON standardisation :(
                 'id' => '',
                 'title' => $e->errorType,
                 'detail' => $e->getMessage(),
                 'status' => $e->httpStatusCode,
                 'code' => ''
-            ]);
+            ]]);
         }
 
 	}
