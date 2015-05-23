@@ -35,7 +35,7 @@ class ComicTest extends ApiTester {
         $response = $this->getRequest($this->comic_endpoint);
 
         //assert
-        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+        $this->assertResponseStatus(401);
 
     }
     public function test_it_does_not_accept_post_requests(){

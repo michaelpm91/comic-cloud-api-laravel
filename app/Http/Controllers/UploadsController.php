@@ -42,8 +42,6 @@ class UploadsController extends ApiController {
 
         $uploads = Cache::remember('_index_upload_user_id_'.$currentUser['id'].'_page_'.$page, env('route_cache_time', 10080), function() use ($currentUser) {
             $uploadsArray = $currentUser->uploads()->paginate(env('paginate_per_page'))->toArray();
-            $uploadsArray['uploads'] = $uploadsArray['data'];
-            unset($uploadsArray['data']);
             return $uploadsArray;
         });
 
@@ -51,7 +49,6 @@ class UploadsController extends ApiController {
             return $this->respondNoContent('No Uploads Found');
         }
 
-        //return $this->respond($uploads);
         return $this->respond($uploads);
     }
 
@@ -74,7 +71,7 @@ class UploadsController extends ApiController {
         }
 
         return $this->respond([
-            'uploads' => $upload
+            'data' => $upload
         ]);
     }
 
@@ -95,7 +92,7 @@ class UploadsController extends ApiController {
             }
         });
         Validator::extend('valid_uuid', function($attribute, $value, $parameters) {
-            if (preg_match('/^\{?[A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}\}?$/', $value)) {
+            if(preg_match("/^(\{)?[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}(?(1)\})$/i", $value)) {
                 return true;
             } else {
                 return false;
@@ -130,7 +127,7 @@ class UploadsController extends ApiController {
                 ];
             }, $validator->errors()->all());
 
-            return $this->respondWithError($pretty_errors);
+            return $this->respondBadRequest($pretty_errors);
         }
 
         $file = Request::file('file');

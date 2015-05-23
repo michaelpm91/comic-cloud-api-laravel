@@ -31,7 +31,7 @@ class UploadTest extends ApiTester {
         $response = $this->getRequest($this->upload_endpoint);
 
         //assert
-        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
+        $this->assertResponseStatus(401);
 
 
     }
@@ -232,7 +232,7 @@ class UploadTest extends ApiTester {
         //assert
         $result = true;
         foreach($mocked_uploads as $mocked_upload ){
-            if (!in_array($mocked_upload->id, json_decode($response, true)['uploads'])) {
+            if (!in_array($mocked_upload->id, json_decode($response, true)['data'])) {
                 $result = false;
                 break;
             }
@@ -250,8 +250,8 @@ class UploadTest extends ApiTester {
 
         //assert
         $this->assertResponseOk();
-        $this->assertEquals($upload->id, json_decode($response, true)['uploads']['id']);
-        $this->assertEquals($upload->file_original_name, json_decode($response, true)['uploads']['file_original_name']);
+        $this->assertEquals($upload->id, json_decode($response, true)['data']['id']);
+        $this->assertEquals($upload->file_original_name, json_decode($response, true)['data']['file_original_name']);
 
     }
     public function test_it_cannot_fetch_an_upload_that_does_not_exist(){
@@ -275,7 +275,7 @@ class UploadTest extends ApiTester {
 
         //assert
         $result = false;
-        foreach(json_decode($response, true)['uploads'] as $upload){
+        foreach(json_decode($response, true)['data'] as $upload){
             if($upload['id'] == $other_user_upload->id) $result = true;
         }
         $this->assertEquals(false, $result);

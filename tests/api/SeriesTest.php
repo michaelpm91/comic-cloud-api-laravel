@@ -31,7 +31,7 @@ class SeriesTest extends ApiTester {
         $response = $this->getRequest($this->series_endpoint);
 
         //assert
-        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are made more consistent
+        $this->assertResponseStatus(401);
 
     }
     public function test_it_does_not_accept_post_requests_to_a_specific_series(){
