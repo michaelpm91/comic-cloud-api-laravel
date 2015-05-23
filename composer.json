@@ -15,7 +15,8 @@
         "guzzlehttp/guzzle": "5.2.0",
         "lucadegasperi/oauth2-server-laravel": "4.0.x@dev",
         "league/flysystem-aws-s3-v2": "1.0.1",
-        "graham-campbell/throttle": "~3.0"
+        "graham-campbell/throttle": "~3.0",
+		"ramsey/uuid": "~2.8"
 
 	},
 	"require-dev": {
