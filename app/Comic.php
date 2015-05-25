@@ -14,7 +14,7 @@ class Comic extends Model {
 
     protected $fillable = ['comic_issue','comic_writer','comic_book_archive_contents'];
 
-    protected $hidden = array('created_at', 'updated_at', 'user_id', 'series_id','comic_book_archive_id','deleted_at');
+    protected $hidden = array('created_at', 'updated_at', 'user_id','comic_book_archive_id','deleted_at');
 
     public function series()
     {

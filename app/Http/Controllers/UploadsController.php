@@ -40,7 +40,7 @@ class UploadsController extends ApiController {
 
         $page = (Input::get('page') ? Input::get('page'): 1);
 
-        $uploads = Cache::remember('_index_upload_user_id_'.$currentUser['id'].'_page_'.$page, env('route_cache_time', 10080), function() use ($currentUser) {
+        $uploads = Cache::remember('_index_uploads_user_id_'.$currentUser['id'].'_page_'.$page, env('route_cache_time', 10080), function() use ($currentUser) {
             $uploadsArray = $currentUser->uploads()->paginate(env('paginate_per_page'))->toArray();
             return $uploadsArray;
         });
@@ -62,7 +62,7 @@ class UploadsController extends ApiController {
     {
         $currentUser = $this->currentUser;
 
-        $upload = Cache::remember('_show_upload_id_'.$id.'_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
+        $upload = Cache::remember('_show_uploads_id_'.$id.'_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
             return $currentUser->uploads()->find($id);
         });
 
@@ -161,7 +161,7 @@ class UploadsController extends ApiController {
 
         Queue::push(new ProcessComicBookArchiveCommand($process_info));
 
-        Cache::forget('_index_upload_user_id_'.$this->currentUser['id']);
+        Cache::forget('_index_uploads_user_id_'.$this->currentUser['id']);
 
         return $this->respondCreated('Upload Successful');
 
