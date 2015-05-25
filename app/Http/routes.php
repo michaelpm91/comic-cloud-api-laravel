@@ -29,6 +29,7 @@ Route::group(array('before' => 'oauth'), function() {
     Route::resource('comics','ComicsController', array('only' => array('index', 'show', 'update', 'destroy')));
     Route::get('image/{image_key}/{size?}', 'ComicImagesController@show');
     Route::get('series/{series_id}/meta', 'SeriesController@getMeta');
+    Route::get('series/{series_id}/comics', 'SeriesController@getRelatedComics');
     Route::get('comics/{comic_id}/meta', 'ComicsController@getMeta');
 });
 

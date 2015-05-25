@@ -22,15 +22,6 @@ use Rhumsaa\Uuid\Uuid;
 
 class UploadsController extends ApiController {
 
-    //protected $user;
-    //public $user;
-
-    /*public function __construct(Upload $upload){//
-        //$this->upload = $upload;//For unit testing... maybe
-        parent::__construct();
-
-    }*/
-
     /**
      * @return mixed
      */

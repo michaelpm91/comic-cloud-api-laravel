@@ -24,7 +24,7 @@ class SeriesController extends ApiController {
         $currentUser = $this->currentUser;
 
         $series = Cache::remember('_index_series_user_id_'.$currentUser['id'], env('route_cache_time', 10080), function() use ($currentUser) {
-            return $currentUser->series()->with('comics')->get();
+            return $currentUser->series()->get();//->with('comics')->get();
         });
 
         if(!$series){
@@ -47,7 +47,7 @@ class SeriesController extends ApiController {
         $currentUser = $this->currentUser;
 
         $series = Cache::remember('_show_series_id_'.$id.'_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
-            return $currentUser->series()->with('comics')->find($id);
+            return $currentUser->series()->find($id);//->with('comics')->find($id);
         });
 
         if(!$series){
@@ -240,6 +240,16 @@ class SeriesController extends ApiController {
             ]);
         }
         return $this->respondNotFound('No Series Found');
+
+    }
+
+    public function getRelatedComics($id){
+
+        $currentUser = $this->currentUser;
+
+        //$currentUser->comics()->get();//->where('series_id', '=', $id);
+        return $currentUser->comics()->where('series_id', '=', $id)->get();
+
 
     }
 
