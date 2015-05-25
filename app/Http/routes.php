@@ -23,19 +23,20 @@ Route::get('/status', function()
 
 });
 
-Route::group(array('before' => 'oauth'), function() {
+Route::group(['before' => 'oauth', 'prefix' => 'v'.env('APP_API_VERSION')], function() {
     Route::resource('uploads','UploadsController', array('only' => array('index', 'store', 'show')));
     Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
     Route::resource('comics','ComicsController', array('only' => array('index', 'show', 'update', 'destroy')));
     Route::get('image/{image_key}/{size?}', 'ComicImagesController@show');
-    Route::get('series/{series_id}/meta', 'SeriesController@getMeta');
-    Route::get('series/{series_id}/comics', 'SeriesController@getRelatedComics');
-    Route::get('comics/{comic_id}/meta', 'ComicsController@getMeta');
+    Route::get('series/{series_id}/meta', 'SeriesController@showMetaData');
+    Route::get('series/{series_id}/comics', 'SeriesController@showRelatedComics');
+    Route::get('comics/{comic_id}/meta', 'ComicsController@howMetaData');
 });
-
-Route::post('auth/register', 'AuthController@store');
-Route::post('oauth/access_token', function () {//TODO:Mode to Auth Controller
-    return Response::json(Authorizer::issueAccessToken());
+Route::group(['prefix' => 'v'.env('APP_API_VERSION')], function() {
+    Route::post('auth/register', 'AuthController@store');
+    Route::post('oauth/access_token', function () {//TODO:Mode to Auth Controller
+        return Response::json(Authorizer::issueAccessToken());
+    });
 });
 
 /*Route::controllers([

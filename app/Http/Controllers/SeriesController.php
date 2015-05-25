@@ -23,17 +23,18 @@ class SeriesController extends ApiController {
 	public function index(){
         $currentUser = $this->currentUser;
 
-        $series = Cache::remember('_index_series_user_id_'.$currentUser['id'], env('route_cache_time', 10080), function() use ($currentUser) {
-            return $currentUser->series()->get();//->with('comics')->get();
+        $page = (Input::get('page') ? Input::get('page') : 1);
+
+        $series = Cache::remember('_index_series_user_id_'.$currentUser['id'].'_page_'.$page, env('route_cache_time', 10080), function() use ($currentUser) {
+            $seriesArray = $currentUser->series()->paginate(env('paginate_per_page'))->toArray();
+            return $seriesArray;
         });
 
         if(!$series){
             return $this->respondNotFound('No Series Found');
         }
 
-        return $this->respond([
-            'series' => $series
-        ]);
+        return $this->respond($series);
 	}
 
     /**
@@ -137,8 +138,7 @@ class SeriesController extends ApiController {
      * @param  int  $id
      * @return Response
      */
-    public function update($id)
-    {
+    public function update($id){
 
         $series = $this->currentUser->series()->find($id);
         if($series){
@@ -172,8 +172,7 @@ class SeriesController extends ApiController {
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id)
-    {
+    public function destroy($id){
         $series = $this->currentUser->series()->find($id);
         if($series) {
             $series->delete();
@@ -192,7 +191,7 @@ class SeriesController extends ApiController {
      * @param $id
      * @return mixed
      */
-    public function getMeta($id){
+    public function showMetaData($id){
         $series = $this->currentUser->series()->find($id);
 
         if($series) {
@@ -243,12 +242,19 @@ class SeriesController extends ApiController {
 
     }
 
-    public function getRelatedComics($id){
+    public function showRelatedComics($id){
 
         $currentUser = $this->currentUser;
 
-        //$currentUser->comics()->get();//->where('series_id', '=', $id);
-        return $currentUser->comics()->where('series_id', '=', $id)->get();
+        $page = (Input::get('page') ? Input::get('page') : 1);
+
+        $comic = Cache::remember('_show_related_comics_user_id_'.$currentUser['id'].'_page_'.$page, env('route_cache_time', 10080), function() use ($currentUser) {
+            $seriesArray = $currentUser->series()->paginate(env('paginate_per_page'))->toArray();
+            return $seriesArray;
+        });
+
+        return $this->respond($comic);
+        //return $currentUser->comics()->where('series_id', '=', $id)->paginate(env('paginate_per_page'))->toArray();
 
 
     }

@@ -32,7 +32,7 @@ class ComicsController extends ApiController {
 	public function index(){
         $currentUser = $this->currentUser;
 
-        $page = (Input::get('page') ? Input::get('page'): 1);
+        $page = (Input::get('page') ? Input::get('page') : 1);
 
         $comics = Cache::remember('_index_comics_user_id_'.$currentUser['id'].'_page_'.$page, env('route_cache_time', 10080), function() use ($currentUser) {
             $comicsArray = $currentUser->comics()->paginate(env('paginate_per_page'))->toArray();
@@ -175,7 +175,7 @@ class ComicsController extends ApiController {
      * @param $id
      * @return mixed
      */
-    public function getMeta($id){
+    public function showMetaData($id){
         $comic = $this->currentUser->comics()->with('series')->find($id);
 
         if($comic) {
