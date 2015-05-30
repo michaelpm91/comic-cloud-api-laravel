@@ -25,7 +25,9 @@ class Series extends Model {
     }
 
     public function getSeriesCoverImgAttribute(){
-        return head($this->comics()->get()->first()['comic_book_archive_contents']);
+        $first_comic = $this->comics()->get()->first()['comic_book_archive_contents'];
+        if(!$first_comic) return null;
+        return head($first_comic);
     }
 
 }

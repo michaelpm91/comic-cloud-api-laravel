@@ -34,6 +34,9 @@ class SeriesController extends ApiController {
             return $this->respondNotFound('No Series Found');
         }
 
+        $series['series'] = $series['data'];
+        unset($series['data']);
+
         return $this->respond($series);
 	}
 

@@ -77,7 +77,7 @@ class UploadsController extends ApiController {
 
         if(!$upload){
             Cache::forget('_show_uploads_id_'.$id.'_user_id_'.$currentUser['id']);
-            return $this->respondNotFound([
+            return $this->respondNotFound([//TODO: Detailed api error response
                 'id' => '',
                 'detail' => 'Not Found',
                 'status' => 404,
@@ -187,7 +187,7 @@ class UploadsController extends ApiController {
             }
         }
 
-        return $this->respondCreated('Upload Successful');
+        return $this->respondCreated('Upload Successful');//TODO: Detailed api error response
 
     }
 

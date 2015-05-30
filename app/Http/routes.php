@@ -28,9 +28,10 @@ Route::group(['before' => 'oauth', 'prefix' => 'v'.env('APP_API_VERSION')], func
     Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
     Route::resource('comics','ComicsController', array('only' => array('index', 'show', 'update', 'destroy')));
     Route::get('image/{image_key}/{size?}', 'ComicImagesController@show');
+    Route::get('comics/{comic_id}/series', 'ComicsController@showRelatedSeries');
     Route::get('series/{series_id}/meta', 'SeriesController@showMetaData');
     Route::get('series/{series_id}/comics', 'SeriesController@showRelatedComics');
-    Route::get('comics/{comic_id}/meta', 'ComicsController@howMetaData');
+    Route::get('comics/{comic_id}/meta', 'ComicsController@showMetaData');
 });
 Route::group(['prefix' => 'v'.env('APP_API_VERSION')], function() {
     Route::post('auth/register', 'AuthController@store');

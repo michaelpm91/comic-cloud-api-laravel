@@ -41,6 +41,9 @@ class ComicsController extends ApiController {
 
         if(!$comics) return $this->respondNotFound('No Comics Found');
 
+        $comics['comic'] = $comics['data'];
+        unset($comics['data']);
+
         return $this->respond($comics);
 
 	}
@@ -56,13 +59,13 @@ class ComicsController extends ApiController {
         $currentUser = $this->currentUser;
 
         $comic = Cache::remember('_show_comic_id_'.$id.'_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
-            return $currentUser->comics()->with('series')->find($id);
+            return $currentUser->comics()->find($id);
         });
 
         if(!$comic) return $this->respondNotFound('Comic Not Found');//TODO: Proper Response type
 
         return $this->respond([
-            'data' => $comic
+            'comic' => $comic
         ]);
     }
 
@@ -120,7 +123,7 @@ class ComicsController extends ApiController {
                 return $this->respondBadRequest($pretty_errors);
             }
 
-            if(empty($data)) return $this->respondBadRequest("No Data Sent");
+            if(empty($data)) return $this->respondBadRequest("No Data Sent");//TODO: Detailed api error response
 
             if(isset($data['comic_issue'])) $comic->comic_issue = $data['comic_issue'];
             if(isset($data['comic_writer'])) $comic->comic_writer = $data['comic_writer'];
@@ -135,7 +138,7 @@ class ComicsController extends ApiController {
 
         }else{
 
-            return $this->respondNotFound('Comic Not Found');
+            return $this->respondNotFound('Comic Not Found');//TODO: Detailed api error response
 
         }
 	}
@@ -181,7 +184,13 @@ class ComicsController extends ApiController {
         if($comic) {
 
             if(!$comic->series->comic_vine_series_id){
-                return $this->respondBadRequest('No Comic Vine Series ID set on parent series');
+                return $this->respondBadRequest([//TODO: Detailed api error response
+                    'id' => '',
+                    'detail' => 'No Comic Vine Series ID set on parent series',
+                    'status' => 401,
+                    'code' => '',
+                    'title' => 'Comic Vine API Error'
+                ]);
             }
 
             $guzzle = $this->guzzle;//New Guzzle;
@@ -210,7 +219,13 @@ class ComicsController extends ApiController {
             });
 
             if($response['status_code'] != 1) {
-                return $this->respondBadRequest('Comic Vine API Error');
+                return $this->respondBadRequest([//TODO: Detailed api error response
+                    'id' => '',
+                    'detail' => 'Comic Vine API Error',
+                    'status' => 401,
+                    'code' => '',
+                    'title' => ''
+                ]);
                 //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
             }
             $comic_vine_query = $response['results'];
@@ -232,7 +247,7 @@ class ComicsController extends ApiController {
                 'issues' => $issues
             ]);
         }
-        return $this->respondNotFound('No Comic Found');
+        return $this->respondNotFound('No Comic Found');//TODO: Detailed api error response
 
     }
 
