@@ -71,18 +71,17 @@ class UploadsController extends ApiController {
     {
         $currentUser = $this->currentUser;
 
-        $upload = Cache::remember('_show_uploads_id_'.$id.'_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
+        $upload = Cache::remember('_show_upload_id_'.$id.'_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
             return $currentUser->uploads()->find($id);
         });
 
         if(!$upload){
-            Cache::forget('_show_uploads_id_'.$id.'_user_id_'.$currentUser['id']);
-            return $this->respondNotFound([//TODO: Detailed api error response
-                'id' => '',
-                'detail' => 'Not Found',
+            Cache::forget('_show_upload_id_'.$id.'_user_id_'.$currentUser['id']);
+            return $this->respondNotFound([
+                'title' => 'Upload Not Found',
+                'detail' => 'Upload Not Found',
                 'status' => 404,
-                'code' => '',
-                'title' => '',
+                'code' => ''
             ]);
         }
 
@@ -134,15 +133,13 @@ class UploadsController extends ApiController {
             'comic_issue' => 'required|numeric',
         ], $messages);
 
-        if ($validator->fails()){//TODO Finish Error Array
+        if ($validator->fails()){
             $pretty_errors = array_map(function($item){
                 return [
-                    'id' => '',
+                    'title' => 'Missing Required Field',
                     'detail' => $item,
-                    'status' => '',
-                    'code' => '',
-                    'title' => '',
-
+                    'status' => 400,
+                    'code' => ''
                 ];
             }, $validator->errors()->all());
 
@@ -187,7 +184,9 @@ class UploadsController extends ApiController {
             }
         }
 
-        return $this->respondCreated('Upload Successful');//TODO: Detailed api error response
+        return $this->respondCreated([
+            'upload' => $upload
+        ]);
 
     }
 

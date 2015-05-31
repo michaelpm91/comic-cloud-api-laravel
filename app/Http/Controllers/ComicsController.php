@@ -33,13 +33,31 @@ class ComicsController extends ApiController {
         $currentUser = $this->currentUser;
 
         $page = (Input::get('page') ? Input::get('page') : 1);
-
-        $comics = Cache::remember('_index_comics_user_id_'.$currentUser['id'].'_page_'.$page, env('route_cache_time', 10080), function() use ($currentUser) {
+        $comic_cache_key = '_index_comics_user_id_' . $currentUser['id'] . '_page_' . $page;
+        $comics = Cache::remember($comic_cache_key, env('route_cache_time', 10080), function() use ($currentUser) {
             $comicsArray = $currentUser->comics()->paginate(env('paginate_per_page'))->toArray();
             return $comicsArray;
         });
 
-        if(!$comics) return $this->respondNotFound('No Comics Found');
+        $skip_cache_count = false;
+
+        if(!$comics['data']) {
+            Cache::forget($comic_cache_key);
+            $skip_cache_count = true;
+        }
+
+        $cache_key = '_user_id_'.$currentUser['id'].'_index_comics_pages';
+        if(!$skip_cache_count) {
+            if (!Cache::add($cache_key, $page, env('route_cache_time', 10080))) {
+                $read_pages = Cache::get($cache_key);
+                $read_pages_array = explode(',', $read_pages);
+                if (!in_array($page, $read_pages_array)) {
+                    $read_pages_array[] = $page;
+                    $read_pages_string = implode(',', $read_pages_array);
+                    Cache::put($cache_key, $read_pages_string, env('route_cache_time', 10080));
+                }
+            }
+        }
 
         $comics['comic'] = $comics['data'];
         unset($comics['data']);
@@ -62,7 +80,15 @@ class ComicsController extends ApiController {
             return $currentUser->comics()->find($id);
         });
 
-        if(!$comic) return $this->respondNotFound('Comic Not Found');//TODO: Proper Response type
+        if(!$comic){
+            Cache::forget('_show_comic_id_'.$id.'_user_id_'.$currentUser['id']);
+            return $this->respondNotFound([
+                'title' => 'Comic Not Found',
+                'detail' => 'Comic Not Found',
+                'status' => 404,
+                'code' => ''
+            ]);
+        }
 
         return $this->respond([
             'comic' => $comic
@@ -108,22 +134,25 @@ class ComicsController extends ApiController {
                 'comic_vine_issue_id' => 'numeric'
             ], $messages);
 
-            if ($validator->fails()){//TODO Finish Error Array
+            if ($validator->fails()){
                 $pretty_errors = array_map(function($item){
                     return [
-                        'id' => '',
+                        'title' => 'Missing Required Field',
                         'detail' => $item,
-                        'status' => '',
-                        'code' => '',
-                        'title' => '',
-
+                        'status' => 400,
+                        'code' => ''
                     ];
                 }, $validator->errors()->all());
 
                 return $this->respondBadRequest($pretty_errors);
             }
 
-            if(empty($data)) return $this->respondBadRequest("No Data Sent");//TODO: Detailed api error response
+            if(empty($data)) return $this->respondBadRequest([
+                'title' => 'No Data Sent',
+                'detail' => 'No Data Sent',
+                'status' => 400,
+                'code' => ''
+            ]);
 
             if(isset($data['comic_issue'])) $comic->comic_issue = $data['comic_issue'];
             if(isset($data['comic_writer'])) $comic->comic_writer = $data['comic_writer'];
@@ -134,11 +163,18 @@ class ComicsController extends ApiController {
             Cache::forget('_index_comics_user_id_'.$this->currentUser['id']);
             Cache::forget('_show_comics_id_'.$id.'_user_id_'.$this->currentUser['id']);
 
-            return $this->respondSuccessful('Comic Updated');
+            return $this->respondSuccessful([
+               'comic' => $comic
+            ]);
 
         }else{
 
-            return $this->respondNotFound('Comic Not Found');//TODO: Detailed api error response
+            return $this->respondNotFound([
+                'title' => 'Comic Not Found',
+                'detail' => 'Comic Not Found',
+                'status' => 404,
+                'code' => ''
+            ]);
 
         }
 	}
@@ -168,7 +204,12 @@ class ComicsController extends ApiController {
 
             return $this->respondSuccessful('Comic Deleted');
         }
-        return $this->respondNotFound('No Comic Found');
+        return $this->respondNotFound([
+            'title' => 'Comic Not Found',
+            'detail' => 'Comic Not Found',
+            'status' => 404,
+            'code' => ''
+        ]);
 
 	}
 

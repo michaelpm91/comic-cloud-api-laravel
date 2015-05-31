@@ -80,9 +80,7 @@ class ApiController extends Controller {
      */
     protected function respondSuccessful($message)
     {
-        return $this->setStatusCode(IlluminateResponse::HTTP_OK)->respond([
-            'message' => $message
-        ]);
+        return $this->setStatusCode(IlluminateResponse::HTTP_OK)->respond($message);
     }
 
     /**
@@ -91,21 +89,7 @@ class ApiController extends Controller {
      */
     protected function respondCreated($message)
     {
-        return $this->setStatusCode(IlluminateResponse::HTTP_CREATED)->respond([
-            'message' => $message
-        ]);
-    }
-
-
-    /**
-     * @param $message
-     * @return mixed
-     */
-    protected function respondNoContent($message)
-    {
-        return $this->setStatusCode(IlluminateResponse::HTTP_NO_CONTENT)->respond([
-            'message' => $message
-        ]);
+        return $this->setStatusCode(IlluminateResponse::HTTP_CREATED)->respond($message);
     }
 
     /**
