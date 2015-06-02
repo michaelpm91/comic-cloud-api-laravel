@@ -226,11 +226,10 @@ class ComicsController extends ApiController {
 
             if(!$comic->series->comic_vine_series_id){
                 return $this->respondBadRequest([//TODO: Detailed api error response
-                    'id' => '',
+                    'title' => 'Comic Vine API Error',
                     'detail' => 'No Comic Vine Series ID set on parent series',
                     'status' => 401,
-                    'code' => '',
-                    'title' => 'Comic Vine API Error'
+                    'code' => ''
                 ]);
             }
 
@@ -239,7 +238,8 @@ class ComicsController extends ApiController {
             $comic_vine_api_url = 'http://comicvine.com/api/issues/';
 
             $limit = 20; //max is 100
-            $offset = $limit * (Input::get('offset') ? (Input::get('offset') - 1): 0);
+            $page = (int)(Input::get('page') ? Input::get('page') : 1);
+            $offset = $limit * ($page ? ($page - 1) : 0);
             $issue = (Input::get('issue') ? Input::get('issue') : '');//Should use issue data from db somehow//($comic->issue ? $comic->issue : ''));
             $comic_vine_volume_id = $comic->series->comic_vine_series_id;
 
@@ -258,18 +258,54 @@ class ComicsController extends ApiController {
 
                 return (json_decode($guzzle_response, true));
             });
-
+            //dd($response);
             if($response['status_code'] != 1) {
-                return $this->respondBadRequest([//TODO: Detailed api error response
-                    'id' => '',
+                return $this->respondBadRequest([
+                    'title' => 'Comic Vine API Error',
                     'detail' => 'Comic Vine API Error',
                     'status' => 401,
                     'code' => '',
-                    'title' => ''
                 ]);
                 //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
             }
             $comic_vine_query = $response['results'];
+
+            $last_page = ceil($response['number_of_total_results'] / 20);
+            $current_page = ($page > $last_page ? $last_page : $page);
+            $current_page;
+
+            if($page > $last_page) {
+
+                Cache::forget('_comic_vine_issue_query_'.$comic_vine_volume_id.'_offset_'.$offset.= ($issue ? '_issue_'.$issue : ''));
+
+                $new_offset = ($current_page - 1) * $limit;
+                $response = Cache::remember('_comic_vine_issue_query_' . $comic_vine_volume_id . '_offset_' . $new_offset .= ($issue ? '_issue_' . $issue : ''), 10, function () use ($guzzle, $comic_vine_api_url, $limit, $offset, $issue, $comic_vine_volume_id, $new_offset) {//TODO:Consider Cache time
+                    $guzzle_response = $guzzle->get($comic_vine_api_url, [
+                        'query' => [
+                            'api_key' => env('comic_vine_api_key'),
+                            'format' => 'json',
+                            'filter' => 'volume:' . $comic_vine_volume_id .= ($issue ? ',' . 'issue_number:' . $issue : ''),
+                            'limit' => $limit,
+                            'offset' => $new_offset,
+                            'field_list' => 'name,description,issue_number,volume,id,image',
+                        ]
+                    ])->getBody();
+
+                    return (json_decode($guzzle_response, true));
+                });
+
+                //dd($response);
+                if($response['status_code'] != 1) {
+                    return $this->respondBadRequest([
+                        'title' => 'Comic Vine API Error',
+                        'detail' => 'Comic Vine API Error',
+                        'status' => 401,
+                        'code' => '',
+                    ]);
+                    //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
+                }
+            }
+
 
             $issues = array_map(function($issue_entry){
                 return [
@@ -284,8 +320,24 @@ class ComicsController extends ApiController {
                 return $a['issue_number'] - $b['issue_number'];
             });
 
+            $comic_meta_url = url('v'.env('APP_API_VERSION').'/comic/'. $id .'/meta?page=');
+
+
+            $next_link = ($current_page + 1 >= $last_page ? null : $comic_meta_url.($current_page + 1));
+            $prev_link = ($current_page - 1 <= 1 ? null : $comic_meta_url.($current_page - 1));
+
+            $from = ($current_page - 1) * $limit + 1;
+
             return $this->respond([
-                'issues' => $issues
+                'total' => $response['number_of_total_results'],
+                'per_page' => $response['limit'],
+                'current_page' => $current_page,
+                'last_page' => $last_page,
+                'next_page_url' => $next_link,
+                'prev_page_url' => $prev_link,
+                'from' => ($from < 0 ? 1 : $from),
+                'to' => (($current_page - 1)  * $limit) + $response['number_of_page_results'],
+                'issue' => $issues
             ]);
         }
         return $this->respondNotFound('No Comic Found');//TODO: Detailed api error response
