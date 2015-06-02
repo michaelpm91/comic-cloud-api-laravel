@@ -82,12 +82,12 @@ class ComicsController extends ApiController {
 
         if(!$comic){
             Cache::forget('_show_comic_id_'.$id.'_user_id_'.$currentUser['id']);
-            return $this->respondNotFound([
+            return $this->respondNotFound([[
                 'title' => 'Comic Not Found',
                 'detail' => 'Comic Not Found',
                 'status' => 404,
                 'code' => ''
-            ]);
+            ]]);
         }
 
         return $this->respond([
@@ -169,12 +169,12 @@ class ComicsController extends ApiController {
 
         }else{
 
-            return $this->respondNotFound([
+            return $this->respondNotFound([[
                 'title' => 'Comic Not Found',
                 'detail' => 'Comic Not Found',
                 'status' => 404,
                 'code' => ''
-            ]);
+            ]]);
 
         }
 	}
@@ -204,12 +204,12 @@ class ComicsController extends ApiController {
 
             return $this->respondSuccessful('Comic Deleted');
         }
-        return $this->respondNotFound([
+        return $this->respondNotFound([[
             'title' => 'Comic Not Found',
             'detail' => 'Comic Not Found',
             'status' => 404,
             'code' => ''
-        ]);
+        ]]);
 
 	}
 
@@ -223,12 +223,11 @@ class ComicsController extends ApiController {
         $comic = $this->currentUser->comics()->with('series')->find($id);
 
         if($comic) {
-
             if(!$comic->series->comic_vine_series_id){
                 return $this->respondBadRequest([//TODO: Detailed api error response
                     'title' => 'Comic Vine API Error',
                     'detail' => 'No Comic Vine Series ID set on parent series',
-                    'status' => 401,
+                    'status' => 400,
                     'code' => ''
                 ]);
             }
@@ -260,10 +259,10 @@ class ComicsController extends ApiController {
             });
             //dd($response);
             if($response['status_code'] != 1) {
-                return $this->respondBadRequest([
+                return $this->respondInternalError([
                     'title' => 'Comic Vine API Error',
                     'detail' => 'Comic Vine API Error',
-                    'status' => 401,
+                    'status' => 500,
                     'code' => '',
                 ]);
                 //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
@@ -296,10 +295,10 @@ class ComicsController extends ApiController {
 
                 //dd($response);
                 if($response['status_code'] != 1) {
-                    return $this->respondBadRequest([
+                    return $this->respondInternalError([
                         'title' => 'Comic Vine API Error',
                         'detail' => 'Comic Vine API Error',
-                        'status' => 401,
+                        'status' => 500,
                         'code' => '',
                     ]);
                     //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
@@ -340,7 +339,12 @@ class ComicsController extends ApiController {
                 'issue' => $issues
             ]);
         }
-        return $this->respondNotFound('No Comic Found');//TODO: Detailed api error response
+        return $this->respondNotFound([[
+            'title' => 'Comic Not Found',
+            'detail' => 'Comic Not Found',
+            'status' => 404,
+            'code' => ''
+        ]]);
 
     }
 

@@ -16,7 +16,7 @@ class ComicImageTest extends ApiTester {
 
     protected $user;
     protected $auth_header;
-    protected $comic_image_endpoint = "/image/";
+    protected $comic_image_endpoint = "/v0.1/image/";
 
     public function setUp(){//runs per test :(
         parent::setUp();
