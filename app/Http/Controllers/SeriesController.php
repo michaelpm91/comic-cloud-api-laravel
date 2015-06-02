@@ -281,11 +281,16 @@ class SeriesController extends ApiController {
                 'series' => $series_response
             ]);
         }
-        return $this->respondNotFound('No Series Found');
+        return $this->respondNotFound([[
+            'title' => 'Series Not Found',
+            'detail' => 'Series Not Found',
+            'status' => 404,
+            'code' => ''
+        ]]);
 
     }
 
-    public function showRelatedComics($id){
+    public function showRelatedComics($id){//TODO: Finish relationship
 
         $currentUser = $this->currentUser;
 

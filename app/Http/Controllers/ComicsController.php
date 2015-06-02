@@ -297,12 +297,12 @@ class ComicsController extends ApiController {
 
                 //dd($response);
                 if($response['status_code'] != 1) {
-                    return $this->respondInternalError([
+                    return $this->respondInternalError([[
                         'title' => 'Comic Vine API Error',
                         'detail' => 'Comic Vine API Error',
                         'status' => 500,
                         'code' => '',
-                    ]);
+                    ]]);
                     //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
                 }
             }
@@ -347,6 +347,23 @@ class ComicsController extends ApiController {
             'status' => 404,
             'code' => ''
         ]]);
+
+    }
+
+    public function showRelatedSeries($id){//TODO: Finish relationship
+
+        $currentUser = $this->currentUser;
+
+        $page = (Input::get('page') ? Input::get('page') : 1);
+
+        $series = Cache::remember('_show_related_comics_user_id_'.$currentUser['id'].'_page_'.$page, env('route_cache_time', 10080), function() use ($currentUser) {
+            $seriesArray = $currentUser->comic()->paginate(env('paginate_per_page'))->toArray();
+            return $seriesArray;
+        });
+
+        return $this->respond($series);
+        //return $currentUser->comics()->where('series_id', '=', $id)->paginate(env('paginate_per_page'))->toArray();
+
 
     }
 
