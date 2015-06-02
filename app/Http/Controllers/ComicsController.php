@@ -76,12 +76,14 @@ class ComicsController extends ApiController {
     {
         $currentUser = $this->currentUser;
 
-        $comic = Cache::remember('_show_comic_id_'.$id.'_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
+        $show_comic_cache_key = '_show_comic_id_' . $id . '_user_id_' . $currentUser['id'];
+
+        $comic = Cache::remember($show_comic_cache_key, env('route_cache_time', 10080),function() use ($currentUser, $id) {
             return $currentUser->comics()->find($id);
         });
 
         if(!$comic){
-            Cache::forget('_show_comic_id_'.$id.'_user_id_'.$currentUser['id']);
+            Cache::forget($show_comic_cache_key);
             return $this->respondNotFound([[
                 'title' => 'Comic Not Found',
                 'detail' => 'Comic Not Found',
@@ -164,7 +166,7 @@ class ComicsController extends ApiController {
             Cache::forget('_show_comics_id_'.$id.'_user_id_'.$this->currentUser['id']);
 
             return $this->respondSuccessful([
-               'comic' => $comic
+               'comic' => [$comic]
             ]);
 
         }else{

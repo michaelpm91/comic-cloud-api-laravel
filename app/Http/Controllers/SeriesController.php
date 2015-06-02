@@ -24,14 +24,30 @@ class SeriesController extends ApiController {
         $currentUser = $this->currentUser;
 
         $page = (Input::get('page') ? Input::get('page') : 1);
-
-        $series = Cache::remember('_index_series_user_id_'.$currentUser['id'].'_page_'.$page, env('route_cache_time', 10080), function() use ($currentUser) {
+        $series_cache_key = '_index_series_user_id_' . $currentUser['id'] . '_page_' . $page;
+        $series = Cache::remember($series_cache_key, env('route_cache_time', 10080), function() use ($currentUser) {
             $seriesArray = $currentUser->series()->paginate(env('paginate_per_page'))->toArray();
             return $seriesArray;
         });
 
-        if(!$series){
-            return $this->respondNotFound('No Series Found');
+        $skip_cache_count = false;
+
+        if(!$series['data']) {
+            Cache::forget($series_cache_key);
+            $skip_cache_count = true;
+        }
+
+        $cache_key = '_user_id_'.$currentUser['id'].'_index_series_pages';
+        if(!$skip_cache_count) {
+            if (!Cache::add($cache_key, $page, env('route_cache_time', 10080))) {
+                $read_pages = Cache::get($cache_key);
+                $read_pages_array = explode(',', $read_pages);
+                if (!in_array($page, $read_pages_array)) {
+                    $read_pages_array[] = $page;
+                    $read_pages_string = implode(',', $read_pages_array);
+                    Cache::put($cache_key, $read_pages_string, env('route_cache_time', 10080));
+                }
+            }
         }
 
         $series['series'] = $series['data'];
@@ -50,12 +66,20 @@ class SeriesController extends ApiController {
     {
         $currentUser = $this->currentUser;
 
-        $series = Cache::remember('_show_series_id_'.$id.'_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
-            return $currentUser->series()->find($id);//->with('comics')->find($id);
+        $show_series_cache_key = '_show_series_id_' . $id . '_user_id_' . $currentUser['id'];
+
+        $series = Cache::remember($show_series_cache_key, env('route_cache_time', 10080),function() use ($currentUser, $id) {
+            return $currentUser->series()->find($id);
         });
 
         if(!$series){
-            return $this->respondNotFound('Series Not Found');
+            Cache::forget($show_series_cache_key);
+            return $this->respondNotFound([[
+                'title' => 'Series Not Found',
+                'detail' => 'Series Not Found',
+                'status' => 404,
+                'code' => ''
+            ]]);
         }
 
         return $this->respond([
@@ -92,22 +116,20 @@ class SeriesController extends ApiController {
             'series_start_year' => 'date_format:Y'
         ], $messages);
 
-        if ($validator->fails()){//TODO Finish Error Array
+        if ($validator->fails()){
             $pretty_errors = array_map(function($item){
                 return [
-                    'id' => '',
+                    'title' => 'Missing Required Field',
                     'detail' => $item,
-                    'status' => '',
-                    'code' => '',
-                    'title' => '',
-
+                    'status' => 400,
+                    'code' => ''
                 ];
             }, $validator->errors()->all());
 
             return $this->respondBadRequest($pretty_errors);
         }
 
-        if(Series::find($data['id'])) return $this->respondBadRequest("Duplicate ID Error");//TODO: Better Solution please
+        //if(Series::find($data['id'])) return $this->respondBadRequest("Duplicate ID Error");//TODO: Duplicate Client ID solution
         $comic = $this->currentUser->comics()->find($data['comic_id']);
         if($comic) {
             $old_series_id = $comic->series_id;
@@ -126,12 +148,18 @@ class SeriesController extends ApiController {
             $seriesCount = Series::find($old_series_id)->comics()->get()->count();
             if ($seriesCount == 0) Series::find($old_series_id)->delete();
 
-
             Cache::forget('_index_series_user_id_'.$this->currentUser['id']);
 
-            return $this->respondCreated('Series Created');
+            return $this->respondCreated([
+                'series' => [$series]
+            ]);
         }
-        return $this->respondBadRequest("Invalid Comic");
+        return $this->respondBadRequest([[
+            'title' => 'Invalid Comic ID',
+            'detail' => 'Invalid Comic ID',
+            'status' => 400,
+            'code' => ''
+        ]]);
 
     }
 
@@ -151,9 +179,9 @@ class SeriesController extends ApiController {
                 'comic_vine_series_id' => 'numeric'
             ]);
 
-            if ($validator->fails()) return $this->respondBadRequest($validator->errors());
+            if ($validator->fails()) return $this->respondBadRequest($validator->errors());//TODO:Refactor with correct json responses
 
-            if(empty($data)) return $this->respondBadRequest("No Data Sent");
+            if(empty($data)) return $this->respondBadRequest("No Data Sent");//TODO:Refactor with correct json responses
 
             if (isset($data['series_title'])) $series->series_title = $data['series_title'];
             if (isset($data['series_start_year'])) $series->series_start_year = $data['series_start_year'];
@@ -164,9 +192,16 @@ class SeriesController extends ApiController {
             Cache::forget('_index_series_user_id_'.$this->currentUser['id']);
             Cache::forget('_show_series_id_'.$id.'_user_id_'.$this->currentUser['id']);
 
-            return $this->respondSuccessful('Series Updated');
+            return $this->respondSuccessful([
+                'series' => [$series]
+            ]);
         }
-        return $this->respondNotFound('No Series Found');
+        return $this->respondNotFound([[
+            'title' => 'Series Not Found',
+            'detail' => 'Series Not Found',
+            'status' => 404,
+            'code' => ''
+        ]]);
     }
 
     /**
@@ -185,7 +220,12 @@ class SeriesController extends ApiController {
 
             return $this->respondSuccessful('Series Deleted');
         }
-        return $this->respondNotFound('No Series Found');
+        return $this->respondNotFound([[
+            'title' => 'Series Not Found',
+            'detail' => 'Series Not Found',
+            'status' => 404,
+            'code' => ''
+        ]]);
     }
 
     /**
@@ -194,7 +234,7 @@ class SeriesController extends ApiController {
      * @param $id
      * @return mixed
      */
-    public function showMetaData($id){
+    public function showMetaData($id){//TODO:Refactor with correct json responses
         $series = $this->currentUser->series()->find($id);
 
         if($series) {
