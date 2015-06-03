@@ -179,9 +179,25 @@ class SeriesController extends ApiController {
                 'comic_vine_series_id' => 'numeric'
             ]);
 
-            if ($validator->fails()) return $this->respondBadRequest($validator->errors());//TODO:Refactor with correct json responses
+            if ($validator->fails()) {
+                $pretty_errors = array_map(function($item){
+                    return [
+                        'title' => 'Missing Required Field',
+                        'detail' => $item,
+                        'status' => 400,
+                        'code' => ''
+                    ];
+                }, $validator->errors()->all());
 
-            if(empty($data)) return $this->respondBadRequest("No Data Sent");//TODO:Refactor with correct json responses
+                return $this->respondBadRequest($pretty_errors);
+            }
+
+            if(empty($data)) return $this->respondBadRequest([[
+                'title' => 'No Data Sent',
+                'detail' => 'No Data Sent',
+                'status' => 400,
+                'code' => ''
+            ]]);
 
             if (isset($data['series_title'])) $series->series_title = $data['series_title'];
             if (isset($data['series_start_year'])) $series->series_start_year = $data['series_start_year'];
@@ -246,6 +262,7 @@ class SeriesController extends ApiController {
             $limit = 20; //max is 100
             $page = (Input::get('page') ? Input::get('page') : 1);
             $response = Cache::remember('_comic_vine_series_query_'.$series->series_title.'_page_'.$page, 10, function() use($guzzle, $comic_vine_api_url, $limit, $page, $series) {//TODO:Consider Cache time
+                //TODO: Support filtering and ordering
                 $guzzle_response = $guzzle->get($comic_vine_api_url, [
                     'query' => [
                         'api_key' => env('comic_vine_api_key'),
@@ -261,23 +278,83 @@ class SeriesController extends ApiController {
             });
 
             if($response['status_code'] != 1) {
-                return $this->respondBadRequest('Comic Vine API Error');
+                return $this->respondBadRequest([[
+                    'title' => 'Comic Vine API Error',
+                    'detail' => 'Comic Vine API Error',
+                    'status' => 500,
+                    'code' => '',
+                ]]);
                 //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
             }
+
+
+            $last_page = ceil($response['number_of_total_results'] / $limit);
+            $current_page = ($page > $last_page ? $last_page : $page);
+
+            if($page > $last_page) {
+
+                Cache::forget('_comic_vine_series_query_'.$series->series_title.'_page_'.$page);
+                $guzzle = New Guzzle;
+                $response = Cache::remember('_comic_vine_series_query_'.$series->series_title.'_page_'.$last_page, 10, function() use($guzzle, $comic_vine_api_url, $limit, $last_page, $series) {//TODO:Consider Cache time
+                    //TODO: Support filtering and ordering
+                    $guzzle_response = $guzzle->get($comic_vine_api_url, [
+                        'query' => [
+                            'api_key' => env('comic_vine_api_key'),
+                            'format' => 'json',
+                            'resources' => 'volume',
+                            'limit' => $limit,
+                            'page' => $last_page,
+                            'field_list' => 'name,start_year,publisher,id,image,count_of_issues',
+                            'query' => $series->series_title
+                        ]
+                    ])->getBody();
+                    return (json_decode($guzzle_response, true));
+                });
+
+                if($response['status_code'] != 1) {
+                    return $this->respondBadRequest([[
+                        'title' => 'Comic Vine API Error',
+                        'detail' => 'Comic Vine API Error',
+                        'status' => 500,
+                        'code' => '',
+                    ]]);
+                    //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
+                }
+
+            }
+
             $comic_vine_query = $response['results'];
+
 
             $series_response = array_map(function($series_entry){
                 return [
                     'series_title' => $series_entry['name'],
                     'series_issues' => $series_entry['count_of_issues'],
                     'series_cover_image' => $series_entry['image']['medium_url'],
-                    'start_year' => $series_entry['start_year'],
+                    'start_year' => (int)$series_entry['start_year'],
                     'publisher' => $series_entry['publisher']['name'],
                     'comic_vine_series_id' => $series_entry['id']
                 ];
             }, $comic_vine_query);
 
+
+            $series_meta_url = url('v'.env('APP_API_VERSION').'/series/'. $id .'/meta?page=');
+
+
+            $next_link = ($current_page + 1 >= $last_page ? null : $series_meta_url.($current_page + 1));
+            $prev_link = ($current_page - 1 <= 1 ? null : $series_meta_url.($current_page - 1));
+
+            $from = ($current_page - 1) * $limit + 1;
+
             return $this->respond([
+                'total' =>  $response['number_of_total_results'],
+                'per_page' => $response['limit'],
+                'current_page' => (int)$current_page,
+                'last_page' => $last_page,
+                'next_page_url' => $next_link,
+                'prev_page_url' => $prev_link,
+                'from' => ($from < 0 ? 1 : $from),
+                'to' => (($current_page - 1)  * $limit) + $response['number_of_page_results'],
                 'series' => $series_response
             ]);
         }
