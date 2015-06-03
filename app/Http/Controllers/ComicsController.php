@@ -162,7 +162,13 @@ class ComicsController extends ApiController {
             if(isset($data['comic_vine_issue_id'])) $comic->comic_vine_issue_id = $data['comic_vine_issue_id'];
             $comic->save();
 
-            Cache::forget('_index_comics_user_id_'.$this->currentUser['id']);
+            $read_pages = Cache::pull('_user_id_'. $this->currentUser['id'] .'_index_comics_pages');
+            if($read_pages){
+                $read_pages_array = explode(',', $read_pages);
+                foreach($read_pages_array as $page){
+                    Cache::forget('_index_comics_user_id_'.$this->currentUser['id'].'_page_'.$page);
+                }
+            }
             Cache::forget('_show_comics_id_'.$id.'_user_id_'.$this->currentUser['id']);
 
             return $this->respondSuccessful([
@@ -197,11 +203,24 @@ class ComicsController extends ApiController {
             $comic_count = Series::find($series_id)->comics()->get()->count();
             if($comic_count == 0) {
                 Series::find($series_id)->delete();
-                Cache::forget('_index_series_user_id_'.$this->currentUser['id']);
+
+                $read_pages = Cache::pull('_user_id_'. $this->currentUser['id'] .'_index_series_pages');
+                if($read_pages){
+                    $read_pages_array = explode(',', $read_pages);
+                    foreach($read_pages_array as $page){
+                        Cache::forget('_index_series_user_id_'.$this->currentUser['id'].'_page_'.$page);
+                    }
+                }
                 Cache::forget('_show_series_id_'.$series_id.'_user_id_'.$this->currentUser['id']);
             }
 
-            Cache::forget('_index_comics_user_id_'.$this->currentUser['id']);
+            $read_pages = Cache::pull('_user_id_'. $this->currentUser['id'] .'_index_comics_pages');
+            if($read_pages){
+                $read_pages_array = explode(',', $read_pages);
+                foreach($read_pages_array as $page){
+                    Cache::forget('_index_comics_user_id_'.$this->currentUser['id'].'_page_'.$page);
+                }
+            }
             Cache::forget('_show_comics_id_'.$id.'_user_id_'.$this->currentUser['id']);
 
             return $this->respondSuccessful('Comic Deleted');
