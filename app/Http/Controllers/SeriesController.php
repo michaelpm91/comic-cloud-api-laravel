@@ -232,7 +232,7 @@ class SeriesController extends ApiController {
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id){
+    public function destroy($id){//Should this be possible?? It should only delete if a suitable replacement series is available to prevent orphan comics //TODO: Test this logic
         $series = $this->currentUser->series()->find($id);
         if($series) {
             $series->delete();
@@ -381,7 +381,7 @@ class SeriesController extends ApiController {
 
     public function showRelatedComics($series_id){//TODO: Finish relationship
 
-
+        //TODO: User checks?
         $currentUser = $this->currentUser;
 
         $page = (Input::get('page') ? Input::get('page') : 1);
