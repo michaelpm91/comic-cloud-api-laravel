@@ -29,7 +29,6 @@ class OAuthExceptionHandlerMiddleware extends ApiController {
                 $e->httpStatusCode = 401;
             }
             return $this->setStatusCode($e->httpStatusCode)->respondWithError([[//TODO: Fix nested arrays for JSON standardisation :(
-                'id' => '',
                 'title' => $e->errorType,
                 'detail' => $error_message,
                 'status' => $e->httpStatusCode,
