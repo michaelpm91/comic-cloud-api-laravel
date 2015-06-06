@@ -47,7 +47,7 @@ class ComicsController extends ApiController {
         }
 
         $cache_key = '_user_id_'.$currentUser['id'].'_index_comics_pages';
-        if(!$skip_cache_count) {
+        if(!$skip_cache_count) {//TODO:This should be refactored into an elegant cache function
             if (!Cache::add($cache_key, $page, env('route_cache_time', 10080))) {
                 $read_pages = Cache::get($cache_key);
                 $read_pages_array = explode(',', $read_pages);
@@ -104,8 +104,7 @@ class ComicsController extends ApiController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function update($id)
-	{
+	public function update($id){
 
         $comic = $this->currentUser->comics()->find($id);
         if($comic){
@@ -149,6 +148,8 @@ class ComicsController extends ApiController {
                 return $this->respondBadRequest($pretty_errors);
             }
 
+            unset($data['method']);//So empty inputs can be detected correctly
+
             if(empty($data)) return $this->respondBadRequest([[
                 'title' => 'No Data Sent',
                 'detail' => 'No Data Sent',
@@ -158,7 +159,10 @@ class ComicsController extends ApiController {
 
             if(isset($data['comic_issue'])) $comic->comic_issue = $data['comic_issue'];
             if(isset($data['comic_writer'])) $comic->comic_writer = $data['comic_writer'];
-            if(isset($data['series_id'])) $comic->series_id = $data['series_id'];
+            if(isset($data['series_id'])) {
+                $comic->series_id = $data['series_id'];
+                Cache::forget('_show_related_series_comic_id_'.$id.'_user_id_' . $this->currentUser['id']);
+            }
             if(isset($data['comic_vine_issue_id'])) $comic->comic_vine_issue_id = $data['comic_vine_issue_id'];
             $comic->save();
 
@@ -168,15 +172,15 @@ class ComicsController extends ApiController {
                 foreach($read_pages_array as $page){
                     Cache::forget('_index_comics_user_id_'.$this->currentUser['id'].'_page_'.$page);
                 }
-            }
+            } //TODO:This should be refactored into an elegant cache function
 
-            $read_pages = Cache::pull('_user_id_'.$this->currentUser['id'].'_show_related_comics_series_id_'.$$comic->series_id.'_pages');
+            $read_pages = Cache::pull('_user_id_'.$this->currentUser['id'].'_show_related_comics_series_id_'.$comic->series_id.'_pages');
             if($read_pages){
                 $read_pages_array = explode(',', $read_pages);
                 foreach($read_pages_array as $page){
-                    Cache::forget('_show_related_comics_series_id_'.$$comic->series_id.'_user_id_' . $this->currentUser['id'] . '_page_' . $page);
+                    Cache::forget('_show_related_comics_series_id_'.$comic->series_id.'_user_id_' . $this->currentUser['id'] . '_page_' . $page);
                 }
-            }
+            } //TODO:This should be refactored into an elegant cache function
 
             Cache::forget('_show_comics_id_'.$id.'_user_id_'.$this->currentUser['id']);
 
@@ -202,8 +206,7 @@ class ComicsController extends ApiController {
 	 * @param  int  $id
 	 * @return Response
 	 */
-	public function destroy($id)
-	{
+	public function destroy($id){
 
         $comic = $this->currentUser->comics()->find($id);
         if($comic) {
@@ -219,10 +222,15 @@ class ComicsController extends ApiController {
                     foreach($read_pages_array as $page){
                         Cache::forget('_index_series_user_id_'.$this->currentUser['id'].'_page_'.$page);
                     }
-                }
+                } //TODO:This should be refactored into an elegant cache function
 
-                //TODO: Write related series cache wipe.
-
+                $read_pages = Cache::pull('_user_id_'.$this->currentUser['id'].'_show_related_comics_series_id_'.$comic->series_id.'_pages');
+                if($read_pages){
+                    $read_pages_array = explode(',', $read_pages);
+                    foreach($read_pages_array as $page){
+                        Cache::forget('_show_related_comics_series_id_'.$comic->series_id.'_user_id_' . $this->currentUser['id'] . '_page_' . $page);
+                    }
+                } //TODO:This should be refactored into an elegant cache function
 
                 Cache::forget('_show_series_id_'.$series_id.'_user_id_'.$this->currentUser['id']);
             }
@@ -233,7 +241,7 @@ class ComicsController extends ApiController {
                 foreach($read_pages_array as $page){
                     Cache::forget('_index_comics_user_id_'.$this->currentUser['id'].'_page_'.$page);
                 }
-            }
+            } //TODO:This should be refactored into an elegant cache function
 
             $read_pages = Cache::pull('_user_id_'.$this->currentUser['id'].'_show_related_comics_series_id_'.$series_id.'_pages');
             if($read_pages){
@@ -241,8 +249,12 @@ class ComicsController extends ApiController {
                 foreach($read_pages_array as $page){
                     Cache::forget('_show_related_comics_series_id_'.$series_id.'_user_id_' . $this->currentUser['id'] . '_page_' . $page);
                 }
-            }
+            } //TODO:This should be refactored into an elegant cache function
+
             Cache::forget('_show_comics_id_'.$id.'_user_id_'.$this->currentUser['id']);
+
+            Cache::forget('_show_related_series_comic_id_'.$id.'_user_id_' . $this->currentUser['id']);
+
 
             return $this->respondSuccessful('Comic Deleted');
         }
@@ -369,7 +381,7 @@ class ComicsController extends ApiController {
 
             $from = ($current_page - 1) * $limit + 1;
 
-            return $this->respond([
+            return $this->respond([ //TODO: Consider using Laravel's manual pagination. Paginator::make($items, $totalItems, $perPage);
                 'total' => $response['number_of_total_results'],
                 'per_page' => $response['limit'],
                 'current_page' => (int)$current_page,
@@ -391,45 +403,46 @@ class ComicsController extends ApiController {
     }
 
     public function showRelatedSeries($comic_id){//TODO: Finish relationship
-        //TODO: User checks?
         $currentUser = $this->currentUser;
 
-        $page = (Input::get('page') ? Input::get('page') : 1);
 
-        //Query comic -> Get series id -> get series data
-        $comic_related_series_cache_key = '_show_related_series_comic_id_'.$comic_id.'_user_id_' . $currentUser['id'] . '_page_' . $page;
+        $show_comic_cache_key = '_show_comic_id_' . $comic_id . '_user_id_' . $currentUser['id'];
 
-        $series = Cache::remember($comic_related_series_cache_key, env('route_cache_time', 10080), function() use ($currentUser, $comic_id) {
-            $seriesArray = $currentUser->series()->comics()->paginate(env('paginate_per_page'))->toArray();
-            return $seriesArray;
+
+        $comic = Cache::remember($show_comic_cache_key, env('route_cache_time', 10080),function() use ($currentUser, $comic_id) {
+            return $currentUser->comics()->find($comic_id);
         });
 
-        $skip_cache_count = false;
+        if(!$comic_id){
+            Cache::forget($show_comic_cache_key);
+            return $this->respondNotFound([[
+                'title' => 'Comic Not Found',
+                'detail' => 'Comic Not Found',
+                'status' => 404,
+                'code' => ''
+            ]]);
+        }
+        $series_id = $comic->series_id;
 
-        /*if(!$series['data']) {
-            Cache::forget($comic_related_series_cache_key);
-            $skip_cache_count = true;
+        $show_series_cache_key = '_show_series_id_' . $series_id . '_user_id_' . $currentUser['id'];
+
+        $series = Cache::remember($show_series_cache_key, env('route_cache_time', 10080),function() use ($currentUser, $series_id) {
+            return $currentUser->series()->find($series_id);
+        });
+
+        if(!$series){
+            Cache::forget($show_series_cache_key);
+            return $this->respondNotFound([[
+                'title' => 'Series Not Found',
+                'detail' => 'Series Not Found',
+                'status' => 404,
+                'code' => ''
+            ]]);
         }
 
-        $cache_key = '_user_id_'.$currentUser['id'].'_show_related_comics_series_id_'.$series_id.'_pages';
-        if(!$skip_cache_count) {
-            if (!Cache::add($cache_key, $page, env('route_cache_time', 10080))) {
-                $read_pages = Cache::get($cache_key);
-                $read_pages_array = explode(',', $read_pages);
-                if (!in_array($page, $read_pages_array)) {
-                    $read_pages_array[] = $page;
-                    $read_pages_string = implode(',', $read_pages_array);
-                    Cache::put($cache_key, $read_pages_string, env('route_cache_time', 10080));
-                }
-            }
-        }
-
-        $comic['comic'] = $comic['data'];
-        unset($comic['data']);
-
-
-        return $this->respond($comic);*/
-
+        return $this->respond([
+            'series' => [$series]
+        ]);
 
     }
 

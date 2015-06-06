@@ -245,8 +245,8 @@ class SeriesTest extends ApiTester {
 
         //assert
         $this->assertResponseOk();
-        $this->assertEquals($comic->series->id, json_decode($response, true)['series']['id']);
-        $this->assertEquals($comic->series->series_title, json_decode($response, true)['series']['series_title']);
+        $this->assertEquals($comic->series->id, head(json_decode($response, true)['series'])['id']);
+        $this->assertEquals($comic->series->series_title, head(json_decode($response, true)['series'])['series_title']);
 
     }
     /**
@@ -303,8 +303,8 @@ class SeriesTest extends ApiTester {
         $this->assertResponseOk();
 
 
-        $this->assertEquals($comic->series->id, json_decode($response, true)['series']['id']);
-        $this->assertEquals('Test Series Title', json_decode($response, true)['series']['series_title']);
+        $this->assertEquals($comic->series->id, head(json_decode($response, true)['series'])['id']);
+        $this->assertEquals('Test Series Title', head(json_decode($response, true)['series'])['series_title']);
 
     }
     /**
@@ -332,8 +332,8 @@ class SeriesTest extends ApiTester {
         $this->assertResponseOk();
 
 
-        $this->assertEquals($comic->series->id, json_decode($response, true)['series']['id']);
-        $this->assertEquals(1991, json_decode($response, true)['series']['series_start_year']);
+        $this->assertEquals($comic->series->id, head(json_decode($response, true)['series'])['id']);
+        $this->assertEquals(1991, head(json_decode($response, true)['series'])['series_start_year']);
 
     }
     /**
@@ -361,8 +361,8 @@ class SeriesTest extends ApiTester {
         $this->assertResponseOk();
 
 
-        $this->assertEquals($comic->series->id, json_decode($response, true)['series']['id']);
-        $this->assertEquals('Test Series Publisher', json_decode($response, true)['series']['series_publisher']);
+        $this->assertEquals($comic->series->id, head(json_decode($response, true)['series'])['id']);
+        $this->assertEquals('Test Series Publisher', head(json_decode($response, true)['series'])['series_publisher']);
 
     }
     /**
@@ -578,7 +578,7 @@ class SeriesTest extends ApiTester {
         $response = $this->getRequest($this->series_endpoint.$comic->series->id);
 
         //assert
-        $response_comic_vine_series_id = json_decode($response, true)['series']['comic_vine_series_id'];
+        $response_comic_vine_series_id = head(json_decode($response, true)['series'])['comic_vine_series_id'];
         $this->assertEquals($response_comic_vine_series_id, $comic_vine_series_id);
 
     }

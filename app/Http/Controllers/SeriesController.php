@@ -83,7 +83,7 @@ class SeriesController extends ApiController {
         }
 
         return $this->respond([
-            'series' => $series
+            'series' => [$series]
         ]);
     }
 
@@ -262,7 +262,7 @@ class SeriesController extends ApiController {
      * @param $id
      * @return mixed
      */
-    public function showMetaData($id){//TODO:Refactor with correct json responses
+    public function showMetaData($id){
         $series = $this->currentUser->series()->find($id);
 
         if($series) {
@@ -379,9 +379,8 @@ class SeriesController extends ApiController {
 
     }
 
-    public function showRelatedComics($series_id){//TODO: Finish relationship
+    public function showRelatedComics($series_id){
 
-        //TODO: User checks?
         $currentUser = $this->currentUser;
 
         $page = (Input::get('page') ? Input::get('page') : 1);
