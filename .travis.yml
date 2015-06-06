@@ -1,16 +1,22 @@
 branches:
   only:
-    - develop
+  - develop
 language: php
-
 php:
-  - 5.4
-  - 5.5
-  - 5.6
-
+- 5.6
 sudo: false
-
 before_script:
-  - composer install
-
+- composer install
 script: vendor/bin/phpunit
+deploy:
+- provider: codedeploy
+  access_key_id: AKIAICX4EQAQ2SP3PGGA
+  secret_access_key:
+    secure: n9GIsu4WK7YiwdnZcfKpGQH+rrdV42n7FWJT1dF6oPRUO1bUKgsAYPMh0M5S4wA4A//QzA0iS7uE7/rVSPUyZmX7A8KtQOeLHkJL4tO5IZMMsRrBJFncOBFJVagoB764QrTjKd+mC113LXMJec9zhwr+aOHeTD/MzlFhKAPaS8g=
+  bucket: comicclouddeploy
+  revision_type: github
+  application: Comic_Cloud_Deploy
+  deployment_group: Comic_Cloud_Deploy_Develop
+  on:
+    repo: kidshenlong/Comic-Cloud-API
+    branch: develop

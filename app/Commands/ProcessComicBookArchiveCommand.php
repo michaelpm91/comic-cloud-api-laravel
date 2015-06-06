@@ -20,6 +20,8 @@ use Storage;
 use ZipArchive;
 use RarArchive;
 
+use Rhumsaa\Uuid\Uuid;
+
 class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, SelfHandling
 {
 
@@ -293,7 +295,7 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
             $imageExt = strtolower(pathinfo($image, PATHINFO_EXTENSION));
 
 
-            $image_slug = str_random(40);
+            $image_slug = Uuid::uuid4();
 
             Storage::disk(env('user_images'))->put($image_slug.".".$imageExt, file_get_contents($image));
 

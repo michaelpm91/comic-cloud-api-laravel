@@ -14,7 +14,7 @@ class Comic extends Model {
 
     protected $fillable = ['comic_issue','comic_writer','comic_book_archive_contents'];
 
-    protected $hidden = array('created_at', 'updated_at', 'user_id', 'series_id','comic_book_archive_id','deleted_at');
+    protected $hidden = array('created_at', 'updated_at', 'user_id','comic_book_archive_id','deleted_at');
 
     public function series()
     {
@@ -29,7 +29,7 @@ class Comic extends Model {
             $json_array = json_decode($json_array);
 
             array_walk($json_array, function (&$value, $key) {
-                $value = env('image_url') . $value;
+                $value = url('v'.env('APP_API_VERSION').env('image_url') . $value);
             });
             return json_decode(json_encode($json_array, true));
         }
