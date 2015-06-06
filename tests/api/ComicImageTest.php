@@ -16,7 +16,7 @@ class ComicImageTest extends ApiTester {
 
     protected $user;
     protected $auth_header;
-    protected $comic_image_endpoint = "/image/";
+    protected $comic_image_endpoint = "/v0.1/image/";
 
     public function setUp(){//runs per test :(
         parent::setUp();
@@ -31,7 +31,7 @@ class ComicImageTest extends ApiTester {
         $response = $this->getRequest($this->comic_image_endpoint.str_random(40));
 
         //assert
-        $this->assertResponseStatus(400);//TODO: This will need to be updated when API returns are madem ore consistent
+        $this->assertResponseStatus(401);
 
     }
     public function test_it_only_accepts_get_requests_to_a_specific_image(){

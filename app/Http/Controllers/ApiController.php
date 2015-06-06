@@ -12,8 +12,6 @@ use LucaDegasperi\OAuth2Server\Authorizer;
 use App\User;
 
 class ApiController extends Controller {
-    //const HTTP_NOT_FOUND = 404;
-    //self::HTTP_NOT_FOUND
 
     protected $currentUser;
     protected $authorizer;
@@ -32,6 +30,8 @@ class ApiController extends Controller {
      * @var int
      */
     protected $statusCode = 200;
+    protected $statusMessage = 'success';
+    protected $message = null;
 
     /**
      * @param mixed $statusCode
@@ -50,7 +50,6 @@ class ApiController extends Controller {
     {
         return $this->statusCode;
     }
-
     /**
      * @param string $message
      * @return mixed
@@ -75,16 +74,13 @@ class ApiController extends Controller {
         return $this->setStatusCode(IlluminateResponse::HTTP_BAD_REQUEST)->respondWithError($message);
     }
 
-
     /**
      * @param $message
      * @return mixed
      */
     protected function respondSuccessful($message)
     {
-        return $this->setStatusCode(IlluminateResponse::HTTP_OK)->respond([
-            'message' => $message
-        ]);
+        return $this->setStatusCode(IlluminateResponse::HTTP_OK)->respond($message);
     }
 
     /**
@@ -93,10 +89,19 @@ class ApiController extends Controller {
      */
     protected function respondCreated($message)
     {
-        return $this->setStatusCode(IlluminateResponse::HTTP_CREATED)->respond([
-            'message' => $message
+        return $this->setStatusCode(IlluminateResponse::HTTP_CREATED)->respond($message);
+    }
+
+    /**
+     * @param $message
+     * @return mixed
+     */
+    public function respondWithError($errors_object){
+        return $this->respond([
+            'errors' => $errors_object
         ]);
     }
+
 
     /**
      * @param $data
@@ -107,17 +112,6 @@ class ApiController extends Controller {
         return response()->json($data, $this->getStatusCode(), $headers);
     }
 
-    /**
-     * @param $message
-     * @return mixed
-     */
-    public function respondWithError($message){
-        return $this->respond([
-            'error' => [
-                'message' => $message,
-                'status_code' => $this->getStatusCode()
-            ]
-        ]);
-    }
+
 
 }

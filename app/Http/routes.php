@@ -13,22 +13,31 @@
 
 Route::get('/', function()
 {
-    return View::make('home');
+    return "<h1 style='font-family:Arial;'>".env('APP_URL')."-".env('APP_API_VERSION')."</h1>";
 
 });
 
-Route::group(array('before' => 'oauth'), function() {
-    Route::resource('upload','UploadsController', array('only' => array('index', 'store', 'show')));
+Route::get('/status', function()
+{
+    return json_encode('OK');
+
+});
+
+Route::group(['before' => 'oauth', 'prefix' => 'v'.env('APP_API_VERSION')], function() {
+    Route::resource('uploads','UploadsController', array('only' => array('index', 'store', 'show')));
     Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
-    Route::resource('comic','ComicsController', array('only' => array('index', 'show', 'update', 'destroy')));
-    Route::get('image/{image_set_key}/{size?}', 'ComicImagesController@show');
-    Route::get('series/{series_id}/meta', 'SeriesController@getMeta');
-    Route::get('comic/{comic_id}/meta', 'ComicsController@getMeta');
+    Route::resource('comics','ComicsController', array('only' => array('index', 'show', 'update', 'destroy')));
+    Route::get('image/{image_key}/{size?}', 'ComicImagesController@show');
+    Route::get('comics/{comic_id}/series', 'ComicsController@showRelatedSeries');
+    Route::get('series/{series_id}/meta', 'SeriesController@showMetaData');
+    Route::get('series/{series_id}/comics', 'SeriesController@showRelatedComics');
+    Route::get('comics/{comic_id}/meta', 'ComicsController@showMetaData');
 });
-
-Route::post('auth/register', 'AuthController@store');
-Route::post('oauth/access_token', function () {//TODO:Mode to Auth Controller
-    return Response::json(Authorizer::issueAccessToken());
+Route::group(['prefix' => 'v'.env('APP_API_VERSION')], function() {
+    Route::post('auth/register', 'AuthController@store');
+    Route::post('oauth/access_token', function () {//TODO:Mode to Auth Controller
+        return Response::json(Authorizer::issueAccessToken());
+    });
 });
 
 /*Route::controllers([

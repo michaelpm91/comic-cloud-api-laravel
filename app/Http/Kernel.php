@@ -16,7 +16,8 @@ class Kernel extends HttpKernel {
 		'Illuminate\Session\Middleware\StartSession',
 		'Illuminate\View\Middleware\ShareErrorsFromSession',
 		//'App\Http\Middleware\VerifyCsrfToken', moved to $routeMiddleware[]
-        'LucaDegasperi\OAuth2Server\Middleware\OAuthExceptionHandlerMiddleware'
+        //'LucaDegasperi\OAuth2Server\Middleware\OAuthExceptionHandlerMiddleware',
+        'App\Http\Middleware\OAuthExceptionHandlerMiddleware'
 	];
 
 	/**

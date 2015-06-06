@@ -1,0 +1,15 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /var/www/api.dev.comiccloud.io
+hooks:
+  ApplicationStart:
+  - location: deploy_scripts/install.sh
+    timeout: 180
+permissions:
+  - object: /var/www/
+    owner: ec2-user
+    mode: 775
+    type:
+        - directory

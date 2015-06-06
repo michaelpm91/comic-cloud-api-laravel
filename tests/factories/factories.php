@@ -6,6 +6,8 @@
  * Time: 19:12
  */
 
+use Rhumsaa\Uuid\Uuid;
+
 $factory('App\User', [
     'username' => $faker->username,
     'email' => $faker->email,
@@ -16,7 +18,7 @@ $factory('App\Upload', function ($faker){
     $fileExt = ['cbz', 'cbr', 'pdf',];
     $thisFileExt = $fileExt[rand(0,2)];
     $fileName = implode(' ', $faker->words(rand(3,7))).'.'.$thisFileExt;
-    $random_upload_id = str_random(40);
+    $random_upload_id = Uuid::uuid4();
 
     return[
         'user_id'  => 'factory:App\User',
@@ -37,18 +39,18 @@ $factory('App\Upload', function ($faker){
 });
 
 $factory('App\Comic', function($faker){
-    $id = str_random(40);
+    $id = Uuid::uuid4();
     return [
         'id' => $id,
         'comic_issue' => rand(1, 99),
         'comic_writer' => $faker->name,
         'comic_book_archive_contents' => json_encode([
-            1 => str_random(20).".jpg",
-            2 => str_random(20).".jpg",
-            3 => str_random(20).".jpg",
-            4 => str_random(20).".jpg",
-            5 => str_random(20).".jpg",
-            6 => str_random(20).".jpg",
+            1 => Uuid::uuid4().".jpg",
+            2 => Uuid::uuid4().".jpg",
+            3 => Uuid::uuid4().".jpg",
+            4 => Uuid::uuid4().".jpg",
+            5 => Uuid::uuid4().".jpg",
+            6 => Uuid::uuid4().".jpg",
         ]),
         'user_id' => 'factory:App\User',
         'series_id' => 'factory:App\Series',
@@ -59,7 +61,7 @@ $factory('App\Comic', function($faker){
 });
 
 $factory('App\Series', function($faker){
-    $id = str_random(40);
+    $id = Uuid::uuid4();
     return [
         'id' => $id,
         'series_title' => $faker->sentence(),
@@ -74,12 +76,12 @@ $factory('App\ComicBookArchive', [
     'upload_id' => 'factory:App\Upload',
     'comic_book_archive_contents' => '',
     'comic_book_archive_hash' => json_encode([
-        1 => str_random(20).".jpg",
-        2 => str_random(20).".jpg",
-        3 => str_random(20).".jpg",
-        4 => str_random(20).".jpg",
-        5 => str_random(20).".jpg",
-        6 => str_random(20).".jpg",
+        1 => Uuid::uuid4().".jpg",
+        2 => Uuid::uuid4().".jpg",
+        3 => Uuid::uuid4().".jpg",
+        4 => Uuid::uuid4().".jpg",
+        5 => Uuid::uuid4().".jpg",
+        6 => Uuid::uuid4().".jpg",
     ]),
     'comic_book_archive_status' => 1
 ]);

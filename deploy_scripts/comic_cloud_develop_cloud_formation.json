@@ -1,0 +1,290 @@
+{
+
+    "Description": "AWS CloudFormation Template that will attempt to setup an environment for Comic Cloud Deploys.",
+
+    "Parameters": {
+        "KeyName": {
+            "Description": "Name of an existing EC2 KeyPair to enable SSH access to the instance",
+            "Type": "AWS::EC2::KeyPair::KeyName",
+            "ConstraintDescription": "must be the name of an existing EC2 KeyPair."
+        },
+        "TagKey": {
+            "Description": "The EC2 tag key that identifies this as a target for deployments.",
+            "Type": "String",
+            "Default": "Name",
+            "AllowedPattern": "[\\x20-\\x7E]*",
+            "ConstraintDescription": "Can contain only ASCII characters."
+        },
+        "TagValue": {
+            "Description": "The EC2 tag value that identifies this as a target for deployments.",
+            "Type": "String",
+            "Default": "ComicCloudDeploy",
+            "AllowedPattern": "[\\x20-\\x7E]*",
+            "ConstraintDescription": "Can contain only ASCII characters."
+        },
+        "AttachElasticIP": {
+            "Description": "Attach instance to Elastic IP",
+            "Type": "String",
+            "Default": "true"
+        }
+    },
+    "Conditions": {
+        "AttachElasticIPCondition" : {"Fn::Equals" : [{"Ref" : "AttachElasticIP"}, "true"]}
+    },
+    "Resources": {
+        "WebServerInstance": {
+            "Type": "AWS::EC2::Instance",
+            "Metadata": {
+                "AWS::CloudFormation::Init": {
+                    "configSets": {
+                        "InstallAndRun": ["Install"]
+                    },
+
+                    "Install": {
+                        "packages": {
+                            "yum": {
+                                "git": [],
+                                "aws-cli": [],
+                                "php56": [],
+                                "php56-mcrypt": [],
+                                "php56-mbstring": [],
+                                "php56-pdo": [],
+                                "php56-mysqlnd": [],
+                                "php56-gd": [],
+                                "php-pear": [],
+                                "php56-devel": [],
+                                "gcc": [],
+                                "gcc-c++": []
+                            }
+                        },
+
+                        "files": {
+                            "/etc/cfn/cfn-hup.conf": {
+                                "content": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "[main]\n",
+                                            "stack=",
+                                            {"Ref": "AWS::StackId"},
+                                            "\n",
+                                            "region=",
+                                            {"Ref": "AWS::Region"},
+                                            "\n"
+                                        ]
+                                    ]
+                                },
+                                "mode": "000400",
+                                "owner": "root",
+                                "group": "root"
+                            },
+                            "/etc/cfn/hooks.d/cfn-auto-reloader.conf": {
+                                "content": {
+                                    "Fn::Join": [
+                                        "",
+                                        [
+                                            "[cfn-auto-reloader-hook]\n",
+                                            "triggers=post.update\n",
+                                            "path=Resources.WebServerInstance.Metadata.AWS::CloudFormation::Init\n",
+                                            "action=/opt/aws/bin/cfn-init -v ",
+                                            "         --stack ",
+                                            {"Ref": "AWS::StackName"},
+                                            "         --resource WebServerInstance ",
+                                            "         --configsets InstallAndRun ",
+                                            "         --region ",
+                                            {"Ref": "AWS::Region"},
+                                            "\n",
+                                            "runas=root\n"
+                                        ]
+                                    ]
+                                }
+                            }
+                        },
+
+                        "services": {
+                            "sysvinit": {
+                                "httpd": {
+                                    "enabled": "true",
+                                    "ensureRunning": "true"
+                                },
+                                "cfn-hup": {
+                                    "enabled": "true", "ensureRunning": "true",
+                                    "files": [
+                                        "/etc/cfn/cfn-hup.conf",
+                                        "/etc/cfn/hooks.d/cfn-auto-reloader.conf"
+                                    ]
+                                },
+                                "codedeploy-agent": {
+                                    "enabled": "true",
+                                    "ensureRunning": "true"
+                                }
+                            }
+                        }
+                    }
+
+                }
+            },
+            "Properties": {
+                "ImageId": "ami-246ed34c",
+
+                "InstanceType": "t1.micro",
+
+                "SecurityGroups": ["ComicCloudDevelop"],
+
+                "KeyName": {"Ref": "KeyName"},
+                "IamInstanceProfile": "ComicCloudDevelopInstanceRole",
+                "UserData": {
+                    "Fn::Base64": {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "#!/bin/bash -xe\n",
+                                "yum update\n",
+                                "yum update -y aws-cfn-bootstrap\n",
+                                "# Helper function.\n",
+                                "function error_exit\n",
+                                "{\n",
+                                "  /opt/aws/bin/cfn-signal -e 1 -r \"$1\" \n",
+                                "  exit 1\n",
+                                "}\n",
+                                "# Install the AWS CodeDeploy Agent.\n",
+                                "cd /home/ec2-user/\n",
+                                "aws s3 cp 's3://aws-codedeploy-us-east-1/latest/codedeploy-agent.noarch.rpm' . || error_exit 'Failed to download AWS CodeDeploy Agent.'\n",
+                                "yum -y install codedeploy-agent.noarch.rpm || error_exit 'Failed to install AWS CodeDeploy Agent.' \n",
+                                "# Install the files and packages from the metadata\n",
+                                "/opt/aws/bin/cfn-init -v ",
+                                "         --stack ",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                "         --resource WebServerInstance ",
+                                "         --configsets InstallAndRun ",
+                                "         --region ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n",
+                                "# Signal the status from cfn-init\n",
+                                "/opt/aws/bin/cfn-signal -e $? ",
+                                "         --stack ",
+                                {
+                                    "Ref": "AWS::StackName"
+                                },
+                                "         --resource WebServerInstance ",
+                                "         --region ",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                "\n",
+                                "# Install Composer\n",
+                                "curl -sS https://getcomposer.org/installer | php \n",
+                                "mv composer.phar /usr/local/bin/composer \n",
+                                "# Install PHP RAR\n",
+                                "pecl channel-update pecl.php.net \n",
+                                "pecl -v install rar \n",
+                                "echo '<?php phpinfo();?>' >> /var/www/html/index.php \n",
+                                "echo 'extension=rar.so' >> /etc/php.ini \n",
+                                "# Setup Virtual Host Entry for api.dev.comiccloud.io\n",
+                                "cat > /etc/httpd/conf.d/dev.api.comiccloud.io.conf <<EOF\n",
+                                "<VirtualHost *:80>\n",
+                                "\tServerName api.dev.comiccloud.io\n",
+                                "\tDocumentRoot /var/www/api.dev.comiccloud.io/public\n",
+                                "\t<Directory \"/var/www/api.dev.comiccloud.io/public\">\n",
+                                "\t\tAllowOverride all\n",
+                                "\t</Directory>\n",
+                                "</VirtualHost>\n",
+                                "EOF\n",
+                                "# Setup swap file\n",
+                                "dd if=/dev/zero of=/swapfile bs=1024 count=512k\n",
+                                "mkswap /swapfile\n",
+                                "swapon /swapfile\n",
+                                "chown root:root /swapfile\n",
+                                "chmod 0600 /swapfile\n",
+                                "#Update php.ini\n",
+                                "upload_max_filesize=250M\n",
+                                "sed -i \"s/upload_max_filesize = .*/upload_max_filesize = ${upload_max_filesize}/\" /etc/php.ini\n",
+                                "post_max_size=250M\n",
+                                "sed -i \"s/post_max_size = .*/post_max_size = ${post_max_size}/\" /etc/php.ini\n",
+                                "service httpd restart \n",
+                                "#Install Supervisor\n",
+                                "yum install -y python-pip\n",
+                                "pip install supervisor\n",
+                                "/usr/local/bin/echo_supervisord_conf > /etc/supervisord.conf\n",
+                                "mkdir /etc/supervisor\n",
+                                "mkdir /etc/supervisor/conf.d\n",
+                                "cat >>  /etc/supervisord.conf  <<EOF\n",
+                                "[include]\n",
+                                "files = /etc/supervisor/conf.d/*.conf\n",
+                                "EOF\n",
+                                "curl https://gist.githubusercontent.com/kidshenlong/561791200f017b146299/raw/e242b0f43021a63459f75344421ae39903344385/supervisord.sh > /etc/init.d/supervisord\n",
+                                "chmod +x /etc/init.d/supervisord\n",
+                                "chkconfig --add supervisord\n",
+                                "service supervisord start\n"
+                            ]
+                        ]
+                    }
+                },
+                "Tags": [
+                    {
+                        "Key": {
+                            "Ref": "TagKey"
+                        },
+                        "Value": {
+                            "Ref": "TagValue"
+                        }
+                    }
+                ]
+            },
+            "CreationPolicy": {
+                "ResourceSignal": {
+                    "Timeout": "PT5M"
+                }
+            }
+        },
+        "ElasticIPAssociation": {
+            "Type": "AWS::EC2::EIPAssociation",
+            "Condition" : "AttachElasticIPCondition",
+            "Properties": {
+                "AllocationId": "eipalloc-cb3c49ae",
+                "InstanceId": {"Ref" : "WebServerInstance"}
+            }
+        }
+
+    },
+    "Outputs": {
+        "WebsiteURL": {
+            "Description": "URL for newly created stack",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "http://",
+                        {
+                            "Fn::GetAtt": [
+                                "WebServerInstance",
+                                "PublicDnsName"
+                            ]
+                        }
+                    ]
+                ]
+            }
+        },
+        "SSHShortCut": {
+            "Description": "SSH Command",
+            "Value": {
+                "Fn::Join": [
+                    "",
+                    [
+                        "ssh ec2-user@",
+                        {
+                            "Fn::GetAtt": [
+                                "WebServerInstance",
+                                "PublicIp"
+                            ]
+                        }
+                    ]
+                ]
+            }
+        }
+    }
+}
