@@ -14,17 +14,13 @@ use File;
 use Auth;
 use Validator;
 use Cache;
+use Input;
+
+use Illuminate\Pagination\LengthAwarePaginator;
+
+use Rhumsaa\Uuid\Uuid;
 
 class UploadsController extends ApiController {
-
-    //protected $user;
-    //public $user;
-
-    /*public function __construct(Upload $upload){//
-        //$this->upload = $upload;//For unit testing... maybe
-        parent::__construct();
-
-    }*/
 
     /**
      * @return mixed
@@ -33,17 +29,36 @@ class UploadsController extends ApiController {
 
         $currentUser = $this->currentUser;
 
-        $uploads = Cache::remember('_index_upload_user_id_'.$currentUser['id'], env('route_cache_time', 10080), function() use ($currentUser) {
-            return $currentUser->uploads()->get();
+        $page = (Input::get('page') ? Input::get('page'): 1);
+        $upload_cache_key = '_index_uploads_user_id_'.$currentUser['id'].'_page_'.$page;
+        $uploads = Cache::remember($upload_cache_key, env('route_cache_time', 10080), function() use ($currentUser) {
+            $uploadsArray = $currentUser->uploads()->paginate(env('paginate_per_page'))->toArray();
+            return $uploadsArray;
         });
+        $skip_cache_count = false;
 
-        if(!$uploads){
-            return $this->respondNotFound('No Uploads Found');
+        if(!$uploads['data']) {
+            Cache::forget($upload_cache_key);
+            $skip_cache_count = true;
         }
 
-        return $this->respond([
-            'uploads' => $uploads
-        ]);
+        $cache_key = '_user_id_'.$currentUser['id'].'_index_uploads_pages';
+        if(!$skip_cache_count) {
+            if (!Cache::add($cache_key, $page, env('route_cache_time', 10080))) {
+                $read_pages = Cache::get($cache_key);
+                $read_pages_array = explode(',', $read_pages);
+                if (!in_array($page, $read_pages_array)) {
+                    $read_pages_array[] = $page;
+                    $read_pages_string = implode(',', $read_pages_array);
+                    Cache::put($cache_key, $read_pages_string, env('route_cache_time', 10080));
+                }
+            }
+        }
+
+        $uploads['upload'] = $uploads['data'];
+        unset($uploads['data']);
+
+        return $this->respond($uploads);
     }
 
     /**
@@ -56,12 +71,18 @@ class UploadsController extends ApiController {
     {
         $currentUser = $this->currentUser;
 
-        $upload = Cache::remember('_show_upload_id_'.$id.'user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
+        $upload = Cache::remember('_show_upload_id_'.$id.'_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
             return $currentUser->uploads()->find($id);
         });
 
         if(!$upload){
-            return $this->respondNotFound('No Upload Found');
+            Cache::forget('_show_upload_id_'.$id.'_user_id_'.$currentUser['id']);
+            return $this->respondNotFound([
+                'title' => 'Upload Not Found',
+                'detail' => 'Upload Not Found',
+                'status' => 404,
+                'code' => ''
+            ]);
         }
 
         return $this->respond([
@@ -76,6 +97,8 @@ class UploadsController extends ApiController {
      */
     public function store(){//TODO: Multiple Uploads in one request.
 
+        $currentUser = $this->currentUser;
+
         Validator::extend('valid_cba', function($attribute, $value, $parameters) {
             $acceptedMimetypes = array ('application/zip','application/rar','application/x-zip-compressed', 'multipart/x-zip','application/x-compressed','application/octet-stream','application/x-rar-compressed','compressed/rar','application/x-rar');
             $acceptedExtensionTypes = array ('zip', 'rar', 'cbz', 'cbr');
@@ -86,22 +109,41 @@ class UploadsController extends ApiController {
             }
         });
 
+        Validator::extend('valid_uuid', function($attribute, $value, $parameters) {
+            if(preg_match("/^(\{)?[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}(?(1)\})$/i", $value)) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+
         $messages = [
-            'file.valid_cba' => 'Not a valid File',
+            'file.valid_cba' => 'Not a valid File.',
+            'series_id.valid_uuid' => 'The :attribute field is not a valid ID.',
+            'comic_id.valid_uuid' => 'The :attribute field is not a valid ID.'
         ];
 
         $validator = Validator::make(Request::all(), [
             'file' => 'required|valid_cba|between:1,150000',
-            "exists" => 'required|boolean',
-            "series_id" => 'required|alpha_num|min:40|max:40',
-            "comic_id" => 'required|alpha_num|min:40|max:40',
-            "series_title" => 'required',
-            "series_start_year" => 'required|numeric',
-            "comic_issue" => 'required|numeric',
+            'exists' => 'required|boolean',
+            'series_id' => 'required|valid_uuid',
+            'comic_id' => 'required|valid_uuid',
+            'series_title' => 'required',
+            'series_start_year' => 'required|numeric',
+            'comic_issue' => 'required|numeric',
         ], $messages);
 
         if ($validator->fails()){
-            return $this->respondBadRequest($validator->errors());
+            $pretty_errors = array_map(function($item){
+                return [
+                    'title' => 'Missing Required Field',
+                    'detail' => $item,
+                    'status' => 400,
+                    'code' => ''
+                ];
+            }, $validator->errors()->all());
+
+            return $this->respondBadRequest($pretty_errors);
         }
 
         $file = Request::file('file');
@@ -109,7 +151,7 @@ class UploadsController extends ApiController {
         $upload = new Upload;
         $upload->file_original_name = $file->getClientOriginalName();
         $upload->file_size = $file->getSize();
-        $newFileNameWithNoExtension = $upload->file_random_upload_id = str_random(40);
+        $newFileNameWithNoExtension = $upload->file_random_upload_id = Uuid::uuid4();
         $upload->file_upload_name = $newFileName = $newFileNameWithNoExtension . '.' . $file->getClientOriginalExtension();
         $upload->file_original_file_type = $file->getClientOriginalExtension();
         $upload->user_id = $this->currentUser->id;
@@ -123,7 +165,7 @@ class UploadsController extends ApiController {
 
         $process_info = [
             'upload_id' => $upload->id,
-            'user_id'=> $this->currentUser->id,
+            'user_id'=> $currentUser['id'],
             'hash'=> $fileHash,
             'newFileName' => $newFileName,
             'newFileNameNoExt' => $newFileNameWithNoExtension,
@@ -134,9 +176,17 @@ class UploadsController extends ApiController {
 
         Queue::push(new ProcessComicBookArchiveCommand($process_info));
 
-        Cache::forget('_index_upload_user_id_'.$this->currentUser['id']);
+        $read_pages = Cache::pull('_user_id_'. $currentUser['id'] .'_index_uploads_pages');
+        if($read_pages){
+            $read_pages_array = explode(',', $read_pages);
+            foreach($read_pages_array as $page){
+                Cache::forget('_index_uploads_user_id_'.$currentUser['id'].'_page_'.$page);
+            }
+        }
 
-        return $this->respondCreated('Upload Successful');
+        return $this->respondCreated([
+            'upload' => $upload
+        ]);
 
     }
 

@@ -11,8 +11,8 @@ use Laracasts\TestDummy\Factory;
 
 class AuthTest extends ApiTester {
 
-    protected $oauth_endpoint = "/oauth/access_token/";
-    protected $register_endpoint = "/auth/register/";
+    protected $oauth_endpoint = "/v0.1/oauth/access_token/";
+    protected $register_endpoint = "/v0.1/auth/register/";
 
     public function setUp(){
         parent::setUp();

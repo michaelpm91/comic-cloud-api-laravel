@@ -23,17 +23,37 @@ class SeriesController extends ApiController {
 	public function index(){
         $currentUser = $this->currentUser;
 
-        $series = Cache::remember('_index_series_user_id_'.$currentUser['id'], env('route_cache_time', 10080), function() use ($currentUser) {
-            return $currentUser->series()->with('comics')->get();
+        $page = (Input::get('page') ? Input::get('page') : 1);
+        $series_cache_key = '_index_series_user_id_' . $currentUser['id'] . '_page_' . $page;
+        $series = Cache::remember($series_cache_key, env('route_cache_time', 10080), function() use ($currentUser) {
+            $seriesArray = $currentUser->series()->paginate(env('paginate_per_page'))->toArray();
+            return $seriesArray;
         });
 
-        if(!$series){
-            return $this->respondNotFound('No Series Found');
+        $skip_cache_count = false;
+
+        if(!$series['data']) {
+            Cache::forget($series_cache_key);
+            $skip_cache_count = true;
         }
 
-        return $this->respond([
-            'series' => $series
-        ]);
+        $cache_key = '_user_id_'.$currentUser['id'].'_index_series_pages';
+        if(!$skip_cache_count) {
+            if (!Cache::add($cache_key, $page, env('route_cache_time', 10080))) {
+                $read_pages = Cache::get($cache_key);
+                $read_pages_array = explode(',', $read_pages);
+                if (!in_array($page, $read_pages_array)) {
+                    $read_pages_array[] = $page;
+                    $read_pages_string = implode(',', $read_pages_array);
+                    Cache::put($cache_key, $read_pages_string, env('route_cache_time', 10080));
+                }
+            }
+        }
+
+        $series['series'] = $series['data'];
+        unset($series['data']);
+
+        return $this->respond($series);
 	}
 
     /**
@@ -46,16 +66,24 @@ class SeriesController extends ApiController {
     {
         $currentUser = $this->currentUser;
 
-        $series = Cache::remember('_show_series_id_'.$id.'_user_id_'.$currentUser['id'], env('route_cache_time', 10080),function() use ($currentUser, $id) {
-            return $currentUser->series()->with('comics')->find($id);
+        $show_series_cache_key = '_show_series_id_' . $id . '_user_id_' . $currentUser['id'];
+
+        $series = Cache::remember($show_series_cache_key, env('route_cache_time', 10080),function() use ($currentUser, $id) {
+            return $currentUser->series()->find($id);
         });
 
         if(!$series){
-            return $this->respondNotFound('Series Not Found');
+            Cache::forget($show_series_cache_key);
+            return $this->respondNotFound([[
+                'title' => 'Series Not Found',
+                'detail' => 'Series Not Found',
+                'status' => 404,
+                'code' => ''
+            ]]);
         }
 
         return $this->respond([
-            'series' => $series
+            'series' => [$series]
         ]);
     }
 
@@ -66,18 +94,42 @@ class SeriesController extends ApiController {
      * @return Response
      */
     public function store(){
+
+        Validator::extend('valid_uuid', function($attribute, $value, $parameters) {
+            if(preg_match("/^(\{)?[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}(?(1)\})$/i", $value)) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        $messages = [
+            'id.valid_uuid' => 'The :attribute field is not a valid ID.',
+            'comic_id.valid_uuid' => 'The :attribute field is not a valid ID.'
+        ];
+
+
         $validator = Validator::make($data = Request::all(), [
-            'id' => 'required|alpha_num|min:40|max:40',
-            'comic_id' => 'required|alpha_num|min:40|max:40',
+            'id' => 'required|valid_uuid',
+            'comic_id' => 'required|valid_uuid',
             'series_title' => 'required',
             'series_start_year' => 'date_format:Y'
-        ]);
+        ], $messages);
 
-        if ($validator->fails())
-        {
-            return $this->respondBadRequest($validator->errors());
+        if ($validator->fails()){
+            $pretty_errors = array_map(function($item){
+                return [
+                    'title' => 'Missing Required Field',
+                    'detail' => $item,
+                    'status' => 400,
+                    'code' => ''
+                ];
+            }, $validator->errors()->all());
+
+            return $this->respondBadRequest($pretty_errors);
         }
-        if(Series::find($data['id'])) return $this->respondBadRequest("Duplicate ID Error");//TODO: Better Solution please
+
+        //if(Series::find($data['id'])) return $this->respondBadRequest("Duplicate ID Error");//TODO: Duplicate Client ID solution
         $comic = $this->currentUser->comics()->find($data['comic_id']);
         if($comic) {
             $old_series_id = $comic->series_id;
@@ -96,12 +148,18 @@ class SeriesController extends ApiController {
             $seriesCount = Series::find($old_series_id)->comics()->get()->count();
             if ($seriesCount == 0) Series::find($old_series_id)->delete();
 
-
             Cache::forget('_index_series_user_id_'.$this->currentUser['id']);
 
-            return $this->respondCreated('Series Created');
+            return $this->respondCreated([
+                'series' => [$series]
+            ]);
         }
-        return $this->respondBadRequest("Invalid Comic");
+        return $this->respondBadRequest([[
+            'title' => 'Invalid Comic ID',
+            'detail' => 'Invalid Comic ID',
+            'status' => 400,
+            'code' => ''
+        ]]);
 
     }
 
@@ -111,8 +169,7 @@ class SeriesController extends ApiController {
      * @param  int  $id
      * @return Response
      */
-    public function update($id)
-    {
+    public function update($id){
 
         $series = $this->currentUser->series()->find($id);
         if($series){
@@ -122,9 +179,25 @@ class SeriesController extends ApiController {
                 'comic_vine_series_id' => 'numeric'
             ]);
 
-            if ($validator->fails()) return $this->respondBadRequest($validator->errors());
+            if ($validator->fails()) {
+                $pretty_errors = array_map(function($item){
+                    return [
+                        'title' => 'Missing Required Field',
+                        'detail' => $item,
+                        'status' => 400,
+                        'code' => ''
+                    ];
+                }, $validator->errors()->all());
 
-            if(empty($data)) return $this->respondBadRequest("No Data Sent");
+                return $this->respondBadRequest($pretty_errors);
+            }
+
+            if(empty($data)) return $this->respondBadRequest([[
+                'title' => 'No Data Sent',
+                'detail' => 'No Data Sent',
+                'status' => 400,
+                'code' => ''
+            ]]);
 
             if (isset($data['series_title'])) $series->series_title = $data['series_title'];
             if (isset($data['series_start_year'])) $series->series_start_year = $data['series_start_year'];
@@ -132,12 +205,25 @@ class SeriesController extends ApiController {
             if (isset($data['comic_vine_series_id'])) $series->comic_vine_series_id = $data['comic_vine_series_id'];
             $series->save();
 
-            Cache::forget('_index_series_user_id_'.$this->currentUser['id']);
+            $read_pages = Cache::pull('_user_id_'. $this->currentUser['id'] .'_index_series_pages');
+            if($read_pages){
+                $read_pages_array = explode(',', $read_pages);
+                foreach($read_pages_array as $page){
+                    Cache::forget('_index_series_user_id_'.$this->currentUser['id'].'_page_'.$page);
+                }
+            }
             Cache::forget('_show_series_id_'.$id.'_user_id_'.$this->currentUser['id']);
 
-            return $this->respondSuccessful('Series Updated');
+            return $this->respondSuccessful([
+                'series' => [$series]
+            ]);
         }
-        return $this->respondNotFound('No Series Found');
+        return $this->respondNotFound([[
+            'title' => 'Series Not Found',
+            'detail' => 'Series Not Found',
+            'status' => 404,
+            'code' => ''
+        ]]);
     }
 
     /**
@@ -146,18 +232,28 @@ class SeriesController extends ApiController {
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id)
-    {
+    public function destroy($id){//Should this be possible?? It should only delete if a suitable replacement series is available to prevent orphan comics //TODO: Test this logic
         $series = $this->currentUser->series()->find($id);
         if($series) {
             $series->delete();
 
-            Cache::forget('_index_series_user_id_'.$this->currentUser['id']);
+            $read_pages = Cache::pull('_user_id_'. $this->currentUser['id'] .'_index_series_pages');
+            if($read_pages){
+                $read_pages_array = explode(',', $read_pages);
+                foreach($read_pages_array as $page){
+                    Cache::forget('_index_series_user_id_'.$this->currentUser['id'].'_page_'.$page);
+                }
+            }
             Cache::forget('_show_series_id_'.$id.'_user_id_'.$this->currentUser['id']);
 
             return $this->respondSuccessful('Series Deleted');
         }
-        return $this->respondNotFound('No Series Found');
+        return $this->respondNotFound([[
+            'title' => 'Series Not Found',
+            'detail' => 'Series Not Found',
+            'status' => 404,
+            'code' => ''
+        ]]);
     }
 
     /**
@@ -166,7 +262,7 @@ class SeriesController extends ApiController {
      * @param $id
      * @return mixed
      */
-    public function getMeta($id){
+    public function showMetaData($id){
         $series = $this->currentUser->series()->find($id);
 
         if($series) {
@@ -177,7 +273,8 @@ class SeriesController extends ApiController {
 
             $limit = 20; //max is 100
             $page = (Input::get('page') ? Input::get('page') : 1);
-            $response = Cache::remember('comic_vine_series_query_'.$series->series_title.'_page_'.$page, 10, function() use($guzzle, $comic_vine_api_url, $limit, $page, $series) {//TODO:Consider Cache time
+            $response = Cache::remember('_comic_vine_series_query_'.$series->series_title.'_page_'.$page, 10, function() use($guzzle, $comic_vine_api_url, $limit, $page, $series) {//TODO:Consider Cache time
+                //TODO: Support filtering and ordering
                 $guzzle_response = $guzzle->get($comic_vine_api_url, [
                     'query' => [
                         'api_key' => env('comic_vine_api_key'),
@@ -193,27 +290,134 @@ class SeriesController extends ApiController {
             });
 
             if($response['status_code'] != 1) {
-                return $this->respondBadRequest('Comic Vine API Error');
+                return $this->respondBadRequest([[
+                    'title' => 'Comic Vine API Error',
+                    'detail' => 'Comic Vine API Error',
+                    'status' => 500,
+                    'code' => '',
+                ]]);
                 //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
             }
+
+
+            $last_page = ceil($response['number_of_total_results'] / $limit);
+            $current_page = ($page > $last_page ? $last_page : $page);
+
+            if($page > $last_page) {
+
+                Cache::forget('_comic_vine_series_query_'.$series->series_title.'_page_'.$page);
+                $guzzle = New Guzzle;
+                $response = Cache::remember('_comic_vine_series_query_'.$series->series_title.'_page_'.$last_page, 10, function() use($guzzle, $comic_vine_api_url, $limit, $last_page, $series) {//TODO:Consider Cache time
+                    //TODO: Support filtering and ordering
+                    $guzzle_response = $guzzle->get($comic_vine_api_url, [
+                        'query' => [
+                            'api_key' => env('comic_vine_api_key'),
+                            'format' => 'json',
+                            'resources' => 'volume',
+                            'limit' => $limit,
+                            'page' => $last_page,
+                            'field_list' => 'name,start_year,publisher,id,image,count_of_issues',
+                            'query' => $series->series_title
+                        ]
+                    ])->getBody();
+                    return (json_decode($guzzle_response, true));
+                });
+
+                if($response['status_code'] != 1) {
+                    return $this->respondBadRequest([[
+                        'title' => 'Comic Vine API Error',
+                        'detail' => 'Comic Vine API Error',
+                        'status' => 500,
+                        'code' => '',
+                    ]]);
+                    //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
+                }
+
+            }
+
             $comic_vine_query = $response['results'];
+
 
             $series_response = array_map(function($series_entry){
                 return [
                     'series_title' => $series_entry['name'],
                     'series_issues' => $series_entry['count_of_issues'],
                     'series_cover_image' => $series_entry['image']['medium_url'],
-                    'start_year' => $series_entry['start_year'],
+                    'start_year' => (int)$series_entry['start_year'],
                     'publisher' => $series_entry['publisher']['name'],
                     'comic_vine_series_id' => $series_entry['id']
                 ];
             }, $comic_vine_query);
 
+
+            $series_meta_url = url('v'.env('APP_API_VERSION').'/series/'. $id .'/meta?page=');
+
+
+            $next_link = ($current_page + 1 >= $last_page ? null : $series_meta_url.($current_page + 1));
+            $prev_link = ($current_page - 1 <= 1 ? null : $series_meta_url.($current_page - 1));
+
+            $from = ($current_page - 1) * $limit + 1;
+
             return $this->respond([
+                'total' =>  $response['number_of_total_results'],
+                'per_page' => $response['limit'],
+                'current_page' => (int)$current_page,
+                'last_page' => $last_page,
+                'next_page_url' => $next_link,
+                'prev_page_url' => $prev_link,
+                'from' => ($from < 0 ? 1 : $from),
+                'to' => (($current_page - 1)  * $limit) + $response['number_of_page_results'],
                 'series' => $series_response
             ]);
         }
-        return $this->respondNotFound('No Series Found');
+        return $this->respondNotFound([[
+            'title' => 'Series Not Found',
+            'detail' => 'Series Not Found',
+            'status' => 404,
+            'code' => ''
+        ]]);
+
+    }
+
+    public function showRelatedComics($series_id){
+
+        $currentUser = $this->currentUser;
+
+        $page = (Input::get('page') ? Input::get('page') : 1);
+
+
+        $series_related_comic_cache_key = '_show_related_comics_series_id_'.$series_id.'_user_id_' . $currentUser['id'] . '_page_' . $page;
+        $comic = Cache::remember($series_related_comic_cache_key, env('route_cache_time', 10080), function() use ($currentUser, $series_id) {
+            $seriesArray = $currentUser->comics()->where('series_id', '=', $series_id)->paginate(env('paginate_per_page'))->toArray();
+            return $seriesArray;
+        });
+
+        $skip_cache_count = false;
+
+        if(!$comic['data']) {
+            Cache::forget($series_related_comic_cache_key);
+            $skip_cache_count = true;
+        }
+
+        $cache_key = '_user_id_'.$currentUser['id'].'_show_related_comics_series_id_'.$series_id.'_pages';
+        if(!$skip_cache_count) {
+            if (!Cache::add($cache_key, $page, env('route_cache_time', 10080))) {
+                $read_pages = Cache::get($cache_key);
+                $read_pages_array = explode(',', $read_pages);
+                if (!in_array($page, $read_pages_array)) {
+                    $read_pages_array[] = $page;
+                    $read_pages_string = implode(',', $read_pages_array);
+                    Cache::put($cache_key, $read_pages_string, env('route_cache_time', 10080));
+                }
+            }
+        }
+
+        $comic['comic'] = $comic['data'];
+        unset($comic['data']);
+
+
+        return $this->respond($comic);
+
 
     }
 

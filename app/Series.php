@@ -11,8 +11,10 @@ class Series extends Model {
     public $incrementing = false;
 
     protected $hidden = ['created_at', 'updated_at', 'user_id'];
-    // Don't forget to fill this array
+
     protected $fillable = ['id', 'series_title', 'series_start_year', 'series_publisher'];
+
+    protected $appends = ['series_cover_img'];
 
     public function comics(){
         return $this->hasMany('App\Comic')->orderBy('comic_issue', 'ASC');
@@ -20,6 +22,12 @@ class Series extends Model {
 
     public function user(){
         return $this->belongsTo('App\User');
+    }
+
+    public function getSeriesCoverImgAttribute(){
+        $first_comic = $this->comics()->get()->first()['comic_book_archive_contents'];
+        if(!$first_comic) return null;
+        return head($first_comic);
     }
 
 }
