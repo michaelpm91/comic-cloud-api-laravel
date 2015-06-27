@@ -59,7 +59,7 @@ class UploadsController extends ApiController {
         }
 
         return $this->respond([
-            'upload' => $upload
+            'upload' => [$upload]
         ]);
     }
 
@@ -90,8 +90,26 @@ class UploadsController extends ApiController {
             }
         });
 
+        /*Validator::extend('user_series', function($attribute, $value, $parameters) {
+            if($this->currentUser->series()->find($value)){
+                return true;
+            }else{
+                return false;
+            }
+        });*/
+
+        Validator::extend('user_comics', function($attribute, $value, $parameters) {
+            if($this->currentUser->comics()->find($value)){
+                return false;
+            }else{
+                return true;
+            }
+        });
+
         $messages = [
             'file.valid_cba' => 'Not a valid File.',
+            //'series_id.user_series' => 'Not a valid Series ID',
+            'comic_id.user_comics' => 'Not a valid Comic ID',
             'series_id.valid_uuid' => 'The :attribute field is not a valid ID.',
             'comic_id.valid_uuid' => 'The :attribute field is not a valid ID.'
         ];
@@ -100,7 +118,7 @@ class UploadsController extends ApiController {
             'file' => 'required|valid_cba|between:1,150000',
             'exists' => 'required|boolean',
             'series_id' => 'required|valid_uuid',
-            'comic_id' => 'required|valid_uuid',
+            'comic_id' => 'required|valid_uuid|user_comics',
             'series_title' => 'required',
             'series_start_year' => 'required|numeric',
             'comic_issue' => 'required|numeric',
@@ -109,7 +127,7 @@ class UploadsController extends ApiController {
         if ($validator->fails()){
             $pretty_errors = array_map(function($item){
                 return [
-                    'title' => 'Missing Required Field',
+                    'title' => 'Missing Required Field Or Incorrectly Formatted Data',
                     'detail' => $item,
                     'status' => 400,
                     'code' => ''
@@ -124,7 +142,7 @@ class UploadsController extends ApiController {
         $upload = new Upload;
         $upload->file_original_name = $file->getClientOriginalName();
         $upload->file_size = $file->getSize();
-        $newFileNameWithNoExtension = $upload->file_random_upload_id = Uuid::uuid4();
+        $newFileNameWithNoExtension = $upload->file_random_upload_id = Uuid::uuid4()->toString();
         $upload->file_upload_name = $newFileName = $newFileNameWithNoExtension . '.' . $file->getClientOriginalExtension();
         $upload->file_original_file_type = $file->getClientOriginalExtension();
         $upload->user_id = $this->currentUser->id;
@@ -136,7 +154,7 @@ class UploadsController extends ApiController {
 
         Storage::disk(env('user_uploads', 'local_user_uploads'))->put($newFileName, File::get($file));
 
-        /*$process_info = [
+        $process_info = [
             'upload_id' => $upload->id,
             'user_id'=> $currentUser['id'],
             'hash'=> $fileHash,
@@ -146,13 +164,12 @@ class UploadsController extends ApiController {
             'originalFileName' => $file->getClientOriginalName(),
             'time' => time()
         ];
+        //TODO: Virus Scan Here, respond bad request on virus detection
 
-        Queue::push(new ProcessComicBookArchiveCommand($process_info));*/
-
-        //TODO: Create Comics Structure On Upload
+        Queue::push(new ProcessComicBookArchiveCommand($process_info));
 
         return $this->respondCreated([
-            'upload' => $upload
+            'upload' => [$upload]
         ]);
 
     }
