@@ -68,7 +68,6 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
         if($process_archive){
             $this->processArchive($process_info['upload_id']);
         }
-
     }
 
     /**
@@ -133,7 +132,7 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
      * @param $upload_id
      * @return array
      */
-    private function getComicInfo($upload_id){
+    private function getComicInfo($upload_id){//Never Fails only returns empty
 
         $upload = Upload::findOrFail($upload_id);//TODO: Decide on find of find or fail
 
@@ -155,15 +154,15 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
      * @return mixed
      */
     private function getSeriesInfo($match_data){
-        //dd($this->user_id);
+
         $series = User::find($this->user_id)->first()->series()->find($match_data['series_id']);
 
-        if ($match_data['exists'] == false || $series == null) {
-
+        if($match_data['exists'] || !$match_data['exists'] && !$series){//create
             $series = $this->createSeries($match_data);
-
         }
+
         return $series->id;
+
 
     }
 
@@ -181,11 +180,10 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
             $comic_json = $this->extractArchive($upload_obj);
 
+        }else{
+            //TODO: Report File Not Found
         }
 
-
-        //Delete extraction zone.
-        //Storage::disk(env('cba_extraction_area'))->delete('file.jpg');//Something like this?
     }
 
     private function extractArchive($upload_obj){
@@ -205,6 +203,10 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
                 if ($zip->open($archive) === true) {
 
+                    if(!$zip->numFiles){//if zip is empty
+                        //TODO: Fail out and Report empty zip.
+                    }
+
                     for ($i = 0; $i < $zip->numFiles; $i++) {
 
                         $entry = $zip->getNameIndex($i);
@@ -223,7 +225,10 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
                     }
                     $zip->close();
+                    //TODO: Delete zip and extracted files
 
+                }else{
+                    //TODO: Fail out and report zip could not be opened
                 }
 
             }
@@ -234,13 +239,16 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
                 if (!$rar === false) {//rar archive doesn't like truth
 
+                    if(!count($rar->getEntries())){
+                        //TODO: Fail out and report empty rar
+                    }
 
                     foreach ($rar->getEntries() as $key => $entry) {
 
                         $entryExt = strtolower(pathinfo(basename($entry->getName()), PATHINFO_EXTENSION));
                         $acceptedExtensions = ['jpg', 'jpeg'];
 
-                        if (!in_array($entryExt, $acceptedExtensions)) continue; //skip non-jpegs
+                        if (substr($entry, -1) == '/') continue; // skip directories
                         if (!in_array($entryExt, $acceptedExtensions)) continue; //skip non-jpegs
 
                         $file = basename($entry->getName());
@@ -252,12 +260,21 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
                     }
 
                     $rar->close();
+                    //TODO: Delete rar and extracted files
 
+                }else{
+                    //TODO: Fail out and report rar could not be opened
                 }
-
 
             }
 
+            else{
+                //TODO: Report not a valid archive. All though this shouldn't happen at this point.
+            }
+
+            if(!$pages) {
+                //TODO: If pages array is empty something has gone very wrong. Fail out and report this. most likely a nested directory issue.
+            }
 
             natsort($pages);
             $pages = array_flip($pages);
@@ -265,7 +282,6 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
             array_unshift($pages, 'presentation_value');
             unset($pages[0]);//Add and remove value at zero to shift array to 1. Just for presentation.
-
 
 
             $cba= ComicBookArchive::find($this->cba_id);
@@ -281,6 +297,9 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
             return $pages;
 
         }
+        else{
+            //TODO: Report Extraction zone not found
+        }
     }
 
     private function processImage($image){
@@ -295,7 +314,7 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
             $imageExt = strtolower(pathinfo($image, PATHINFO_EXTENSION));
 
 
-            $image_slug = Uuid::uuid4();
+            $image_slug = Uuid::uuid4()->toString();
 
             Storage::disk(env('user_images'))->put($image_slug.".".$imageExt, file_get_contents($image));
 
@@ -311,6 +330,16 @@ class ProcessComicBookArchiveCommand extends Command implements ShouldBeQueued, 
 
         return $imageentry->image_slug;
 
+    }
+
+    /**
+     * Handle a job failure.
+     *
+     * @return void
+     */
+    public function failed()
+    {
+        // TODO: Write failure action
     }
 
 }
