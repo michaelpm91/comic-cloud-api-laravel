@@ -136,7 +136,7 @@ class UploadsController extends ApiController {
 
         Storage::disk(env('user_uploads', 'local_user_uploads'))->put($newFileName, File::get($file));
 
-        $process_info = [
+        /*$process_info = [
             'upload_id' => $upload->id,
             'user_id'=> $currentUser['id'],
             'hash'=> $fileHash,
@@ -147,7 +147,9 @@ class UploadsController extends ApiController {
             'time' => time()
         ];
 
-        Queue::push(new ProcessComicBookArchiveCommand($process_info));
+        Queue::push(new ProcessComicBookArchiveCommand($process_info));*/
+
+        //TODO: Create Comics Structure On Upload
 
         return $this->respondCreated([
             'upload' => $upload
