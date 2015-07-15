@@ -26,6 +26,10 @@ use Rhumsaa\Uuid\Uuid;
 
 use GuzzleHttp\Client as Guzzle;
 
+use Illuminate\Http\Response;
+
+use Illuminate\Contracts\Routing\ResponseFactory;
+
 
 class UploadsController extends ApiController {
 
@@ -69,6 +73,29 @@ class UploadsController extends ApiController {
         return $this->respond([
             'upload' => [$upload]
         ]);
+    }
+
+    public function download($upload_id){
+        $currentUser = $this->currentUser;
+
+        $upload = $currentUser->uploads()->find($upload_id);
+
+        if(!$upload){
+            return $this->respondNotFound([
+                'title' => 'Upload Not Found',
+                'detail' => 'Upload Not Found',
+                'status' => 404,
+                'code' => ''
+            ]);
+        }
+
+        $upload_file = Storage::disk(env('user_uploads', 'local_user_uploads'))->get("Archive.zip");//$upload->file_upload_name);
+
+        //dd($upload_file);
+        //return Response::download($upload_file);
+        //return (new Response($upload_file, 200));//->header('Content-Type', $entry->mime);
+        return response()->download($upload_file)->deleteFileAfterSend(true);
+        //return (new Response($upload_file, 200));
     }
 
     /**

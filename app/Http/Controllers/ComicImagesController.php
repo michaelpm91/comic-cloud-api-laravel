@@ -47,7 +47,6 @@ class ComicImagesController extends ApiController {
             }
         }
         $img = Storage::disk(env('user_images', 'local_user_images'))->get($comicImage->image_slug.".jpg");//TODO: Hard coded file type
-        $size = (is_numeric($size)? $size : 500);
 
         $imgCache = Image::cache(function($image) use ($img, $size) {
             $image->make($img)->interlace()->resize(null, $size, function ($constraint) { $constraint->aspectRatio(); $constraint->upsize(); });
