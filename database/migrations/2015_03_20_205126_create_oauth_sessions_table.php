@@ -28,9 +28,9 @@ class CreateOauthSessionsTable extends Migration
                 ->onDelete('cascade')
                 ->onUpdate('cascade');
 
-            $table->foreign('owner_id')
+            /*$table->foreign('owner_id')
                 ->references('id')->on('users')
-                ->onDelete('cascade');
+                ->onDelete('cascade');*/
         });
     }
 
