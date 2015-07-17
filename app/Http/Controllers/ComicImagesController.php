@@ -9,6 +9,7 @@ use Image;
 use Storage;
 use Request;
 
+
 class ComicImagesController extends ApiController {
     /**
      * Display the specified resource.
@@ -67,6 +68,9 @@ class ComicImagesController extends ApiController {
                 'code' => ''
             ]);
         }
+
+    }
+    public function store(){
 
     }
 
