@@ -33,31 +33,7 @@ class ComicsController extends ApiController {
         $currentUser = $this->currentUser;
 
         $page = (Input::get('page') ? Input::get('page') : 1);
-        $comic_cache_key = '_index_comics_user_id_' . $currentUser['id'] . '_page_' . $page;
-        $comics = Cache::remember($comic_cache_key, env('route_cache_time', 10080), function() use ($currentUser) {
-            $comicsArray = $currentUser->comics()->paginate(env('paginate_per_page'))->toArray();
-            return $comicsArray;
-        });
-
-        $skip_cache_count = false;
-
-        if(!$comics['data']) {
-            Cache::forget($comic_cache_key);
-            $skip_cache_count = true;
-        }
-
-        $cache_key = '_user_id_'.$currentUser['id'].'_index_comics_pages';
-        if(!$skip_cache_count) {//TODO:This should be refactored into an elegant cache function
-            if (!Cache::add($cache_key, $page, env('route_cache_time', 10080))) {
-                $read_pages = Cache::get($cache_key);
-                $read_pages_array = explode(',', $read_pages);
-                if (!in_array($page, $read_pages_array)) {
-                    $read_pages_array[] = $page;
-                    $read_pages_string = implode(',', $read_pages_array);
-                    Cache::put($cache_key, $read_pages_string, env('route_cache_time', 10080));
-                }
-            }
-        }
+        $comics = $currentUser->comics()->paginate(env('paginate_per_page'))->toArray();
 
         $comics['comic'] = $comics['data'];
         unset($comics['data']);
@@ -76,14 +52,10 @@ class ComicsController extends ApiController {
     {
         $currentUser = $this->currentUser;
 
-        $show_comic_cache_key = '_show_comic_id_' . $id . '_user_id_' . $currentUser['id'];
+        $comic = $currentUser->comics()->find($id);
 
-        $comic = Cache::remember($show_comic_cache_key, env('route_cache_time', 10080),function() use ($currentUser, $id) {
-            return $currentUser->comics()->find($id);
-        });
 
         if(!$comic){
-            Cache::forget($show_comic_cache_key);
             return $this->respondNotFound([[
                 'title' => 'Comic Not Found',
                 'detail' => 'Comic Not Found',
@@ -159,30 +131,9 @@ class ComicsController extends ApiController {
 
             if(isset($data['comic_issue'])) $comic->comic_issue = $data['comic_issue'];
             if(isset($data['comic_writer'])) $comic->comic_writer = $data['comic_writer'];
-            if(isset($data['series_id'])) {
-                $comic->series_id = $data['series_id'];
-                Cache::forget('_show_related_series_comic_id_'.$id.'_user_id_' . $this->currentUser['id']);
-            }
+            if(isset($data['series_id'])) $comic->series_id = $data['series_id'];
             if(isset($data['comic_vine_issue_id'])) $comic->comic_vine_issue_id = $data['comic_vine_issue_id'];
             $comic->save();
-
-            $read_pages = Cache::pull('_user_id_'. $this->currentUser['id'] .'_index_comics_pages');
-            if($read_pages){
-                $read_pages_array = explode(',', $read_pages);
-                foreach($read_pages_array as $page){
-                    Cache::forget('_index_comics_user_id_'.$this->currentUser['id'].'_page_'.$page);
-                }
-            } //TODO:This should be refactored into an elegant cache function
-
-            $read_pages = Cache::pull('_user_id_'.$this->currentUser['id'].'_show_related_comics_series_id_'.$comic->series_id.'_pages');
-            if($read_pages){
-                $read_pages_array = explode(',', $read_pages);
-                foreach($read_pages_array as $page){
-                    Cache::forget('_show_related_comics_series_id_'.$comic->series_id.'_user_id_' . $this->currentUser['id'] . '_page_' . $page);
-                }
-            } //TODO:This should be refactored into an elegant cache function
-
-            Cache::forget('_show_comics_id_'.$id.'_user_id_'.$this->currentUser['id']);
 
             return $this->respondSuccessful([
                'comic' => [$comic]
@@ -213,48 +164,7 @@ class ComicsController extends ApiController {
             $series_id = $comic['series']['id'];
             $this->currentUser->comics()->find($id)->delete();
             $comic_count = Series::find($series_id)->comics()->get()->count();
-            if($comic_count == 0) {
-                Series::find($series_id)->delete();
-
-                $read_pages = Cache::pull('_user_id_'. $this->currentUser['id'] .'_index_series_pages');
-                if($read_pages){
-                    $read_pages_array = explode(',', $read_pages);
-                    foreach($read_pages_array as $page){
-                        Cache::forget('_index_series_user_id_'.$this->currentUser['id'].'_page_'.$page);
-                    }
-                } //TODO:This should be refactored into an elegant cache function
-
-                $read_pages = Cache::pull('_user_id_'.$this->currentUser['id'].'_show_related_comics_series_id_'.$comic->series_id.'_pages');
-                if($read_pages){
-                    $read_pages_array = explode(',', $read_pages);
-                    foreach($read_pages_array as $page){
-                        Cache::forget('_show_related_comics_series_id_'.$comic->series_id.'_user_id_' . $this->currentUser['id'] . '_page_' . $page);
-                    }
-                } //TODO:This should be refactored into an elegant cache function
-
-                Cache::forget('_show_series_id_'.$series_id.'_user_id_'.$this->currentUser['id']);
-            }
-
-            $read_pages = Cache::pull('_user_id_'. $this->currentUser['id'] .'_index_comics_pages');
-            if($read_pages){
-                $read_pages_array = explode(',', $read_pages);
-                foreach($read_pages_array as $page){
-                    Cache::forget('_index_comics_user_id_'.$this->currentUser['id'].'_page_'.$page);
-                }
-            } //TODO:This should be refactored into an elegant cache function
-
-            $read_pages = Cache::pull('_user_id_'.$this->currentUser['id'].'_show_related_comics_series_id_'.$series_id.'_pages');
-            if($read_pages){
-                $read_pages_array = explode(',', $read_pages);
-                foreach($read_pages_array as $page){
-                    Cache::forget('_show_related_comics_series_id_'.$series_id.'_user_id_' . $this->currentUser['id'] . '_page_' . $page);
-                }
-            } //TODO:This should be refactored into an elegant cache function
-
-            Cache::forget('_show_comics_id_'.$id.'_user_id_'.$this->currentUser['id']);
-
-            Cache::forget('_show_related_series_comic_id_'.$id.'_user_id_' . $this->currentUser['id']);
-
+            if($comic_count == 0) Series::find($series_id)->delete();
 
             return $this->respondSuccessful('Comic Deleted');
         }
@@ -405,16 +315,9 @@ class ComicsController extends ApiController {
     public function showRelatedSeries($comic_id){//TODO: Finish relationship
         $currentUser = $this->currentUser;
 
-
-        $show_comic_cache_key = '_show_comic_id_' . $comic_id . '_user_id_' . $currentUser['id'];
-
-
-        $comic = Cache::remember($show_comic_cache_key, env('route_cache_time', 10080),function() use ($currentUser, $comic_id) {
-            return $currentUser->comics()->find($comic_id);
-        });
+        $comic = $currentUser->comics()->find($comic_id);
 
         if(!$comic_id){
-            Cache::forget($show_comic_cache_key);
             return $this->respondNotFound([[
                 'title' => 'Comic Not Found',
                 'detail' => 'Comic Not Found',
@@ -424,14 +327,9 @@ class ComicsController extends ApiController {
         }
         $series_id = $comic->series_id;
 
-        $show_series_cache_key = '_show_series_id_' . $series_id . '_user_id_' . $currentUser['id'];
-
-        $series = Cache::remember($show_series_cache_key, env('route_cache_time', 10080),function() use ($currentUser, $series_id) {
-            return $currentUser->series()->find($series_id);
-        });
+        $series = $currentUser->series()->find($series_id);
 
         if(!$series){
-            Cache::forget($show_series_cache_key);
             return $this->respondNotFound([[
                 'title' => 'Series Not Found',
                 'detail' => 'Series Not Found',
