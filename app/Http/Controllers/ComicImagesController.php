@@ -22,13 +22,27 @@ class ComicImagesController extends ApiController {
 
         $comicImage = ComicImage::where('image_slug', '=', $comic_slug)->first();
 
-        if(!$comicImage) return $this->respondNotFound('No Image Found');
+        if(!$comicImage) {
+            return $this->respondNotFound([
+                'title' => 'Image Not Found',
+                'detail' => 'Image Not Found',
+                'status' => 404,
+                'code' => ''
+            ]);
+        }
 
         $userCbaIds = $this->currentUser->comics()->lists('comic_book_archive_id');
         $comicCbaIds = $comicImage->comicBookArchives()->lists('comic_book_archive_id');
 
         foreach($comicCbaIds as $comicCbaId){
-            if(!in_array($comicCbaId, $userCbaIds)) return $this->respondNotFound('No Image Found');
+            if(!in_array($comicCbaId, $userCbaIds)) {
+                return $this->respondNotFound([
+                    'title' => 'Image Not Found',
+                    'detail' => 'Image Not Found',
+                    'status' => 404,
+                    'code' => ''
+                ]);
+            }
         }
 
         $img = Storage::disk(env('user_images', 'local_user_images'))->get($comicImage->image_slug.".jpg");//TODO: Hard coded file type
