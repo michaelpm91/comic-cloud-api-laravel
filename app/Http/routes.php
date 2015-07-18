@@ -27,8 +27,7 @@ Route::group(['before' => 'oauth:basic', 'prefix' => 'v'.env('APP_API_VERSION')]
     Route::resource('uploads','UploadsController', array('only' => array('index', 'store', 'show')));
     Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
     Route::resource('comics','ComicsController', array('only' => array('index', 'show', 'update', 'destroy')));
-    Route::get('image/{image_key}/{size?}', 'ComicImagesController@show');
-    Route::get('image/{image_key}/info', 'ComicImagesController@info');
+    Route::get('images/{image_slug}/{size?}', 'ComicImagesController@show');
     Route::get('comics/{comic_id}/series', 'ComicsController@showRelatedSeries');
     Route::get('series/{series_id}/meta', 'SeriesController@showMetaData');
     Route::get('series/{series_id}/comics', 'SeriesController@showRelatedComics');
@@ -37,7 +36,8 @@ Route::group(['before' => 'oauth:basic', 'prefix' => 'v'.env('APP_API_VERSION')]
 });
 
 Route::group(['before' => 'oauth:processor', 'prefix' => 'v'.env('APP_API_VERSION')], function() {
-    Route::post('image', 'ComicImagesController@store');
+    Route::get('images', 'ComicImagesController@index');
+    Route::post('images', 'ComicImagesController@store');
 });
 
 Route::group(['prefix' => 'v'.env('APP_API_VERSION')], function() {
