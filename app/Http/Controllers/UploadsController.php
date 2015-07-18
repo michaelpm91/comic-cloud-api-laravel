@@ -211,6 +211,8 @@ class UploadsController extends ApiController {
         ];
 
         $comic = $this->createComic($comic_info);
+        $uploadLocation = "https://s3-"/*.env('AWS_REGION', 'us-east-1')*/.".amazonaws.com/".env('AWS_S3_Uploads')."/".$newFileName; //TODO: This ideally needs to something returned from Laravel's upload
+        //dd($uploadLocation);
 
         //invoke lambda
         if($process_cba) {
@@ -219,7 +221,7 @@ class UploadsController extends ApiController {
             $aws->invokeAsync([
                 'FunctionName' => 'Comic_Cloud_Lambda_Function-development-1-0-0',
                 'InvokeArgs' => json_encode([
-                    "bucket_name" => "comicclouddevelopuploads",
+                    "bucket_name" => env('AWS_S3_Uploads'),
                     "file_name" => $upload->file_upload_name,
                     "cba_id" => $cba->id
                 ]),
