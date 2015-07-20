@@ -8,7 +8,7 @@ class ComicImage extends Model {
 
     protected $guarded = ['updated_at', 'created_at'];
 
-    protected $hidden = array('id', 'updated_at');
+    protected $hidden = array('updated_at');
 
     public function comicBookArchives(){
         return $this->belongsToMany('App\ComicBookArchive')->withTimestamps();

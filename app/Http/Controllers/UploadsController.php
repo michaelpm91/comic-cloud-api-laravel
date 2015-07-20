@@ -185,7 +185,7 @@ class UploadsController extends ApiController {
         $process_cba = false;
         //If not write an entry for one to the DB and send the file to S3
         if(!$cba){//Upload not found so send file to S3
-            Storage::disk(env('user_uploads', 'local_user_uploads'))->put($newFileName, File::get($file));
+            Storage::disk(env('user_uploads', 'local_user_uploads'))->put($newFileName, File::get($file));//TODO: Make sure right AWS S3 ACL is used in production
             //create cba
             $cba = $this->createComicBookArchive($upload->id, $fileHash);
             $process_cba = true;
@@ -211,7 +211,7 @@ class UploadsController extends ApiController {
         ];
 
         $comic = $this->createComic($comic_info);
-        $uploadLocation = "https://s3-"/*.env('AWS_REGION', 'us-east-1')*/.".amazonaws.com/".env('AWS_S3_Uploads')."/".$newFileName; //TODO: This ideally needs to something returned from Laravel's upload
+        $uploadLocation = "https://s3"/*.env('AWS_REGION', 'us-east-1')*/.".amazonaws.com/".env('AWS_S3_Uploads')."/".$newFileName; //TODO: This ideally needs to something returned from Laravel's upload
         //dd($uploadLocation);
 
         //invoke lambda
