@@ -38,6 +38,7 @@ Route::group(['before' => 'oauth:basic', 'prefix' => 'v'.env('APP_API_VERSION')]
 Route::group(['before' => 'oauth:processor', 'prefix' => 'v'.env('APP_API_VERSION')], function() {
     Route::get('images', 'ComicImagesController@index');
     Route::post('images', 'ComicImagesController@store');
+    Route::put('comicbookarchives', 'ComicBookArchivesController@update');
 });
 
 Route::group(['prefix' => 'v'.env('APP_API_VERSION')], function() {
