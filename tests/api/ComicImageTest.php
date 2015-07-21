@@ -63,6 +63,7 @@ class ComicImageTest extends ApiTester {
         $imageentry->image_slug = $img_slug;
         $imageentry->image_hash = hash_file('md5', $img);
         $imageentry->image_size = rand(5000, 150000);
+        $imageentry->image_url = 'http://www.dogster.com/wp-content/uploads/2015/05/doge.jpg';
         $imageentry->save();
         $imageentry->comicBookArchives()->attach($cba->id);//Pivot table needed which aren't currently support by Test Dummy :(
 
@@ -154,6 +155,7 @@ class ComicImageTest extends ApiTester {
         $imageentry->image_slug = $img_slug;
         $imageentry->image_hash = hash_file('md5', $img);
         $imageentry->image_size = rand(5000, 150000);
+        $imageentry->image_url = 'http://www.dogster.com/wp-content/uploads/2015/05/doge.jpg';
         $imageentry->save();
         $imageentry->comicBookArchives()->attach($cba->id);//Pivot table needed which aren't currently support by Test Dummy :(
 
@@ -206,6 +208,7 @@ class ComicImageTest extends ApiTester {
         $imageentry->image_slug = $img_slug;
         $imageentry->image_hash = hash_file('md5', $img);
         $imageentry->image_size = rand(5000, 150000);
+        $imageentry->image_url = 'http://www.dogster.com/wp-content/uploads/2015/05/doge.jpg';
         $imageentry->save();
         $imageentry->comicBookArchives()->attach($cba->id);//Pivot table needed which aren't currently support by Test Dummy :(
 

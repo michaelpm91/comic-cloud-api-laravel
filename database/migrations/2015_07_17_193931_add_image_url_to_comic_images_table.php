@@ -14,7 +14,7 @@ class AddImageUrlToComicImagesTable extends Migration {
 	{
 		Schema::table('comic_images', function(Blueprint $table)
 		{
-            $table->text('image_url')->after('image_size');
+            $table->text('image_url')->nullable()->after('image_size');
 		});
 	}
 

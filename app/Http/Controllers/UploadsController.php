@@ -1,14 +1,11 @@
 <?php namespace App\Http\Controllers;
 
-use App\Commands\ProcessComicBookArchive;
-use App\Commands\ProcessComicBookArchiveCommand;
 use App\Upload;
 use App\User;
 use App\Series;
 use App\Comic;
 use App\ComicBookArchive;
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
 
 use Storage;
 use Request;
@@ -24,11 +21,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 use Rhumsaa\Uuid\Uuid;
 
-use GuzzleHttp\Client as Guzzle;
-
 use Illuminate\Http\Response;
-
-use Illuminate\Contracts\Routing\ResponseFactory;
 
 
 class UploadsController extends ApiController {

@@ -89,5 +89,6 @@ $factory('App\ComicBookArchive', [
 $factory('App\ComicImage', [
     'image_slug' => '',
     'image_size' => '',
-    'image_hash' => ''
+    'image_hash' => '',
+    'image_url' => 'http://www.dogster.com/wp-content/uploads/2015/05/doge.jpg'
 ]);
