@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use App\ComicImage;
 use App\ComicBookArchive;
 
-use Validator;
 use Input;
 
 
