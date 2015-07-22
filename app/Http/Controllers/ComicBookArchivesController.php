@@ -26,6 +26,7 @@ class ComicBookArchivesController extends ApiController {
 
         $cba = ComicBookArchive::find($id);
 
+
         if(!$cba){
             return $this->respondNotFound([
                 'title' => 'Comic Book Archive Not Found',
@@ -35,40 +36,43 @@ class ComicBookArchivesController extends ApiController {
             ]);
         }
 
-        Validator::extend('image_id_exist', function($attribute, $value, $parameters) use ($id)  {
-            $comic_image = ComicImage::find($id);
-            if($comic_image) {
-                return true;
-            } else {
-                return false;
-            }
-        });
+        if($request['attach_image_id']) {
 
-        $messages = [
-            'attach_image_id.image_id_exists' =>  'Not a valid Image ID'
-        ];
+            $comic_image = ComicImage::find($request['attach_image_id']);
 
-        $validator = Validator::make($request, [
-            'attach_image_id' => 'numeric|image_id_exist'
-        ], $messages);
-
-        if ($validator->fails()){
-            $pretty_errors = array_map(function($item){
-                return [
-                    'title' => 'Missing Required Field Or Incorrectly Formatted Data',
-                    'detail' => $item,
-                    'status' => 400,
+            if (!$comic_image) {
+                return $this->respondNotFound([
+                    'title' => 'Comic Image Not Found',
+                    'detail' => 'Comic Image  Not Found',
+                    'status' => 404,
                     'code' => ''
-                ];
-            }, $validator->errors()->all());
+                ]);
+            }
 
-            return $this->respondBadRequest($pretty_errors);
+            $comic_image->comicBookArchives()->attach($id);
+
+            return $this->respondNoContent();
+        }else if(isset($request['comic_book_archive_status'])){
+            if($request['comic_book_archive_status'] == 1){
+                if(!isset($request['comic_book_archive_contents'])){
+                    return $this->respondBadRequest([
+                        'title' => 'Missing Required Field Or Incorrectly Formatted Dat',
+                        'detail' => 'Comic Book Archive Contents cannot be empty',
+                        'status' => 400,
+                        'code' => ''
+                    ]);
+                }
+                //post new status and json to database
+                //cascade across related comics
+                //return no content
+
+            }else if ($request['comic_book_archive_status'] == 2){
+                //post new status and json to database
+                //cascade across related comics
+                //return no content
+            }
+
         }
-
-        //$cba->attach($request['attach_image_id']);
-        //$imageentry->comicBookArchives()->attach($request['related_comic_book_archive_id']);
-        $cba->comicImages()->
-
 
     }
 

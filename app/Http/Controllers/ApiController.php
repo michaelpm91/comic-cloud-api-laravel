@@ -97,6 +97,11 @@ class ApiController extends Controller {
         return $this->setStatusCode(IlluminateResponse::HTTP_CREATED)->respond($message);
     }
 
+    public function respondNoContent(){
+
+        return $this->setStatusCode(IlluminateResponse::HTTP_NO_CONTENT)->respond();
+    }
+
     /**
      * @param $message
      * @return mixed
@@ -113,7 +118,7 @@ class ApiController extends Controller {
      * @param array $headers
      * @return mixed
      */
-    public function respond($data, $headers = []){
+    public function respond($data = [], $headers = []){
         return response()->json($data, $this->getStatusCode(), $headers);
     }
 
