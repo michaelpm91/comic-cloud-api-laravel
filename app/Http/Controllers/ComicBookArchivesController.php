@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 
 use App\ComicImage;
 use App\ComicBookArchive;
+use App\Comic;
 
 use Input;
 
@@ -35,7 +36,7 @@ class ComicBookArchivesController extends ApiController {
             ]);
         }
 
-        if($request['attach_image_id']) {
+        if(isset($request['attach_image_id'])) {
 
             $comic_image = ComicImage::find($request['attach_image_id']);
 
@@ -52,8 +53,8 @@ class ComicBookArchivesController extends ApiController {
 
             return $this->respondNoContent();
         }else if(isset($request['comic_book_archive_status'])){
-            if($request['comic_book_archive_status'] == 1){
-                if(!isset($request['comic_book_archive_contents'])){
+            if($request['comic_book_archive_status'] == 1) {
+                if (!isset($request['comic_book_archive_contents'])) {
                     return $this->respondBadRequest([
                         'title' => 'Missing Required Field Or Incorrectly Formatted Dat',
                         'detail' => 'Comic Book Archive Contents cannot be empty',
@@ -61,16 +62,24 @@ class ComicBookArchivesController extends ApiController {
                         'code' => ''
                     ]);
                 }
-                //post new status and json to database
-                //cascade across related comics
-                //return no content
 
-            }else if ($request['comic_book_archive_status'] == 2){
-                //post new status and json to database
-                //cascade across related comics
-                //return no content
+                $comic_book_archive_contents = json_encode($request['comic_book_archive_contents']);
             }
 
+            //post new status and json to database
+            $cba->comic_book_archive_status = $request['comic_book_archive_status'];
+            if($request['comic_book_archive_status'] == 1) {
+                $cba->comic_book_archive_contents = $comic_book_archive_contents;
+            }
+            $cba->save();
+            //cascade across related comics
+            if($request['comic_book_archive_status'] == 1) {
+                Comic::where('comic_book_archive_id', '=', $id) ->update(['comic_book_archive_contents' => $comic_book_archive_contents]);
+            }
+            Comic::where('comic_book_archive_id', '=', $id) ->update(['comic_status' =>  $request['comic_book_archive_status']]);
+
+            //return no content
+            return $this->respondNoContent();
         }
 
     }

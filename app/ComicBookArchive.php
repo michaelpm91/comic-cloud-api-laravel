@@ -10,5 +10,9 @@ class ComicBookArchive extends Model {
     public function comicimages(){
         return $this->belongsToMany('App\ComicImage');
     }
+    public function comics()
+    {
+        return $this->hasMany('App\Comic');
+    }
 
 }
