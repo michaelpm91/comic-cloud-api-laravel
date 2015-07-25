@@ -190,7 +190,7 @@ class UploadsController extends ApiController {
         //invoke lambda
         if($process_cba) {
             $s3 = AWS::get('s3');
-            $s3TempLink = $s3->getObjectUrl(env('user_uploads', 'local_user_uploads'), $newFileName, '+10 minutes');
+            $s3TempLink = $s3->getObjectUrl(env('AWS_S3_Uploads'), $newFileName, '+10 minutes');
 
             $lambda = AWS::get('Lambda');
             $lambda->invokeAsync([
@@ -266,6 +266,5 @@ class UploadsController extends ApiController {
 
         return $comic;
     }
-
 
 }
