@@ -21,8 +21,13 @@ class ApiController extends Controller {
         $this->currentUser = null;
 
         if( ( null !== $authorizer->getChecker()->getAccessToken()) ){
-            $uid = $this->authorizer->getResourceOwnerId();
-            $this->currentUser = User::find($uid);
+            if($this->authorizer->getResourceOwnerType() == "user"){
+                $uid = $this->authorizer->getResourceOwnerId();
+                $this->currentUser = User::find($uid);
+                return;
+            }else if($this->authorizer->getResourceOwnerType() == "client"){
+                return;
+            }
         }
     }
 
@@ -92,6 +97,11 @@ class ApiController extends Controller {
         return $this->setStatusCode(IlluminateResponse::HTTP_CREATED)->respond($message);
     }
 
+    public function respondNoContent(){
+
+        return $this->setStatusCode(IlluminateResponse::HTTP_NO_CONTENT)->respond();
+    }
+
     /**
      * @param $message
      * @return mixed
@@ -108,7 +118,7 @@ class ApiController extends Controller {
      * @param array $headers
      * @return mixed
      */
-    public function respond($data, $headers = []){
+    public function respond($data = [], $headers = []){
         return response()->json($data, $this->getStatusCode(), $headers);
     }
 

@@ -1,11 +1,11 @@
 <?php namespace App\Http\Controllers;
 
-use App\Commands\ProcessComicBookArchive;
-use App\Commands\ProcessComicBookArchiveCommand;
 use App\Upload;
 use App\User;
+use App\Series;
+use App\Comic;
+use App\ComicBookArchive;
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
 
 use Storage;
 use Request;
@@ -15,9 +15,14 @@ use Auth;
 use Validator;
 use Input;
 
+use AWS;
+
 use Illuminate\Pagination\LengthAwarePaginator;
 
 use Rhumsaa\Uuid\Uuid;
+
+use Illuminate\Http\Response;
+
 
 class UploadsController extends ApiController {
 
@@ -59,7 +64,7 @@ class UploadsController extends ApiController {
         }
 
         return $this->respond([
-            'upload' => $upload
+            'upload' => [$upload]
         ]);
     }
 
@@ -90,8 +95,17 @@ class UploadsController extends ApiController {
             }
         });
 
+        Validator::extend('user_comics', function($attribute, $value, $parameters) {
+            if($this->currentUser->comics()->find($value)){
+                return false;
+            }else{
+                return true;
+            }
+        });
+
         $messages = [
             'file.valid_cba' => 'Not a valid File.',
+            'comic_id.user_comics' => 'Not a valid Comic ID',
             'series_id.valid_uuid' => 'The :attribute field is not a valid ID.',
             'comic_id.valid_uuid' => 'The :attribute field is not a valid ID.'
         ];
@@ -100,7 +114,7 @@ class UploadsController extends ApiController {
             'file' => 'required|valid_cba|between:1,150000',
             'exists' => 'required|boolean',
             'series_id' => 'required|valid_uuid',
-            'comic_id' => 'required|valid_uuid',
+            'comic_id' => 'required|valid_uuid|user_comics',
             'series_title' => 'required',
             'series_start_year' => 'required|numeric',
             'comic_issue' => 'required|numeric',
@@ -109,7 +123,7 @@ class UploadsController extends ApiController {
         if ($validator->fails()){
             $pretty_errors = array_map(function($item){
                 return [
-                    'title' => 'Missing Required Field',
+                    'title' => 'Missing Required Field Or Incorrectly Formatted Data',
                     'detail' => $item,
                     'status' => 400,
                     'code' => ''
@@ -119,40 +133,138 @@ class UploadsController extends ApiController {
             return $this->respondBadRequest($pretty_errors);
         }
 
-        $file = Request::file('file');
 
+
+        $file = Request::file('file');
+        $fileHash = hash_file('md5', $file->getRealPath());
+        $match_data = Request::except('file');
+
+        //Write Upload to DB
         $upload = new Upload;
         $upload->file_original_name = $file->getClientOriginalName();
         $upload->file_size = $file->getSize();
-        $newFileNameWithNoExtension = $upload->file_random_upload_id = Uuid::uuid4();
+        $newFileNameWithNoExtension = $upload->file_random_upload_id = Uuid::uuid4()->toString();
         $upload->file_upload_name = $newFileName = $newFileNameWithNoExtension . '.' . $file->getClientOriginalExtension();
         $upload->file_original_file_type = $file->getClientOriginalExtension();
         $upload->user_id = $this->currentUser->id;
-        $upload->match_data = json_encode(Request::except('file'));
+        $upload->match_data = json_encode($match_data);
         $upload->save();
 
-        $tempPath = $file->getRealPath();
-        $fileHash = hash_file('md5', $tempPath);
+        //Check if CBA exists
+        $cba = ComicBookArchive::where('comic_book_archive_hash', '=', $fileHash)->first();
+        $process_cba = false;
+        //If not write an entry for one to the DB and send the file to S3
+        if(!$cba){//Upload not found so send file to S3
+            Storage::disk(env('user_uploads', 'local_user_uploads'))->put($newFileName, File::get($file));//TODO: Make sure right AWS S3 ACL is used in production
+            //Storage::disk(env('user_uploads', 'local_user_uploads'))->getDriver()->getAdapter
 
-        Storage::disk(env('user_uploads', 'local_user_uploads'))->put($newFileName, File::get($file));
 
-        $process_info = [
-            'upload_id' => $upload->id,
-            'user_id'=> $currentUser['id'],
-            'hash'=> $fileHash,
-            'newFileName' => $newFileName,
-            'newFileNameNoExt' => $newFileNameWithNoExtension,
-            'fileExt' => $file->getClientOriginalExtension(),
-            'originalFileName' => $file->getClientOriginalName(),
-            'time' => time()
+            //create cba
+            $cba = $this->createComicBookArchive($upload->id, $fileHash);
+            $process_cba = true;
+        }
+
+        //check if series exists, if not create one
+        $series = User::find($this->currentUser->id)->first()->series()->find($match_data['series_id']);
+
+        //dd($series);
+
+        if(!$series){//create
+            $series = $this->createSeries($match_data);
+        }
+
+        //$series->id;
+
+        $comic_info = [
+            'comic_issue' => $match_data['comic_issue'],
+            'comic_id' => $match_data['comic_id'],
+            'series_id' => $series->id,
+            'comic_writer' => 'Unknown',
+            'comic_book_archive_id' => $cba->id
         ];
 
-        Queue::push(new ProcessComicBookArchiveCommand($process_info));
+        $comic = $this->createComic($comic_info);
+        $uploadLocation = "https://s3"/*.env('AWS_REGION', 'us-east-1')*/.".amazonaws.com/".env('AWS_S3_Uploads')."/".$newFileName; //TODO: This ideally needs to something returned from Laravel's upload
+        //dd($uploadLocation);
+
+        //invoke lambda
+        if($process_cba) {
+            $s3 = AWS::get('s3');
+            $s3TempLink = $s3->getObjectUrl(env('user_uploads', 'local_user_uploads'), $newFileName, '+10 minutes');
+
+            $lambda = AWS::get('Lambda');
+            $lambda->invokeAsync([
+                'FunctionName' => env('LAMBDA_FUNCTION_NAME'),
+                'InvokeArgs' => json_encode([
+                    "api_version" => url('v'.env('APP_API_VERSION')),
+                    "environment" => env('APP_ENV'),
+                    "fileLocation" => $s3TempLink,
+                    "cba_id" => $cba->id
+                ]),
+            ]);
+
+        }
+
+
 
         return $this->respondCreated([
-            'upload' => $upload
+            'upload' => [$upload]
         ]);
 
+    }
+
+    /**
+     * @return ComicBookArchive
+     */
+    private function createComicBookArchive($upload_id, $cba_hash)
+    {
+        $process_info = $this->message;
+
+        $cba = new ComicBookArchive();
+        $cba->upload_id = $upload_id;
+        $cba->comic_book_archive_hash = $cba_hash;
+        $cba->comic_book_archive_status = 0;
+        $cba->save();
+
+        return $cba;
+    }
+    /**
+     * @param $match_data
+     * @return Series
+     */
+    private function createSeries($match_data){
+        $series = new Series;
+        $newSeriesID = $match_data['series_id'];
+        $series->id = $newSeriesID;
+        $series->series_title = $match_data['series_title'];
+        $series->series_start_year = $match_data['series_start_year'];
+        $series->series_publisher = 'Unknown';
+        $series->user_id = $this->currentUser->id;
+        $series->save();
+        return $series;
+    }
+
+    /**
+     * @param $comic_info
+     * @return Comic
+     */
+    private function createComic($comic_info){
+
+        $cba = ComicBookArchive::find($comic_info['comic_book_archive_id']);
+
+        $newComicID = $comic_info['comic_id'];
+
+        $comic = new Comic;
+        $comic->id = $newComicID;
+        $comic->comic_issue = $comic_info['comic_issue'];
+        $comic->comic_writer = $comic_info['comic_writer'];
+        $comic->comic_book_archive_contents = (($cba->comic_book_archive_contents ? $cba->comic_book_archive_contents : ''));
+        $comic->user_id = $this->currentUser->id;
+        $comic->series_id = $comic_info['series_id'];
+        $comic->comic_book_archive_id = $cba->id;
+        $comic->save();
+
+        return $comic;
     }
 
 
