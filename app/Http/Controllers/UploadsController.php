@@ -68,29 +68,6 @@ class UploadsController extends ApiController {
         ]);
     }
 
-    public function download($upload_id){
-        $currentUser = $this->currentUser;
-
-        $upload = $currentUser->uploads()->find($upload_id);
-
-        if(!$upload){
-            return $this->respondNotFound([
-                'title' => 'Upload Not Found',
-                'detail' => 'Upload Not Found',
-                'status' => 404,
-                'code' => ''
-            ]);
-        }
-
-        $upload_file = Storage::disk(env('user_uploads', 'local_user_uploads'))->get("Archive.zip");//$upload->file_upload_name);
-
-        //dd($upload_file);
-        //return Response::download($upload_file);
-        //return (new Response($upload_file, 200));//->header('Content-Type', $entry->mime);
-        return response()->download($upload_file)->deleteFileAfterSend(true);
-        //return (new Response($upload_file, 200));
-    }
-
     /**
      * Store a newly created upload in storage.
      *
@@ -179,6 +156,9 @@ class UploadsController extends ApiController {
         //If not write an entry for one to the DB and send the file to S3
         if(!$cba){//Upload not found so send file to S3
             Storage::disk(env('user_uploads', 'local_user_uploads'))->put($newFileName, File::get($file));//TODO: Make sure right AWS S3 ACL is used in production
+            //Storage::disk(env('user_uploads', 'local_user_uploads'))->getDriver()->getAdapter
+
+
             //create cba
             $cba = $this->createComicBookArchive($upload->id, $fileHash);
             $process_cba = true;
@@ -209,13 +189,16 @@ class UploadsController extends ApiController {
 
         //invoke lambda
         if($process_cba) {
-            $aws = AWS::get('Lambda');
-            //dd($aws->listFunctions());
-            $aws->invokeAsync([
-                'FunctionName' => 'Comic_Cloud_Lambda_Function-development-1-0-0',
+            $s3 = AWS::get('s3');
+            $s3TempLink = $s3->getObjectUrl(env('user_uploads', 'local_user_uploads'), $newFileName, '+10 minutes');
+
+            $lambda = AWS::get('Lambda');
+            $lambda->invokeAsync([
+                'FunctionName' => env('LAMBDA_FUNCTION_NAME'),
                 'InvokeArgs' => json_encode([
-                    "bucket_name" => env('AWS_S3_Uploads'),
-                    "file_name" => $upload->file_upload_name,
+                    "api_version" => url('v'.env('APP_API_VERSION')),
+                    "environment" => env('APP_ENV'),
+                    "fileLocation" => $s3TempLink,
                     "cba_id" => $cba->id
                 ]),
             ]);
@@ -279,7 +262,6 @@ class UploadsController extends ApiController {
         $comic->user_id = $this->currentUser->id;
         $comic->series_id = $comic_info['series_id'];
         $comic->comic_book_archive_id = $cba->id;
-        $comic->comic_status = $cba->comic_book_archive_status;
         $comic->save();
 
         return $comic;

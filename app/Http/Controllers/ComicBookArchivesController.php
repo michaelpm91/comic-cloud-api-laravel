@@ -14,6 +14,25 @@ use Input;
 
 class ComicBookArchivesController extends ApiController {
 
+    public function show($id){
+
+        $comic_book_archive = ComicBookArchive::find($id);
+
+        if(!$comic_book_archive){
+            return $this->respondNotFound([
+                'title' => 'Comic Book Archive Not Found',
+                'detail' => 'Comic Book Archive Not Found',
+                'status' => 404,
+                'code' => ''
+            ]);
+        }
+
+        return $this->respond([
+            'comic_book_archive' => [$comic_book_archive]
+        ]);
+
+    }
+
 	/**
 	 * Update the specified resource in storage.
 	 *
@@ -66,19 +85,14 @@ class ComicBookArchivesController extends ApiController {
                 $comic_book_archive_contents = json_encode($request['comic_book_archive_contents']);
             }
 
-            //post new status and json to database
             $cba->comic_book_archive_status = $request['comic_book_archive_status'];
             if($request['comic_book_archive_status'] == 1) {
                 $cba->comic_book_archive_contents = $comic_book_archive_contents;
             }
             $cba->save();
-            //cascade across related comics
             if($request['comic_book_archive_status'] == 1) {
                 Comic::where('comic_book_archive_id', '=', $id) ->update(['comic_book_archive_contents' => $comic_book_archive_contents]);
             }
-            Comic::where('comic_book_archive_id', '=', $id) ->update(['comic_status' =>  $request['comic_book_archive_status']]);
-
-            //return no content
             return $this->respondNoContent();
         }
 

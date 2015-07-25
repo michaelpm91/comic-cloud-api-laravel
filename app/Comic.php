@@ -16,7 +16,7 @@ class Comic extends Model {
 
     protected $hidden = array('created_at', 'updated_at', 'user_id','comic_book_archive_id','deleted_at');
 
-    protected $appends = ['from_cba'];
+    protected $appends = ['comic_status'];
 
     public function series()
     {
@@ -27,7 +27,7 @@ class Comic extends Model {
         return $this->belongsTo('App\User');
     }
     public function cba(){
-        return $this->belongsTo('App\ComicBookArchive');
+        return $this->belongsTo('App\ComicBookArchive',  'comic_book_archive_id', 'id');
     }
     public function getComicBookArchiveContentsAttribute($json_array){
         if($json_array) {
@@ -40,11 +40,8 @@ class Comic extends Model {
         }
     }
 
-    public function getFromCbaAttribute(){
-        //dd($this->cba()->id);
-        dd($this->cba()->get());
-        return $this->cba();
-        //return "1";
+    public function getComicStatusAttribute(){
+        return $this->cba()->get()->first()['comic_book_archive_status'];
     }
 
 }

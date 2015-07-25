@@ -39,6 +39,7 @@ Route::group(['before' => 'oauth:processor', 'prefix' => 'v'.env('APP_API_VERSIO
     Route::get('images', 'ComicImagesController@index');
     Route::post('images', 'ComicImagesController@store');
     Route::put('comicbookarchives/{cba_id}', 'ComicBookArchivesController@update');
+    Route::get('comicbookarchives/{cba_id}', 'ComicBookArchivesController@show');
 });
 
 Route::group(['prefix' => 'v'.env('APP_API_VERSION')], function() {

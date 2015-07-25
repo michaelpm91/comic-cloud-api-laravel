@@ -56,7 +56,6 @@ $factory('App\Comic', function($faker){
         'series_id' => 'factory:App\Series',
         'comic_vine_issue_id' => '',
         'comic_book_archive_id' => 'factory:App\ComicBookArchive',
-        'comic_status' => 1
     ];
 });
 
