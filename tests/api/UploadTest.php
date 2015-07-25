@@ -75,8 +75,8 @@ class UploadTest extends ApiTester {
     /**      
 	* @group upload-test      
 	*/
-	public function test_it_creates_upload(){
-        $this->markTestSkipped('This test will fail on some PHP environments due to a PHP bug with PHP-VCR');
+	public function test_it_creates_upload(){//TODO: Skipping this test for now as AWS LAMBDA Calls needs to be MOCKED
+        $this->markTestSkipped('This test will fail on some PHP environments due to a PHP bug with PHP-VCR. Also skipping until AWS Lambda calls can be mocked.');
         //arrange
 
         //act
@@ -289,8 +289,8 @@ class UploadTest extends ApiTester {
 
         //assert
         $this->assertResponseOk();
-        $this->assertEquals($upload->id, json_decode($response, true)['upload']['id']);
-        $this->assertEquals($upload->file_original_name, json_decode($response, true)['upload']['file_original_name']);
+        $this->assertEquals($upload->id, json_decode($response, true)['upload'][0]['id']);
+        $this->assertEquals($upload->file_original_name, json_decode($response, true)['upload'][0]['file_original_name']);
 
     }
     /**      

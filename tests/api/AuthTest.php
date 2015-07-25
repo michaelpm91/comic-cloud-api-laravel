@@ -32,7 +32,8 @@ class AuthTest extends ApiTester {
             'client_id' => 'test_client_id',
             'client_secret' => 'test_client_secret',
             'username' => $user->email,
-            'password' => '1234'
+            'password' => '1234',
+            'scope' => 'basic'
         ]);
 
         //assert

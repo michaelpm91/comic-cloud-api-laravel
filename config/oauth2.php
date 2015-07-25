@@ -104,6 +104,10 @@ return [
             // whether or not to issue a new refresh token when a new access token is issued
             'rotate_refresh_tokens' => false,
 
+        ],
+        'client_credentials' => [
+            'class' => '\League\OAuth2\Server\Grant\ClientCredentialsGrant',
+            'access_token_ttl' => 3600
         ]
     ],
 
@@ -158,7 +162,7 @@ return [
     | The default scope to use if not present in the query string
     |
     */
-    'default_scope' => null,
+    'default_scope' => "basic",
 
     /*
     |--------------------------------------------------------------------------
@@ -191,7 +195,7 @@ return [
     | This is useful to only allow specific clients to use some scopes
     |
     */
-    'limit_clients_to_scopes' => false,
+    'limit_clients_to_scopes' => true,
 
     /*
     |--------------------------------------------------------------------------

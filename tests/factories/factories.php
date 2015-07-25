@@ -56,7 +56,6 @@ $factory('App\Comic', function($faker){
         'series_id' => 'factory:App\Series',
         'comic_vine_issue_id' => '',
         'comic_book_archive_id' => 'factory:App\ComicBookArchive',
-        'comic_status' => 1
     ];
 });
 
@@ -89,5 +88,6 @@ $factory('App\ComicBookArchive', [
 $factory('App\ComicImage', [
     'image_slug' => '',
     'image_size' => '',
-    'image_hash' => ''
+    'image_hash' => '',
+    'image_url' => 'http://www.dogster.com/wp-content/uploads/2015/05/doge.jpg'
 ]);

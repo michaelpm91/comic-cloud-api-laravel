@@ -40,6 +40,24 @@ class TestSeeder extends Seeder {
 
         DB::table('oauth_clients')->insert($clients);
 
+        $oauth_scopes = [
+            'id' => 'basic',
+            'description' => 'test_scope',
+            'created_at' => $datetime,
+            'updated_at' => $datetime,
+        ];
+
+        DB::table('oauth_scopes')->insert($oauth_scopes);
+
+        $scopes = [
+            'client_id' => 'test_client_id',
+            'scope_id' => 'basic',
+            'created_at' => $datetime,
+            'updated_at' => $datetime,
+        ];
+
+        DB::table('oauth_client_scopes')->insert($scopes);
+
         $sessions = [
             [
                 'client_id' => 'test_client_id',
@@ -63,6 +81,15 @@ class TestSeeder extends Seeder {
         ];
 
         DB::table('oauth_access_tokens')->insert($tokens);
+
+        $token_scopes = [
+            'access_token_id' => 'test_access_token',
+            'scope_id' => 'basic',
+            'created_at' => $datetime,
+            'updated_at' => $datetime,
+        ];
+
+        DB::table('oauth_access_token_scopes')->insert($token_scopes);
 
         $refreshtokens = [
             [
