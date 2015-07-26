@@ -32,7 +32,7 @@ Route::group(['before' => 'oauth:basic', 'prefix' => 'v'.env('APP_API_VERSION')]
     Route::get('series/{series_id}/meta', 'SeriesController@showMetaData');//TODO: Should these be filters?
     Route::get('series/{series_id}/comics', 'SeriesController@showRelatedComics');
     Route::get('comics/{comic_id}/meta', 'ComicsController@showMetaData');//TODO: Should these be filters?
-    Route::get('uploads/{upload_id}/download','UploadsController@download');//TODO: Is this needed anymore?
+    Route::get('s3signature', 'UploadsController@showS3Signature');
 });
 
 Route::group(['before' => 'oauth:processor', 'prefix' => 'v'.env('APP_API_VERSION')], function() {
