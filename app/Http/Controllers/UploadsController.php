@@ -277,7 +277,7 @@ class UploadsController extends ApiController {
             $aws_request_type
         ];
         $aws_credentials = implode('/', $aws_scope);
-        $amz_success_status = 201;
+        $amz_success_status = "201";
         $amz_algorithm = "AWS4-HMAC-SHA256";
 
         $policy = [
