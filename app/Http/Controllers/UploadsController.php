@@ -213,57 +213,7 @@ class UploadsController extends ApiController {
 
     }
 
-    public function showS3Signature(){
-
-
-        /*$algorithm = "AWS4-HMAC-SHA256";
-        $service = "s3";
-        $date = gmdate('Ymd\THis\Z');
-        $shortDate = gmdate('Ymd');
-        $requestType = "aws4_request";
-        $expires = '600'; // 24 Hours
-        $successStatus = '201';
-
-        $scope = [
-            env('AWS_ACCESS_KEY_ID'),
-            $shortDate,
-            env('AWS_REGION'),
-            $service,
-            $requestType
-        ];
-        $credentials = implode('/', $scope);
-
-        $policy = [
-            'expiration' => gmdate('Y-m-d\TG:i:s\Z', strtotime('+10 Minutes')),
-            'conditions' => [
-                ['bucket' => env('AWS_S3_Uploads')],
-                ['acl' => 'private'],
-                ['starts-with', '$key', ''],
-                ['starts-with', '$Content-Type', ''],
-                ['success_action_status' => $successStatus],
-                ['x-amz-credential' => $credentials],
-                ['x-amz-algorithm' => $algorithm],
-                ['x-amz-date' => $date],
-                ['x-amz-expires' => $expires],
-            ]
-        ];
-        $base64Policy = base64_encode(json_encode($policy));
-
-        // Signing Keys
-        $dateKey = hash_hmac('sha256', $shortDate, 'AWS4' .env('AWS_SECRET_ACCESS_KEY'), true);
-        $dateRegionKey = hash_hmac('sha256', env('AWS_REGION'), $dateKey, true);
-        $dateRegionServiceKey = hash_hmac('sha256', $service, $dateRegionKey, true);
-        $signingKey = hash_hmac('sha256', $requestType, $dateRegionServiceKey, true);
-
-        // Signature
-        $signature = hash_hmac('sha256', $base64Policy, $signingKey);
-        return [
-            'policy' => $base64Policy,
-            'x-amz-algorithm' => 'AWS4-HMAC-SHA256',
-            'x-amz-credentials' => $credentials,
-            'x-amz-date' => $date,
-            'signature' => $signature
-        ];*/
+    public function showUploadSignature(){
 
         $aws_date = gmdate('Ymd\THis\Z');
         $aws_request_type = "aws4_request";
