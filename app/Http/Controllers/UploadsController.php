@@ -216,7 +216,7 @@ class UploadsController extends ApiController {
     public function showS3Signature(){
 
 
-        $algorithm = "AWS4-HMAC-SHA256";
+        /*$algorithm = "AWS4-HMAC-SHA256";
         $service = "s3";
         $date = gmdate('Ymd\THis\Z');
         $shortDate = gmdate('Ymd');
@@ -263,6 +263,53 @@ class UploadsController extends ApiController {
             'x-amz-credentials' => $credentials,
             'x-amz-date' => $date,
             'signature' => $signature
+        ];*/
+
+        $aws_date = gmdate('Ymd\THis\Z');
+        $aws_request_type = "aws4_request";
+        $aws_short_date = gmdate('Ymd');
+        $aws_service_type = "s3";
+        $aws_scope = [
+            env('AWS_ACCESS_KEY_ID'),
+            $aws_short_date,
+            env('AWS_REGION'),
+            $aws_service_type,
+            $aws_request_type
+        ];
+        $aws_credentials = implode('/', $aws_scope);
+        $amz_success_status = 201;
+        $amz_algorithm = "AWS4-HMAC-SHA256";
+
+        $policy = [
+            'expiration' => gmdate('Y-m-d\TG:i:s\Z', strtotime('+10 Minutes')),
+            'conditions' => [
+                ['bucket' => env('AWS_S3_Uploads')],
+                ['acl' => 'private'],
+                ['starts-with', '$key', ''],
+                ['starts-with', '$Content-Type', ''],
+                ['success_action_status' => $amz_success_status],
+                ['x-amz-credential' => $aws_credentials],
+                ['x-amz-algorithm' => $amz_algorithm],
+                ['x-amz-date' => $aws_date],
+            ]
+        ];
+        $base64Policy = base64_encode(json_encode($policy));
+
+        // Signing Keys
+        $dateKey = hash_hmac('sha256', $aws_short_date , 'AWS4' .env('AWS_SECRET_ACCESS_KEY'), true);
+        $dateRegionKey = hash_hmac('sha256', env('AWS_REGION'), $dateKey, true);
+        $dateRegionServiceKey = hash_hmac('sha256', $aws_service_type, $dateRegionKey, true);
+        $signingKey = hash_hmac('sha256', $aws_request_type, $dateRegionServiceKey, true);
+
+        // Signature
+        $signature = hash_hmac('sha256', $base64Policy, $signingKey);
+
+        return [
+            "policy" => $base64Policy,
+            "X-Amz-Algorithm" => $amz_algorithm,
+            "X-Amz-Date" => $aws_date,
+            "X-Amz-Credential" => $aws_credentials,
+            "signature" => $signature
         ];
     }
 
