@@ -49,6 +49,10 @@ Route::group(['prefix' => 'v'.env('APP_API_VERSION')], function() {
     });
 });
 
+Route::get('directupload', function(){
+    return view('s3DirectUpload.upload');
+});
+
 /*Route::controllers([
     'auth' => 'Auth\AuthController',
     //'password' => 'Auth\PasswordController' //temporarily disabled
