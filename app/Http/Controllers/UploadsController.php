@@ -188,7 +188,7 @@ class UploadsController extends ApiController {
         //dd($uploadLocation);
 
         //invoke lambda
-        if($process_cba) {
+        /*if($process_cba) {
             $s3 = AWS::get('s3');
             $s3TempLink = $s3->getObjectUrl(env('AWS_S3_Uploads'), $newFileName, '+10 minutes');
 
@@ -203,7 +203,7 @@ class UploadsController extends ApiController {
                 ]),
             ]);
 
-        }
+        }*/
 
 
 
