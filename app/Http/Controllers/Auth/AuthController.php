@@ -32,6 +32,7 @@ class AuthController extends Controller
      */
     protected function validator(Request $request)
     {
+        $request = $request->all();
         return Validator::make($request, [
             'name' => 'required|max:255',
             'email' => 'required|email|max:255|unique:users',
@@ -47,6 +48,7 @@ class AuthController extends Controller
      */
     protected function create(Request $request)
     {
+        $request = $request->all();
         return User::create([
             'name' => $request['name'],
             'email' => $request['email'],

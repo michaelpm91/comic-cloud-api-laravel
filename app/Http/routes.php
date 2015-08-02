@@ -43,10 +43,8 @@ Route::group(['before' => 'oauth:processor', 'prefix' => 'v'.env('APP_API_VERSIO
 });
 
 Route::group(['prefix' => 'v'.env('APP_API_VERSION')], function() {
-    Route::post('auth/register', 'Auth\AuthController@create');
-    Route::post('oauth/access_token', function () {//TODO:Mode to Auth Controller
-        return Response::json(Authorizer::issueAccessToken());
-    });
+    Route::post('auth/register', 'Auth\NewAuthController@create');
+    Route::post('oauth/access_token', 'Auth\NewAuthController@createToken');
 });
 
 /*Route::controllers([

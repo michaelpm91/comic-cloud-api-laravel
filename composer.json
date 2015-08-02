@@ -16,7 +16,8 @@
         "lucadegasperi/oauth2-server-laravel": "4.0.*",
         "graham-campbell/throttle": "4.1.*",
         "ramsey/uuid": "~2.8",
-        "doctrine/dbal": "~2.3"
+        "doctrine/dbal": "~2.3",
+		"league/flysystem-aws-s3-v3": "^1.0"
 
 	},
 	"require-dev": {
