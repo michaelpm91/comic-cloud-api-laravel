@@ -12,8 +12,7 @@ class Kernel extends ConsoleKernel {
 	 */
 	protected $commands = [
 		'App\Console\Commands\Inspire',
-        'LucaDegasperi\OAuth2Server\Console\ClientCreatorCommand',
-        'App\Console\Commands\GenerateEnvironmentVariablesCommand'
+         'App\Console\Commands\GenerateEnvironmentVariablesCommand'
 	];
 
 	/**
