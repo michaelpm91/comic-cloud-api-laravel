@@ -30,9 +30,7 @@ class Kernel extends HttpKernel {
 		'auth.basic' => 'Illuminate\Auth\Middleware\AuthenticateWithBasicAuth',
 		'guest' => 'App\Http\Middleware\RedirectIfAuthenticated',
         'csrf' => 'App\Http\Middleware\VerifyCsrfToken',
-        'oauthlogin' => 'App\Http\Middleware\OAuthLogin',
-        'oauth-owner' => 'LucaDegasperi\OAuth2Server\Middleware\OAuthOwnerMiddleware', //TODO: Check if this logic needs to be moved into App.
-        'check-authorization-params' => 'LucaDegasperi\OAuth2Server\Middleware\CheckAuthCodeRequestMiddleware'
+        'oauthlogin' => 'App\Http\Middleware\OAuthLogin'
 	];
 
 }
