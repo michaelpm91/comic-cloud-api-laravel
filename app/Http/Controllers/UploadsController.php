@@ -17,8 +17,6 @@ use Input;
 
 use AWS;
 
-use Illuminate\Pagination\LengthAwarePaginator;
-
 use Rhumsaa\Uuid\Uuid;
 
 use Illuminate\Http\Response;

@@ -23,6 +23,13 @@ Route::get('/status', function()
 
 });
 
+
+Route::group(['prefix' => 'v'.env('APP_API_VERSION')], function() {
+    Route::post('auth/register', 'Auth\NewAuthController@create');
+    Route::post('oauth/access_token', 'Auth\NewAuthController@createToken');
+});
+
+
 Route::group(['before' => 'oauth:basic', 'prefix' => 'v'.env('APP_API_VERSION')], function() {
     Route::resource('uploads','UploadsController', array('only' => array('index', 'store', 'show')));
     Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
@@ -42,9 +49,8 @@ Route::group(['before' => 'oauth:processor', 'prefix' => 'v'.env('APP_API_VERSIO
     Route::get('comicbookarchives/{cba_id}', 'ComicBookArchivesController@show');
 });
 
-Route::group(['prefix' => 'v'.env('APP_API_VERSION')], function() {
-    Route::post('auth/register', 'Auth\NewAuthController@create');
-    Route::post('oauth/access_token', 'Auth\NewAuthController@createToken');
+Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function(){
+    Route::resource('uploads','UploadsController', array('only' => array('index')));
 });
 
 /*Route::controllers([
