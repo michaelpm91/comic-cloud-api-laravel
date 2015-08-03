@@ -30,7 +30,7 @@ class OAuthExceptionHandlerMiddleware extends ApiController {
             }
             return $this->setStatusCode($e->httpStatusCode)->respondWithError([[//TODO: Fix nested arrays for JSON standardisation :(
                 'title' => $e->errorType,
-                'detail' => $error_message,
+                'detail' => str_replace('"', "", $error_message),//TODO: Maybe escape this appropriately
                 'status' => $e->httpStatusCode,
                 'code' => ''
             ]]);

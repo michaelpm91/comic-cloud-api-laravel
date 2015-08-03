@@ -54,8 +54,8 @@ class ComicImagesController extends ApiController {
             ]);
         }
 
-        $userCbaIds = $this->currentUser->comics()->lists('comic_book_archive_id');
-        $comicCbaIds = $comicImage->comicBookArchives()->lists('comic_book_archive_id');
+        $userCbaIds = $this->currentUser->comics()->lists('comic_book_archive_id')->all();
+        $comicCbaIds = $comicImage->comicBookArchives()->lists('comic_book_archive_id')->all();
 
         foreach($comicCbaIds as $comicCbaId){
             if(!in_array($comicCbaId, $userCbaIds)) {
