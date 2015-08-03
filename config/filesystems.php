@@ -60,16 +60,16 @@ return [
 
         'aws_s3_user_uploads' => [
             'driver' => 's3',
-            'key'    => env('AWS_Key'),
-            'secret' => env('AWS_Secret'),
-            'region' => env('AWS_S3_Region'),
+            'key'    => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_REGION'),
             'bucket' => env('AWS_S3_Uploads'),
         ],
         'aws_s3_user_images' => [
             'driver' => 's3',
-            'key'    => env('AWS_Key'),
-            'secret' => env('AWS_Secret'),
-            'region' => env('AWS_S3_Region'),
+            'key'    => env('AWS_ACCESS_KEY_ID'),
+            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+            'region' => env('AWS_REGION'),
             'bucket' => env('AWS_S3_Images'),
         ],
 	],
