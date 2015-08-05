@@ -29,7 +29,7 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 	 *
 	 * @var array
 	 */
-	protected $hidden = ['password', 'remember_token', 'updated_at'];
+	protected $hidden = ['password', 'type', 'updated_at'];
 
     public function uploads()
     {
