@@ -31,7 +31,7 @@ class AuthTest extends ApiTester {
             'grant_type' => 'password',
             'client_id' => 'test_client_id',
             'client_secret' => 'test_client_secret',
-            'username' => $user->email,
+            'username' => $user->username,
             'password' => '1234',
             'scope' => 'basic'
         ]);

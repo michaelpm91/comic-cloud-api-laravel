@@ -81,9 +81,9 @@ return [
             'access_token_ttl' => 604800,
 
             // the code to run in order to verify the user's identity
-            'callback'         => function($email, $password){
+            'callback'         => function($username, $password){
                 $credentials = [
-                    'email'    => $email,
+                    'username'    => $username,
                     'password' => $password,
                 ];
 
@@ -184,7 +184,7 @@ return [
     | This is useful to allow only trusted clients to access your API differently
     |
     */
-    'limit_clients_to_grants' => false,
+    'limit_clients_to_grants' => true,
 
     /*
     |--------------------------------------------------------------------------

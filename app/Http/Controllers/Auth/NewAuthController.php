@@ -20,7 +20,7 @@ class NewAuthController extends ApiController {
         $request = $request->all();
 
         $validator = Validator::make($request, [
-            'username' => 'required|max:255',//TODO: consider removing usernames
+            'username' => 'required|max:255',
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|confirmed|min:6',
         ]);
@@ -39,12 +39,12 @@ class NewAuthController extends ApiController {
         }
 
         User::create([
-            'username' => $request['username'],//TODO: consider removing usernames
+            'username' => $request['username'],
             'email' => $request['email'],
             'password' => bcrypt($request['password']),
         ]);
 
-        return $this->respondCreated('Registration Successful');
+        return $this->respondCreated('Registration Successful');//TODO: Should this be a more meaning message?
     }
 
     protected function createToken(){
