@@ -81,9 +81,9 @@ return [
             'access_token_ttl' => 604800,
 
             // the code to run in order to verify the user's identity
-            'callback'         => function($username, $password){
+            'callback'         => function($email, $password){
                 $credentials = [
-                    'email'    => $username,
+                    'email'    => $email,
                     'password' => $password,
                 ];
 
@@ -206,7 +206,7 @@ return [
     | This is useful to allow certain scopes to be used only with certain grant types
     |
     */
-    'limit_scopes_to_grants' => false,
+    'limit_scopes_to_grants' => true,
 
     /*
     |--------------------------------------------------------------------------

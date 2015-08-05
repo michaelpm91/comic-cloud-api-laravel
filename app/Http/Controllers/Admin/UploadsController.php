@@ -1,7 +1,7 @@
 <?php namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\ApiController;
-use App\Upload;
+use App\AdminUpload;
 
 use DB;
 
@@ -13,7 +13,7 @@ class UploadsController extends ApiController {
      */
     public function index(){
 
-        $uploads = Upload::with('user')->paginate(env('paginate_per_page'))->toArray();
+        $uploads = AdminUpload::with('user')->paginate(env('paginate_per_page'))->toArray();
         //$uploads = DB::table('uploads')->paginate(env('paginate_per_page'))->toArray();
 
         $uploads['upload'] = $uploads['data'];

@@ -49,7 +49,7 @@ Route::group(['before' => 'oauth:processor', 'prefix' => 'v'.env('APP_API_VERSIO
     Route::get('comicbookarchives/{cba_id}', 'ComicBookArchivesController@show');
 });
 
-Route::group(['prefix' => 'admin', 'namespace' => 'Admin'], function(){
+Route::group(['before' => 'oauth:admin', 'prefix' => 'admin', 'namespace' => 'Admin'], function(){
     Route::resource('uploads','UploadsController', array('only' => array('index')));
 });
 

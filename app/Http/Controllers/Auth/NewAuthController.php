@@ -20,7 +20,7 @@ class NewAuthController extends ApiController {
         $request = $request->all();
 
         $validator = Validator::make($request, [
-            'username' => 'required|max:255',
+            'username' => 'required|max:255',//TODO: consider removing usernames
             'email' => 'required|email|max:255|unique:users',
             'password' => 'required|confirmed|min:6',
         ]);
@@ -39,7 +39,7 @@ class NewAuthController extends ApiController {
         }
 
         User::create([
-            'username' => $request['username'],
+            'username' => $request['username'],//TODO: consider removing usernames
             'email' => $request['email'],
             'password' => bcrypt($request['password']),
         ]);
