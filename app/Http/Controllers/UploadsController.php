@@ -24,6 +24,7 @@ use Illuminate\Http\Response;
 
 class UploadsController extends ApiController {
 
+
     /**
      * @return mixed
      */

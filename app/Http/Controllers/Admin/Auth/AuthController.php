@@ -1,4 +1,4 @@
-<?php namespace App\Http\Controllers\Auth;
+<?php namespace App\Http\Controllers\Admin\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\ApiController;
@@ -7,7 +7,7 @@ use Validator;
 use Response;
 use Authorizer;
 
-class NewAuthController extends ApiController {
+class AuthController extends ApiController {
 
     /**
      * Create a new user instance after a valid registration.
@@ -48,10 +48,6 @@ class NewAuthController extends ApiController {
     }
 
     protected function createToken(){
-        //$user = User::find(Authorizer::getResourceOwnerId());
-        //dd($user);
-        //dd(Authorizer::getResourceOwnerId());
-
         return Response::json(Authorizer::issueAccessToken());
     }
 

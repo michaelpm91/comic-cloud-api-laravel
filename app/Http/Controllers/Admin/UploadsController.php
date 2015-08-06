@@ -3,10 +3,20 @@
 use App\Http\Controllers\ApiController;
 use App\AdminUpload;
 
+use LucaDegasperi\OAuth2Server\Authorizer;
+
 use DB;
 
 
 class UploadsController extends ApiController {
+
+    /*public function __construct(Authorizer $authorizer){
+        parent::__construct($authorizer);
+        //$currentUser = $this->currentUser;
+        if($this->currentUserType != 'admin') {
+            return $this->respondUnauthorised();
+        }
+    }*/
 
     /**
      * @return mixed

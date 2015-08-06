@@ -88,7 +88,11 @@ return [
                 ];
 
                 if (Auth::once($credentials)) {
-                    return Auth::user()->id;
+                    if(Auth::user()->type != "basic"){
+                        return false;
+                    }else {
+                        return Auth::user()->id;
+                    }
                 } else {
                     return false;
                 }

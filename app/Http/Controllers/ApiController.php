@@ -13,17 +13,18 @@ use App\User;
 
 class ApiController extends Controller {
 
-    protected $currentUser;
+    protected $currentUser = null;
+    protected $currentUserType = null;
     protected $authorizer;
 
     public function __construct(Authorizer $authorizer = null){
         $this->authorizer = $authorizer;
-        $this->currentUser = null;
 
         if( ( null !== $authorizer->getChecker()->getAccessToken()) ){
             if($this->authorizer->getResourceOwnerType() == "user"){
                 $uid = $this->authorizer->getResourceOwnerId();
                 $this->currentUser = User::find($uid);
+                $this->currentUserType = $this->currentUser->type;
                 return;
             }else if($this->authorizer->getResourceOwnerType() == "client"){
                 return;
@@ -103,6 +104,11 @@ class ApiController extends Controller {
     public function respondNoContent(){
 
         return $this->setStatusCode(IlluminateResponse::HTTP_NO_CONTENT)->respond();
+    }
+
+    public function respondUnauthorised($message = "Unauthorised Request"){
+
+        return $this->setStatusCode(IlluminateResponse::HTTP_UNAUTHORIZED)->respond($message);
     }
 
     /**
