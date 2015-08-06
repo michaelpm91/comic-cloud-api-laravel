@@ -89,8 +89,34 @@ return [
 
                 if (Auth::once($credentials)) {
                     if(Auth::user()->type != "basic"){
+                        dd("not admin in basic password");
                         return false;
                     }else {
+                        dd("is admin in basic password");
+                        return Auth::user()->id;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        ],
+        'password_admin' => [
+            'class'            => 'League\OAuth2\Server\Grant\PasswordGrant',
+            'access_token_ttl' => 604800,
+
+            // the code to run in order to verify the user's identity
+            'callback'         => function($username, $password){
+                $credentials = [
+                    'username'    => $username,
+                    'password' => $password,
+                ];
+
+                if (Auth::once($credentials)) {
+                    if(Auth::user()->type != "admin"){
+                        dd("not admin in admin password");
+                        return false;
+                    }else {
+                        dd("is admin in admin password");
                         return Auth::user()->id;
                     }
                 } else {

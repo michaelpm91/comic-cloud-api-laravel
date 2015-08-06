@@ -89,6 +89,11 @@ class TestSeeder extends Seeder {
                 'updated_at' => $datetime,
             ],
             [
+                'id' => 'password_admin',
+                'created_at' => $datetime,
+                'updated_at' => $datetime,
+            ],
+            [
                 'id' => 'refresh_token',
                 'created_at' => $datetime,
                 'updated_at' => $datetime,
@@ -112,7 +117,7 @@ class TestSeeder extends Seeder {
             ],
             [
                 'scope_id' => 'admin',
-                'grant_id' => 'password',
+                'grant_id' => 'password_admin',
                 'created_at' => $datetime,
                 'updated_at' => $datetime,
             ],
@@ -148,7 +153,7 @@ class TestSeeder extends Seeder {
             ],
             [
                 'client_id' => 'test_client_admin_id',
-                'grant_id' => 'password',
+                'grant_id' => 'password_admin',
                 'created_at' => $datetime,
                 'updated_at' => $datetime,
             ],
