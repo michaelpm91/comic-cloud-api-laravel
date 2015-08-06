@@ -75,6 +75,27 @@ class AuthTest extends ApiTester {
         $this->assertResponseStatus(401);
 
     }
+    public function test_it_cannot_generate_access_tokens_if_the_client_does_not_have_access_to_the_scope(){
+        //arrange
+        $user = Factory::create('App\User', [
+            'username' => 'auth_test_user',
+            'password' => Hash::make('1234')
+        ]);
+
+        //act
+        $response = $this->postRequest($this->oauth_endpoint, [
+            'grant_type' => 'password',
+            'client_id' => 'test_client_id',
+            'client_secret' => 'test_client_secret',
+            'username' => $user->username,
+            'password' => '1234',
+            'scope' => 'admin'
+        ]);
+        //assert
+        $this->assertJson($response);
+        $this->assertResponseStatus(401);
+
+    }
     /**
      * @group auth-test
      */
@@ -96,7 +117,7 @@ class AuthTest extends ApiTester {
         ]);
         //assert
         $this->assertJson($response);
-        $this->assertResponseStatus(401);
+        $this->assertResponseStatus(400);
 
     }
     /**
