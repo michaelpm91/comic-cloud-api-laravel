@@ -8,11 +8,15 @@
 
 use Rhumsaa\Uuid\Uuid;
 
-$factory('App\User', [
-    'username' => $faker->username,
-    'email' => $faker->email,
-    'password' => $faker->password
-]);
+$factory('App\User', function($faker){
+    $types = ['basic', 'admin'];
+    return [
+        'username' => $faker->username,
+        'email' => $faker->email,
+        'type' => $types[rand(0,1)],
+        'password' => $faker->password
+    ];
+});
 
 $factory('App\Upload', function ($faker){
     $fileExt = ['cbz', 'cbr', 'pdf',];
