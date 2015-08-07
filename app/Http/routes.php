@@ -24,15 +24,9 @@ Route::get('/status', function()
 });
 
 
-Route::group(['prefix' => 'v'.env('APP_API_VERSION'), 'namespace' => 'Auth'], function() {
+Route::group(['namespace' => 'Auth'], function() {
     Route::post('auth/register', 'NewAuthController@create');
     Route::post('oauth/access_token', 'NewAuthController@createToken');
-});
-
-
-Route::group(['prefix' => 'admin', 'namespace' => 'Admin\Auth'], function() {
-    //Route::post('auth/register', 'AuthController@create');//TODO: This route needs to be internal
-    Route::post('oauth/access_token', 'AuthController@createToken');
 });
 
 
