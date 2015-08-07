@@ -195,7 +195,8 @@ class UploadsController extends ApiController {
             $lambda->invokeAsync([
                 'FunctionName' => env('LAMBDA_FUNCTION_NAME'),
                 'InvokeArgs' => json_encode([
-                    "api_version" => url('v'.env('APP_API_VERSION')),
+                    "api_base" => url(),
+                    "api_version" => 'v'.env('APP_API_VERSION'),
                     "environment" => env('APP_ENV'),
                     "fileLocation" => $s3TempLink,
                     "cba_id" => $cba->id
