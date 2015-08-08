@@ -3,20 +3,8 @@
 use App\Http\Controllers\ApiController;
 use App\AdminUpload;
 
-use LucaDegasperi\OAuth2Server\Authorizer;
-
-use DB;
-
 
 class UploadsController extends ApiController {
-
-    /*public function __construct(Authorizer $authorizer){
-        parent::__construct($authorizer);
-        //$currentUser = $this->currentUser;
-        if($this->currentUserType != 'admin') {
-            return $this->respondUnauthorised();
-        }
-    }*/
 
     /**
      * @return mixed
@@ -24,12 +12,37 @@ class UploadsController extends ApiController {
     public function index(){
 
         $uploads = AdminUpload::with('user')->paginate(env('paginate_per_page'))->toArray();
-        //$uploads = DB::table('uploads')->paginate(env('paginate_per_page'))->toArray();
 
         $uploads['upload'] = $uploads['data'];
         unset($uploads['data']);
 
         return $this->respond($uploads);
+    }
+
+    /**
+     * Display the specified upload.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function show($id)
+    {
+
+        $upload = AdminUpload::with('user')->find($id);
+
+
+        if(!$upload){
+            return $this->respondNotFound([
+                'title' => 'Upload Not Found',
+                'detail' => 'Upload Not Found',
+                'status' => 404,
+                'code' => ''
+            ]);
+        }
+
+        return $this->respond([
+            'upload' => [$upload]
+        ]);
     }
 
 

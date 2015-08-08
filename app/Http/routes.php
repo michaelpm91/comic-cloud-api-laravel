@@ -50,7 +50,8 @@ Route::group(['before' => 'oauth:processor', 'prefix' => 'v'.env('APP_API_VERSIO
 });
 
 Route::group(['before' => 'oauth:admin', 'prefix' => 'admin', 'namespace' => 'Admin'], function(){
-    Route::resource('uploads','UploadsController', array('only' => array('index')));
+    Route::resource('uploads','UploadsController', array('only' => array('index', 'show')));
+    Route::resource('users','UsersController', array('only' => array('index', 'show')));
 });
 
 /*Route::controllers([
