@@ -25,8 +25,8 @@ Route::get('/status', function()
 
 
 Route::group(['namespace' => 'Auth'], function() {
-    Route::post('auth/register', 'NewAuthController@create');
-    Route::post('oauth/access_token', 'NewAuthController@createToken');
+    Route::post('auth/register', 'AuthController@create');
+    Route::post('oauth/access_token', 'AuthController@createToken');
 });
 
 

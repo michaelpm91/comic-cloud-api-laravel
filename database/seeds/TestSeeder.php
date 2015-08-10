@@ -5,7 +5,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Carbon\Carbon;
 
-Use App\User;
+Use App\Models\User;
 
 class TestSeeder extends Seeder {
 

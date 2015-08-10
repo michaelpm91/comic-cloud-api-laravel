@@ -8,7 +8,7 @@
 
 use Rhumsaa\Uuid\Uuid;
 
-$factory('App\User', function($faker){
+$factory('App\Models\User', function($faker){
     $types = ['basic', 'admin'];
     return [
         'username' => $faker->username,
@@ -18,14 +18,14 @@ $factory('App\User', function($faker){
     ];
 });
 
-$factory('App\Upload', function ($faker){
+$factory('App\Models\Upload', function ($faker){
     $fileExt = ['cbz', 'cbr', 'pdf',];
     $thisFileExt = $fileExt[rand(0,2)];
     $fileName = implode(' ', $faker->words(rand(3,7))).'.'.$thisFileExt;
     $random_upload_id = Uuid::uuid4();
 
     return[
-        'user_id'  => 'factory:App\User',
+        'user_id'  => 'factory:App\Models\User',
         'file_original_name' => $fileName,
         'file_size' => rand(1000000, 50000000),
         'file_upload_name' => $random_upload_id.'.'.$thisFileExt,
@@ -33,8 +33,8 @@ $factory('App\Upload', function ($faker){
         'file_random_upload_id' => $random_upload_id,
         'match_data' => json_encode([
             'exists' => false,
-            'series_id' => 'factory:App\Series',
-            'comic_id' => 'factory:App\Comic',
+            'series_id' => 'factory:App\Models\Series',
+            'comic_id' => 'factory:App\Models\Comic',
             'series_title' => $faker->sentence,
             'series_start_year' => rand(1900, 2015),
             'comic_issue' => rand(1, 99)
@@ -42,7 +42,7 @@ $factory('App\Upload', function ($faker){
     ];
 });
 
-$factory('App\Comic', function($faker){
+$factory('App\Models\Comic', function($faker){
     $id = Uuid::uuid4();
     return [
         'id' => $id,
@@ -56,14 +56,14 @@ $factory('App\Comic', function($faker){
             5 => Uuid::uuid4().".jpg",
             6 => Uuid::uuid4().".jpg",
         ]),
-        'user_id' => 'factory:App\User',
-        'series_id' => 'factory:App\Series',
+        'user_id' => 'factory:App\Models\User',
+        'series_id' => 'factory:App\Models\Series',
         'comic_vine_issue_id' => '',
-        'comic_book_archive_id' => 'factory:App\ComicBookArchive',
+        'comic_book_archive_id' => 'factory:App\Models\ComicBookArchive',
     ];
 });
 
-$factory('App\Series', function($faker){
+$factory('App\Models\Series', function($faker){
     $id = Uuid::uuid4();
     return [
         'id' => $id,
@@ -71,12 +71,12 @@ $factory('App\Series', function($faker){
         'series_start_year' => rand(1900, 2015),
         'series_publisher' => 'Unknown',
         'comic_vine_series_id' => '',
-        'user_id' => 'factory:App\User'
+        'user_id' => 'factory:App\Models\User'
     ];
 });
 
-$factory('App\ComicBookArchive', [
-    'upload_id' => 'factory:App\Upload',
+$factory('App\Models\ComicBookArchive', [
+    'upload_id' => 'factory:App\Models\Upload',
     'comic_book_archive_contents' => '',
     'comic_book_archive_hash' => json_encode([
         1 => Uuid::uuid4().".jpg",
@@ -89,7 +89,7 @@ $factory('App\ComicBookArchive', [
     'comic_book_archive_status' => 1
 ]);
 
-$factory('App\ComicImage', [
+$factory('App\Models\ComicImage', [
     'image_slug' => '',
     'image_size' => '',
     'image_hash' => '',

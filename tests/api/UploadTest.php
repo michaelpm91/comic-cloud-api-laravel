@@ -6,8 +6,8 @@
  * Time: 18:16
  */
 
-use App\Upload;
-use App\User;
+use App\Models\Upload;
+use App\Models\User;
 use Laracasts\TestDummy\Factory;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -63,7 +63,7 @@ class UploadTest extends ApiTester {
 	*/
 	public function test_it_does_not_accept_post_requests_to_a_specific_upload(){
         //arrange
-        $upload = Factory::create('App\Upload', ['user_id' => $this->user->id]);
+        $upload = Factory::create('App\Models\Upload', ['user_id' => $this->user->id]);
 
         //act
         $response = $this->deleteRequest($this->upload_endpoint.$upload->id);
@@ -260,7 +260,7 @@ class UploadTest extends ApiTester {
 	*/
 	public function test_it_fetches_all_uploads(){//Retrieve all user uploads
         //arrange
-        $mocked_uploads = Factory::times(10)->create('App\Upload', ['user_id' => $this->user->id]);
+        $mocked_uploads = Factory::times(10)->create('App\Models\Upload', ['user_id' => $this->user->id]);
 
         //act
         $response = $this->getRequest($this->upload_endpoint);
@@ -282,7 +282,7 @@ class UploadTest extends ApiTester {
 	*/
 	public function test_it_fetches_upload(){//Retrieve single upload
         //arrange
-        $upload = Factory::create('App\Upload', ['user_id' => $this->user->id]);
+        $upload = Factory::create('App\Models\Upload', ['user_id' => $this->user->id]);
 
         //act
         $response = $this->getRequest($this->upload_endpoint.$upload->id);
@@ -312,8 +312,8 @@ class UploadTest extends ApiTester {
 	*/
 	public function test_it_fetches_user_uploads_only(){//
         //arrange
-        $user_uploads = Factory::times(5)->create('App\Upload', ['user_id' => $this->user->id]);
-        $other_user_upload = Factory::create('App\Upload', ['user_id.id' => 2]);
+        $user_uploads = Factory::times(5)->create('App\Models\Upload', ['user_id' => $this->user->id]);
+        $other_user_upload = Factory::create('App\Models\Upload', ['user_id.id' => 2]);
 
         //act
         $response = $this->getRequest($this->upload_endpoint);
@@ -331,7 +331,7 @@ class UploadTest extends ApiTester {
 	*/
 	public function test_it_fetches_user_upload_only(){//
         //arrange
-        $upload = Factory::create('App\Upload', ['user_id.id' => 2]);
+        $upload = Factory::create('App\Models\Upload', ['user_id.id' => 2]);
 
         //act
         $response = $this->getRequest($this->upload_endpoint.$upload->id);

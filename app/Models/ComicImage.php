@@ -11,6 +11,6 @@ class ComicImage extends Model {
     protected $hidden = array('updated_at');
 
     public function comicBookArchives(){
-        return $this->belongsToMany('App\ComicBookArchive')->withTimestamps();
+        return $this->belongsToMany('App\Models\ComicBookArchive')->withTimestamps();
     }
 }

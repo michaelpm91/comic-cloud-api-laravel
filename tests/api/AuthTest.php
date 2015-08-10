@@ -6,7 +6,7 @@
  * Time: 22:00
  */
 
-use App\User;
+use App\Models\User;
 use Laracasts\TestDummy\Factory;
 
 class AuthTest extends ApiTester {
@@ -23,7 +23,7 @@ class AuthTest extends ApiTester {
      */
     public function test_it_generates_access_tokens_via_the_password_grant_and_basic_scope(){
         //arrange
-        $user = Factory::create('App\User', [
+        $user = Factory::create('\App\Models\User', [
             'username' => 'auth_test_user',
             'password' => Hash::make('1234')
         ]);
@@ -56,7 +56,7 @@ class AuthTest extends ApiTester {
      */
     public function test_it_cannot_generate_access_tokens_if_the_grant_type_is_not_available_in_the_scope(){
         //arrange
-        $user = Factory::create('App\User', [
+        $user = Factory::create('App\Models\User', [
             'username' => 'auth_test_user',
             'password' => Hash::make('1234')
         ]);
@@ -77,7 +77,7 @@ class AuthTest extends ApiTester {
     }
     public function test_it_cannot_generate_access_tokens_if_the_client_does_not_have_access_to_the_scope(){
         //arrange
-        $user = Factory::create('App\User', [
+        $user = Factory::create('\App\Models\User', [
             'username' => 'auth_test_user',
             'password' => Hash::make('1234')
         ]);
@@ -101,7 +101,7 @@ class AuthTest extends ApiTester {
      */
     public function test_it_cannot_generate_access_tokens_if_the_scope_is_not_available_to_the_grant_type(){
         //arrange
-        $user = Factory::create('App\User', [
+        $user = Factory::create('App\Models\User', [
             'username' => 'auth_test_user',
             'password' => Hash::make('1234')
         ]);
