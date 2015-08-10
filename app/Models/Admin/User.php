@@ -27,20 +27,20 @@ class User extends Model {
 	 *
 	 * @var array
 	 */
-	protected $hidden = ['password', 'remember_token',];
+	protected $hidden = ['password'];
 
     public function uploads()
     {
-        return $this->hasMany('App\AdminUpload');
+        return $this->hasMany('App\Models\Admin\Upload');
     }
 
     public function comics()
     {
-        return $this->hasMany('App\Comic');
+        return $this->hasMany('App\Models\Admin\Comic');
     }
 
     public function series(){
-        return $this->hasMany('App\Series');
+        return $this->hasMany('App\Models\Admin\Series');
     }
 
 }

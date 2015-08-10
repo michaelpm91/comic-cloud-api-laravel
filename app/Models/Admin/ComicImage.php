@@ -13,6 +13,6 @@ class ComicImage extends Model {
     protected $hidden = array();
 
     public function comicBookArchives(){
-        return $this->belongsToMany('App\ComicBookArchive')->withTimestamps();
+        return $this->belongsToMany('App\Models\Admin\ComicBookArchive')->withTimestamps();
     }
 }

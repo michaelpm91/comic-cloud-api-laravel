@@ -17,11 +17,11 @@ class Series extends Model {
     protected $appends = ['series_cover_img'];
 
     public function comics(){
-        return $this->hasMany('App\Comic')->orderBy('comic_issue', 'ASC');
+        return $this->hasMany('App\Models\Admin\Comic')->orderBy('comic_issue', 'ASC');
     }
 
     public function user(){
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\Models\Admin\User');
     }
 
     public function getSeriesCoverImgAttribute(){

@@ -1,4 +1,4 @@
-<?php namespace App\Http\Controller\Admin;
+<?php namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\ApiController;
 use App\Models\Admin\ComicBookArchive;
@@ -11,16 +11,16 @@ class ComicBookArchivesController extends ApiController {
      */
     public function index(){
 
-        $comic_book_archive = ComicBookArchive::with('user')->paginate(env('paginate_per_page'))->toArray();
+        $comic_book_archive = ComicBookArchive::paginate(env('paginate_per_page'))->toArray();
 
-        $comic_book_archive['upload'] = $comic_book_archive['data'];
+        $comic_book_archive['comic_book_archive'] = $comic_book_archive['data'];
         unset($comic_book_archive['data']);
 
         return $this->respond($comic_book_archive);
     }
 
     /**
-     * Display the specified upload.
+     * Display the specified comic_book_archive.
      *
      * @param  int  $id
      * @return Response

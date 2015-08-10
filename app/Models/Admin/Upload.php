@@ -15,12 +15,12 @@ class Upload extends Model {
 	//
     public function user()
     {
-        return $this->belongsTo('App\AdminUser');
+        return $this->belongsTo('App\Models\Admin\User');
     }
 
     public function ComicBookArchives()
     {
-        return $this->hasMany('App\ComicBookArchive');
+        return $this->hasMany('App\Models\Admin\ComicBookArchive');
     }
 
     public function getMatchDataAttribute($json_array){

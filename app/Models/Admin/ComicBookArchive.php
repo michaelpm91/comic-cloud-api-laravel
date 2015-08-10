@@ -10,11 +10,11 @@ class ComicBookArchive extends Model {
         return $this->belongsTo('Upload');
     }
     public function comicimages(){
-        return $this->belongsToMany('App\ComicImage');
+        return $this->belongsToMany('App\Models\Admin\ComicImage');
     }
     public function comics()
     {
-        return $this->hasMany('App\Comic');
+        return $this->hasMany('App\Models\Admin\Comic');
     }
     public function getComicBookArchiveContentsAttribute($json_array){
         if($json_array) {

@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\ApiController;
+use App\Models\Admin\Comic;
 
 class ComicsController extends ApiController {
 
@@ -10,12 +11,12 @@ class ComicsController extends ApiController {
      */
     public function index(){
 
-        $uploads = AdminUpload::with('user')->paginate(env('paginate_per_page'))->toArray();
+        $comics = Comic::paginate(env('paginate_per_page'))->toArray();
 
-        $uploads['upload'] = $uploads['data'];
-        unset($uploads['data']);
+        $comics['comic'] = $comics['data'];
+        unset($comics['data']);
 
-        return $this->respond($uploads);
+        return $this->respond($comics);
     }
 
     /**
@@ -27,20 +28,20 @@ class ComicsController extends ApiController {
     public function show($id)
     {
 
-        $upload = AdminUpload::with('user')->find($id);
+        $comic = Comic::find($id);
 
 
-        if(!$upload){
+        if(!$comic){
             return $this->respondNotFound([
-                'title' => 'Upload Not Found',
-                'detail' => 'Upload Not Found',
+                'title' => 'Comic Not Found',
+                'detail' => 'Comic Not Found',
                 'status' => 404,
                 'code' => ''
             ]);
         }
 
         return $this->respond([
-            'upload' => [$upload]
+            'comic' => [$comic]
         ]);
     }
 
