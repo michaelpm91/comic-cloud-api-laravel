@@ -8,7 +8,7 @@
  */
 
 use App\Http\Controllers\ApiController;
-use App\AdminUser;
+use App\Models\Admin\User;
 
 
 class UsersController extends ApiController {
@@ -18,7 +18,7 @@ class UsersController extends ApiController {
      */
     public function index(){
 
-        $users = AdminUser::paginate(env('paginate_per_page'))->toArray();//TODO: Filter admins?
+        $users = User::paginate(env('paginate_per_page'))->toArray();//TODO: Filter admins?
 
         $users['user'] = $users['data'];
         unset($users['user']);
@@ -35,7 +35,7 @@ class UsersController extends ApiController {
     public function show($id)
     {
 
-        $user = AdminUser::find($id);
+        $user = User::find($id);
 
 
         if(!$user){

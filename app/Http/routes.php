@@ -39,7 +39,6 @@ Route::group(['before' => 'oauth:basic', 'prefix' => 'v'.env('APP_API_VERSION')]
     Route::get('series/{series_id}/meta', 'SeriesController@showMetaData');//TODO: Should these be filters?
     Route::get('series/{series_id}/comics', 'SeriesController@showRelatedComics');
     Route::get('comics/{comic_id}/meta', 'ComicsController@showMetaData');//TODO: Should these be filters?
-    Route::get('uploads/{upload_id}/download','UploadsController@download');//TODO: Is this needed anymore?
 });
 
 Route::group(['before' => 'oauth:processor', 'prefix' => 'v'.env('APP_API_VERSION')], function() {
@@ -53,7 +52,10 @@ Route::group(['before' => 'oauth:admin', 'prefix' => 'admin', 'namespace' => 'Ad
     Route::resource('uploads','UploadsController', array('only' => array('index', 'show')));
     Route::resource('users','UsersController', array('only' => array('index', 'show')));
     Route::resource('images','ComicImagesController', array('only' => array('index')));
-
+    Route::resource('comics','ComicsController', array('only' => array('index')));
+    Route::resource('series','SeriesController', array('only' => array('index')));
+    Route::resource('comicbookarchives','ComicBookArchivesController', array('only' => array('index', 'show')));
+    //TODO: Comic Vine Search Routes
 });
 
 /*Route::controllers([

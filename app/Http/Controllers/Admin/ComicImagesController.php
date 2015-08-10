@@ -1,7 +1,7 @@
 <?php namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\ApiController;
-use App\AdminComicImage;
+use App\Models\Admin\ComicImage;
 use Input;
 
 class ComicImagesController extends ApiController {
@@ -16,7 +16,7 @@ class ComicImagesController extends ApiController {
     public function index(){//
 
         $queryFilters = Input::get();
-        $comicImages = AdminComicImage::where($queryFilters)->paginate(env('paginate_per_page'))->toArray();
+        $comicImages = ComicImage::where($queryFilters)->paginate(env('paginate_per_page'))->toArray();
         $comicImages['images'] = $comicImages['data'];
         unset($comicImages['data']);
         return $this->respond($comicImages);

@@ -1,15 +1,12 @@
 <?php namespace App\Http\Controllers;
 
 use App\Http\Requests;
-use App\Http\Controllers\Controller;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Response as IlluminateResponse;
-use Illuminate\Contracts\Routing\ResponseFactory;
 
 use LucaDegasperi\OAuth2Server\Authorizer;
 
-use App\User;
+use App\Models\User;
 
 class ApiController extends Controller {
 

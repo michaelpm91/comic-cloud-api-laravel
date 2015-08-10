@@ -2,8 +2,8 @@
 
 use App\Http\Controllers\Controller;
 
-use App\Series;
-use App\Comic;
+use App\Models\Series;
+use App\Models\Comic;
 
 use Validator;
 use Request;

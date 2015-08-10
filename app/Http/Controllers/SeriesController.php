@@ -7,8 +7,8 @@ use Validator;
 use Input;
 use Cache;
 
-use App\Series;
-use App\Comic;
+use App\Models\Series;
+use App\Models\Comic;
 
 
 use GuzzleHttp\Client as Guzzle;

@@ -1,10 +1,10 @@
 <?php namespace App\Http\Controllers;
 
-use App\Upload;
-use App\User;
-use App\Series;
-use App\Comic;
-use App\ComicBookArchive;
+use App\Models\Upload;
+use App\Models\User;
+use App\Models\Series;
+use App\Models\Comic;
+use App\Models\ComicBookArchive;
 use App\Http\Requests;
 
 use Storage;

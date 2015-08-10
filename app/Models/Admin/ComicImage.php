@@ -1,8 +1,8 @@
-<?php namespace App;
+<?php namespace App\Models\Admin;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AdminComicImage extends Model {
+class ComicImage extends Model {
 
     protected $fillable = [];
 

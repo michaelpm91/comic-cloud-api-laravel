@@ -1,8 +1,8 @@
-<?php namespace App;
+<?php namespace App\Models\Admin;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AdminUpload extends Model {
+class Upload extends Model {
 
     protected $fillable = [];
 

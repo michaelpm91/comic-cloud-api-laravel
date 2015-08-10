@@ -1,10 +1,7 @@
 <?php namespace App\Http\Controllers;
 
-use App\ComicBookArchive;
-use App\Http\Controllers\Controller;
-
-
-use App\ComicImage;
+use App\Models\ComicBookArchive;
+use App\Models\ComicImage;
 
 use Image;
 use Storage;

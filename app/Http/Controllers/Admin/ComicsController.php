@@ -1,17 +1,16 @@
 <?php namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\ApiController;
-use App\Models\Admin\Upload;
 
+class ComicsController extends ApiController {
 
-class UploadsController extends ApiController {
 
     /**
      * @return mixed
      */
     public function index(){
 
-        $uploads = Upload::with('user')->paginate(env('paginate_per_page'))->toArray();
+        $uploads = AdminUpload::with('user')->paginate(env('paginate_per_page'))->toArray();
 
         $uploads['upload'] = $uploads['data'];
         unset($uploads['data']);
@@ -28,7 +27,7 @@ class UploadsController extends ApiController {
     public function show($id)
     {
 
-        $upload = Upload::with('user')->find($id);
+        $upload = AdminUpload::with('user')->find($id);
 
 
         if(!$upload){
@@ -44,6 +43,5 @@ class UploadsController extends ApiController {
             'upload' => [$upload]
         ]);
     }
-
 
 }
