@@ -8,7 +8,7 @@
 
 use Rhumsaa\Uuid\Uuid;
 
-$factory('App\Models\User', function($faker){
+$factory('App\Models\User', function($faker){//TODO: Make sure you're overriding type.
     $types = ['basic', 'admin'];
     return [
         'username' => $faker->username,

@@ -23,9 +23,10 @@ class AuthTest extends ApiTester {
      */
     public function test_it_generates_access_tokens_via_the_password_grant_and_basic_scope(){
         //arrange
-        $user = Factory::create('\App\Models\User', [
+        $user = Factory::create('App\Models\User', [
             'username' => 'auth_test_user',
-            'password' => Hash::make('1234')
+            'password' => Hash::make('1234'),
+            'type' => 'basic'
         ]);
 
         //act
@@ -58,7 +59,8 @@ class AuthTest extends ApiTester {
         //arrange
         $user = Factory::create('App\Models\User', [
             'username' => 'auth_test_user',
-            'password' => Hash::make('1234')
+            'password' => Hash::make('1234'),
+            'type' => 'basic'//TODO: tests returning incorrectly sometimes
         ]);
 
         //act
@@ -77,9 +79,9 @@ class AuthTest extends ApiTester {
     }
     public function test_it_cannot_generate_access_tokens_if_the_client_does_not_have_access_to_the_scope(){
         //arrange
-        $user = Factory::create('\App\Models\User', [
+        $user = Factory::create('App\Models\User', [
             'username' => 'auth_test_user',
-            'password' => Hash::make('1234')
+            'password' => Hash::make('1234'),
         ]);
 
         //act
