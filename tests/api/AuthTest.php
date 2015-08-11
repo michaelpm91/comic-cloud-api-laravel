@@ -60,8 +60,9 @@ class AuthTest extends ApiTester {
         $user = Factory::create('App\Models\User', [
             'username' => 'auth_test_user',
             'password' => Hash::make('1234'),
-            'type' => 'basic'//TODO: tests returning incorrectly sometimes
+            'type' => 'basic'
         ]);
+        //dd($user->type);
 
         //act
         $response = $this->postRequest($this->oauth_endpoint, [
@@ -105,8 +106,10 @@ class AuthTest extends ApiTester {
         //arrange
         $user = Factory::create('App\Models\User', [
             'username' => 'auth_test_user',
-            'password' => Hash::make('1234')
+            'password' => Hash::make('1234'),
+            'type' => 'basic'
         ]);
+
 
         //act
         $response = $this->postRequest($this->oauth_endpoint, [
