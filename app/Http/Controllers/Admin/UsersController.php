@@ -52,5 +52,57 @@ class UsersController extends ApiController {
         ]);
     }
 
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function update($id){
+
+        $user = User::find($id);
+
+        if($user){
+
+            //TODO: Edit User Data
+
+        }else{
+            return $this->respondNotFound([
+                'title' => 'User Not Found',
+                'detail' => 'User Not Found',
+                'status' => 404,
+                'code' => ''
+            ]);
+        }
+    }
+
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function destroy($id){
+
+        $user = User::find($id);
+
+        if($user){
+            $user->delete();
+            return $this->respondSuccessful('User Deleted');
+
+        }else{
+            return $this->respondNotFound([
+                'title' => 'User Not Found',
+                'detail' => 'User Not Found',
+                'status' => 404,
+                'code' => ''
+            ]);
+        }
+
+    }
+
+
+
 
 }

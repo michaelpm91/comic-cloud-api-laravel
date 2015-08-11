@@ -50,10 +50,10 @@ Route::group(['before' => 'oauth:processor', 'prefix' => 'v'.env('APP_API_VERSIO
 
 Route::group(['before' => 'oauth:admin', 'prefix' => 'admin', 'namespace' => 'Admin'], function(){
     Route::resource('uploads','UploadsController', array('only' => array('index', 'show')));
-    Route::resource('users','UsersController', array('only' => array('index', 'show')));
-    Route::resource('images','ComicImagesController', array('only' => array('index')));
-    Route::resource('comics','ComicsController', array('only' => array('index')));
-    Route::resource('series','SeriesController', array('only' => array('index')));
+    Route::resource('users','UsersController', array('only' => array('index', 'show', 'update', 'destroy')));
+    Route::resource('images','ComicImagesController', array('only' => array('index', 'show')));
+    Route::resource('comics','ComicsController', array('only' => array('index', 'show')));
+    Route::resource('series','SeriesController', array('only' => array('index', 'show')));
     Route::resource('comicbookarchives','ComicBookArchivesController', array('only' => array('index', 'show')));
     //TODO: Comic Vine Search Routes
 });
