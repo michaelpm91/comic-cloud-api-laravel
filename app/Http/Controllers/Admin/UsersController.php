@@ -64,7 +64,24 @@ class UsersController extends ApiController {
 
         if($user){
 
+            $data = Request::all();
+
             //TODO: Edit User Data
+
+            if(empty($data)) return $this->respondBadRequest([[
+                'title' => 'No Data Sent',
+                'detail' => 'No Data Sent',
+                'status' => 400,
+                'code' => ''
+            ]]);
+
+            if (isset($data['series_title'])) {
+                $user->email = $data['email'];
+                $user->save();
+            }
+            return $this->respondSuccessful([
+                'user' => [$user]
+            ]);
 
         }else{
             return $this->respondNotFound([
