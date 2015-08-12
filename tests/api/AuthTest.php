@@ -83,6 +83,7 @@ class AuthTest extends ApiTester {
         $user = Factory::create('App\Models\User', [
             'username' => 'auth_test_user',
             'password' => Hash::make('1234'),
+            'type' => 'admin'
         ]);
 
         //act
