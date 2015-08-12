@@ -5,9 +5,9 @@ use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
 
-use App\ComicImage;
-use App\ComicBookArchive;
-use App\Comic;
+use App\Models\ComicImage;
+use App\Models\ComicBookArchive;
+use App\Models\Comic;
 
 use Input;
 

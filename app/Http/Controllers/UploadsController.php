@@ -1,10 +1,10 @@
 <?php namespace App\Http\Controllers;
 
-use App\Upload;
-use App\User;
-use App\Series;
-use App\Comic;
-use App\ComicBookArchive;
+use App\Models\Upload;
+use App\Models\User;
+use App\Models\Series;
+use App\Models\Comic;
+use App\Models\ComicBookArchive;
 use App\Http\Requests;
 
 use Storage;
@@ -17,14 +17,13 @@ use Input;
 
 use AWS;
 
-use Illuminate\Pagination\LengthAwarePaginator;
-
 use Rhumsaa\Uuid\Uuid;
 
 use Illuminate\Http\Response;
 
 
 class UploadsController extends ApiController {
+
 
     /**
      * @return mixed
@@ -196,7 +195,8 @@ class UploadsController extends ApiController {
             $lambda->invokeAsync([
                 'FunctionName' => env('LAMBDA_FUNCTION_NAME'),
                 'InvokeArgs' => json_encode([
-                    "api_version" => url('v'.env('APP_API_VERSION')),
+                    "api_base" => url(),
+                    "api_version" => 'v'.env('APP_API_VERSION'),
                     "environment" => env('APP_ENV'),
                     "fileLocation" => $s3TempLink,
                     "cba_id" => $cba->id

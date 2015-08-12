@@ -1,20 +1,20 @@
-<?php namespace App;
+<?php namespace App\Models\Admin;
 
 use Illuminate\Database\Eloquent\Model;
 
 class ComicBookArchive extends Model {
 
-    protected $hidden = array('updated_at', 'deleted_at');
+    protected $hidden = array();
 
     public function upload(){
         return $this->belongsTo('Upload');
     }
     public function comicimages(){
-        return $this->belongsToMany('App\ComicImage');
+        return $this->belongsToMany('App\Models\Admin\ComicImage');
     }
     public function comics()
     {
-        return $this->hasMany('App\Comic');
+        return $this->hasMany('App\Models\Admin\Comic');
     }
     public function getComicBookArchiveContentsAttribute($json_array){
         if($json_array) {

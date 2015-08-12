@@ -23,6 +23,13 @@ Route::get('/status', function()
 
 });
 
+
+Route::group(['namespace' => 'Auth'], function() {
+    Route::post('auth/register', 'AuthController@create');
+    Route::post('oauth/access_token', 'AuthController@createToken');
+});
+
+
 Route::group(['before' => 'oauth:basic', 'prefix' => 'v'.env('APP_API_VERSION')], function() {
     Route::resource('uploads','UploadsController', array('only' => array('index', 'store', 'show')));
     Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
@@ -32,7 +39,6 @@ Route::group(['before' => 'oauth:basic', 'prefix' => 'v'.env('APP_API_VERSION')]
     Route::get('series/{series_id}/meta', 'SeriesController@showMetaData');//TODO: Should these be filters?
     Route::get('series/{series_id}/comics', 'SeriesController@showRelatedComics');
     Route::get('comics/{comic_id}/meta', 'ComicsController@showMetaData');//TODO: Should these be filters?
-    Route::get('uploads/{upload_id}/download','UploadsController@download');//TODO: Is this needed anymore?
 });
 
 Route::group(['before' => 'oauth:processor', 'prefix' => 'v'.env('APP_API_VERSION')], function() {
@@ -42,9 +48,14 @@ Route::group(['before' => 'oauth:processor', 'prefix' => 'v'.env('APP_API_VERSIO
     Route::get('comicbookarchives/{cba_id}', 'ComicBookArchivesController@show');
 });
 
-Route::group(['prefix' => 'v'.env('APP_API_VERSION')], function() {
-    Route::post('auth/register', 'Auth\NewAuthController@create');
-    Route::post('oauth/access_token', 'Auth\NewAuthController@createToken');
+Route::group(['before' => 'oauth:admin', 'prefix' => 'admin', 'namespace' => 'Admin'], function(){
+    Route::resource('uploads','UploadsController', array('only' => array('index', 'show')));
+    Route::resource('users','UsersController', array('only' => array('index', 'show', 'update', 'destroy')));
+    Route::resource('images','ComicImagesController', array('only' => array('index', 'show')));
+    Route::resource('comics','ComicsController', array('only' => array('index', 'show')));
+    Route::resource('series','SeriesController', array('only' => array('index', 'show')));
+    Route::resource('comicbookarchives','ComicBookArchivesController', array('only' => array('index', 'show')));
+    //TODO: Comic Vine Search Routes
 });
 
 /*Route::controllers([

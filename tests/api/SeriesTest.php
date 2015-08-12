@@ -8,8 +8,8 @@
 
 use Laracasts\TestDummy\Factory;
 
-use App\User;
-use App\Series;
+use App\Models\User;
+use App\Models\Series;
 
 use Rhumsaa\Uuid\Uuid;
 
@@ -44,7 +44,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_does_not_accept_post_requests_to_a_specific_series(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -63,7 +63,7 @@ class SeriesTest extends ApiTester {
         $this->markTestSkipped('This test will fail as API relationship representations have changed');
 
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -96,7 +96,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_cannot_create_a_series_without_an_id(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -117,7 +117,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_cannot_create_a_series_without_a_comic_id(){//aka orphan_series
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -139,7 +139,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_cannot_create_a_series_without_a_series_title(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -161,7 +161,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_can_create_a_series_with_a_start_year(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -184,7 +184,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_can_create_a_series_without_a_start_year(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -211,7 +211,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_can_fetch_all_series(){
         //arrange
-        $mocked_comics = Factory::times(10)->create('App\Comic', [
+        $mocked_comics = Factory::times(10)->create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -235,7 +235,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_can_fetch_a_specific_series(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -267,7 +267,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_cannot_fetch_a_series_that_does_not_belong_to_the_user(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id.id' => 2,
             'series_id.user_id' => 2
         ]);
@@ -283,7 +283,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_can_update_a_series_title(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -312,7 +312,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_can_update_a_series_start_year(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -341,7 +341,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_can_update_a_series_publisher(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -370,7 +370,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_cannot_update_a_series_title_that_does_not_belong_to_the_user(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id.id' => 2,
             'series_id.user_id' => 2
         ]);
@@ -389,7 +389,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_cannot_update_a_series_start_year_that_does_not_belong_to_the_user(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id.id' => 2,
             'series_id.user_id' => 2
         ]);
@@ -408,7 +408,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_cannot_update_a_series_publisher_that_does_not_belong_to_the_user(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id.id' => 2,
             'series_id.user_id' => 2
         ]);
@@ -427,8 +427,8 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_can_delete_a_series(){
         //arrange
-        $mocked_series = Factory::create('App\Series', ['user_id' => $this->user->id]);
-        $mocked_comics = Factory::times(10)->create('App\Comic', [
+        $mocked_series = Factory::create('App\Models\Series', ['user_id' => $this->user->id]);
+        $mocked_comics = Factory::times(10)->create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id' => $mocked_series->id
         ]);
@@ -444,8 +444,8 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_can_delete_a_series_and_associated_comics(){
         //arrange
-        $mocked_series = Factory::create('App\Series', ['user_id' => $this->user->id]);
-        $mocked_comics = Factory::times(10)->create('App\Comic', [
+        $mocked_series = Factory::create('App\Models\Series', ['user_id' => $this->user->id]);
+        $mocked_comics = Factory::times(10)->create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id' => $mocked_series->id
         ]);
@@ -470,7 +470,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_cannot_delete_a_series_that_does_not_belong_to_the_user(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id.id' => 2,
             'series_id.user_id' => 2
         ]);
@@ -501,7 +501,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_can_fetch_meta_data_for_a_series_that_exists(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id,
             'series_id.series_title' => 'All Star Superman',
@@ -531,7 +531,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_it_cannot_fetch_meta_data_for_series_that_does_not_belong_to_the_user(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id.id' => 2,
             'series_id.user_id' => 2,
             'series_id.series_title' => 'All Star Superman',
@@ -552,7 +552,7 @@ class SeriesTest extends ApiTester {
 	public function test_it_can_set_a_comic_vine_series_id_on_a_series_that_exists(){
 
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id,
             'series_id.series_title' => 'All Star Superman',
@@ -587,7 +587,7 @@ class SeriesTest extends ApiTester {
 	*/
 	public function test_a_comic_vine_series_id_must_be_numerical (){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id,
             'series_id.series_title' => 'All Star Superman',
@@ -631,7 +631,7 @@ class SeriesTest extends ApiTester {
 	public function test_it_cannot_set_a_comic_vine_series_id_on_a_series_that_does_not_belong_to_the_user(){
 
         //arrange
-        $other_user_comic = Factory::create('App\Comic', [
+        $other_user_comic = Factory::create('App\Models\Comic', [
             'user_id.id' => 2,
             'series_id.user_id' => 2,
             'series_id.series_title' => 'All Star Superman',

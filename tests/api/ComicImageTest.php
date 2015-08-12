@@ -8,9 +8,9 @@
 
 use Laracasts\TestDummy\Factory;
 
-use App\Upload; //TODO: Remove this
-use App\User;
-use App\ComicImage;
+use App\Models\Upload; //TODO: Remove this
+use App\Models\User;
+use App\Models\ComicImage;
 
 class ComicImageTest extends ApiTester {
 
@@ -45,16 +45,16 @@ class ComicImageTest extends ApiTester {
         $img_slug = str_random(40);
         $img_json =  json_encode([1 => $img_slug]);
 
-        $upload = Factory::create('App\Upload', [
+        $upload = Factory::create('App\Models\Upload', [
             'user_id' =>  $this->user->id
         ]);
 
-        $cba = Factory::create('App\ComicBookArchive', [
+        $cba = Factory::create('App\Models\ComicBookArchive', [
             'upload_id' => $upload->id,
             'comic_book_archive_hash' => $img_json
         ]);
 
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'comic_book_archive_contents' => $img_json,
             'comic_book_archive_id' => $cba->id
@@ -138,16 +138,16 @@ class ComicImageTest extends ApiTester {
         $img_slug = str_random(40);
         $img_json =  json_encode([1 => $img_slug]);
 
-        $upload = Factory::create('App\Upload', [
+        $upload = Factory::create('App\Models\Upload', [
             'user_id' =>  $this->user->id
         ]);
 
-        $cba = Factory::create('App\ComicBookArchive', [
+        $cba = Factory::create('App\Models\ComicBookArchive', [
             'upload_id' => $upload->id,
             'comic_book_archive_hash' => $img_json
         ]);
 
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'comic_book_archive_contents' => $img_json,
             'comic_book_archive_id' => $cba->id
@@ -191,17 +191,17 @@ class ComicImageTest extends ApiTester {
         $img_slug = str_random(40);
         $img_json =  json_encode([1 => $img_slug]);
 
-        $upload = Factory::create('App\Upload', [
+        $upload = Factory::create('App\Models\Upload', [
             'user_id.id' =>  2
         ]);
 
-        $cba = Factory::create('App\ComicBookArchive', [
+        $cba = Factory::create('App\Models\ComicBookArchive', [
             'upload_id' => $upload->id,
             'comic_book_archive_hash' => $img_json
         ]);
 
 
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => 2,
             'comic_book_archive_contents' => $img_json,
             'comic_book_archive_id' => $cba->id

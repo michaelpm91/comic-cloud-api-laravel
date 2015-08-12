@@ -6,24 +6,27 @@
  * Time: 22:00
  */
 
-use App\User;
+use App\Models\User;
 use Laracasts\TestDummy\Factory;
 
 class AuthTest extends ApiTester {
 
-    protected $oauth_endpoint = "/v0.1/oauth/access_token/";
-    protected $register_endpoint = "/v0.1/auth/register/";
+    protected $oauth_endpoint = "/oauth/access_token/";
+    protected $register_endpoint = "/auth/register/";
 
     public function setUp(){
         parent::setUp();
         Artisan::call('db:seed');//TODO: Would be nice to move this...
     }
-
-    public function test_it_generates_access_tokens(){
+    /**
+     * @group auth-test
+     */
+    public function test_it_generates_access_tokens_via_the_password_grant_and_basic_scope(){
         //arrange
-        $user = Factory::create('App\User', [
+        $user = Factory::create('App\Models\User', [
             'username' => 'auth_test_user',
-            'password' => Hash::make('1234')
+            'password' => Hash::make('1234'),
+            'type' => 'basic'
         ]);
 
         //act
@@ -31,7 +34,7 @@ class AuthTest extends ApiTester {
             'grant_type' => 'password',
             'client_id' => 'test_client_id',
             'client_secret' => 'test_client_secret',
-            'username' => $user->email,
+            'username' => $user->username,
             'password' => '1234',
             'scope' => 'basic'
         ]);
@@ -41,7 +44,91 @@ class AuthTest extends ApiTester {
         $this->assertResponseOk();
 
     }
+    /**
+     * @group auth-test
+     */
+    public function test_it_generates_access_tokens_via_the_password_grant_and_admin_scope(){
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+    }
+    /**
+     * @group auth-test
+     */
+    public function test_it_cannot_generate_access_tokens_if_the_grant_type_is_not_available_in_the_scope(){
+        //arrange
+        $user = Factory::create('App\Models\User', [
+            'username' => 'auth_test_user',
+            'password' => Hash::make('1234'),
+            'type' => 'basic'
+        ]);
+        //dd($user->type);
 
+        //act
+        $response = $this->postRequest($this->oauth_endpoint, [
+            'grant_type' => 'client_credentials',
+            'client_id' => 'test_client_id',
+            'client_secret' => 'test_client_secret',
+            'username' => $user->username,
+            'password' => '1234',
+            'scope' => 'basic'
+        ]);
+        //assert
+        $this->assertJson($response);
+        $this->assertResponseStatus(401);
+
+    }
+    public function test_it_cannot_generate_access_tokens_if_the_client_does_not_have_access_to_the_scope(){
+        //arrange
+        $user = Factory::create('App\Models\User', [
+            'username' => 'auth_test_user',
+            'password' => Hash::make('1234'),
+            'type' => 'admin'
+        ]);
+
+        //act
+        $response = $this->postRequest($this->oauth_endpoint, [
+            'grant_type' => 'password',
+            'client_id' => 'test_client_id',
+            'client_secret' => 'test_client_secret',
+            'username' => $user->username,
+            'password' => '1234',
+            'scope' => 'admin'
+        ]);
+        //assert
+        $this->assertJson($response);
+        $this->assertResponseStatus(401);
+
+    }
+    /**
+     * @group auth-test
+     */
+    public function test_it_cannot_generate_access_tokens_if_the_scope_is_not_available_to_the_grant_type(){
+        //arrange
+        $user = Factory::create('App\Models\User', [
+            'username' => 'auth_test_user',
+            'password' => Hash::make('1234'),
+            'type' => 'basic'
+        ]);
+
+
+        //act
+        $response = $this->postRequest($this->oauth_endpoint, [
+            'grant_type' => 'password',
+            'client_id' => 'test_client_id',
+            'client_secret' => 'test_client_secret',
+            'username' => $user->username,
+            'password' => '1234',
+            'scope' => 'processor'
+        ]);
+        //assert
+        $this->assertJson($response);
+        $this->assertResponseStatus(400);
+
+    }
+    /**
+     * @group auth-test
+     */
     public function test_it_can_register_user(){
 
         //arrange
@@ -58,7 +145,9 @@ class AuthTest extends ApiTester {
         $this->assertResponseStatus(201);
 
     }
-
+    /**
+     * @group auth-test
+     */
     public function test_registering_a_user_will_fail_without_username(){
 
         //arrange
@@ -75,7 +164,9 @@ class AuthTest extends ApiTester {
         $this->assertResponseStatus(400);
 
     }
-
+    /**
+     * @group auth-test
+     */
     public function test_registering_a_user_will_fail_without_email(){
 
         //arrange
@@ -92,7 +183,9 @@ class AuthTest extends ApiTester {
         $this->assertResponseStatus(400);
 
     }
-
+    /**
+     * @group auth-test
+     */
     public function test_registering_a_user_will_fail_without_password(){
 
         //arrange
@@ -109,7 +202,9 @@ class AuthTest extends ApiTester {
         $this->assertResponseStatus(400);
 
     }
-
+    /**
+     * @group auth-test
+     */
     public function test_registering_a_user_will_fail_without_password_confirmation(){
 
         //arrange
@@ -126,7 +221,9 @@ class AuthTest extends ApiTester {
         $this->assertResponseStatus(400);
 
     }
-
+    /**
+     * @group auth-test
+     */
     public function test_registering_a_user_will_fail_if_passwords_do_not_match(){
 
         //arrange
