@@ -19,4 +19,4 @@ deploy:
   deployment_group: Comic_Cloud_Deploy_Develop
   on:
     repo: kidshenlong/Comic-Cloud-API
-    branch: develop
+    branch: master
