@@ -45,5 +45,30 @@ class UploadsController extends ApiController {
         ]);
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return Response
+     */
+    public function destroy($id){
+
+        $upload = Upload::find($id);
+
+        if($upload){
+            $upload->delete();
+            return $this->respondSuccessful('Upload Deleted');
+
+        }else{
+            return $this->respondNotFound([
+                'title' => 'Upload Not Found',
+                'detail' => 'Upload Not Found',
+                'status' => 404,
+                'code' => ''
+            ]);
+        }
+
+    }
+
 
 }

@@ -103,7 +103,7 @@ class ComicsController extends ApiController {
 
             $validator = Validator::make($data = Request::all(), [
                 'comic_issue' => 'numeric',
-                'series_id' => 'user_series|valid_uuid',
+                'series_id' => 'user_series|valid_uuid',//TODO: should allow writing of new series IDs or other related
                 'comic_vine_issue_id' => 'numeric'
             ], $messages);
 
