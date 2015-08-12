@@ -83,12 +83,38 @@ return [
             // the code to run in order to verify the user's identity
             'callback'         => function($username, $password){
                 $credentials = [
-                    'email'    => $username,
+                    'username'    => $username,
                     'password' => $password,
                 ];
 
                 if (Auth::once($credentials)) {
-                    return Auth::user()->id;
+                    if(Auth::user()->type != "basic"){
+                        return false;
+                    }else {
+                        return Auth::user()->id;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        ],
+        'password_admin' => [
+            'class'            => 'App\Grants\PasswordGrant',
+            'access_token_ttl' => 604800,
+
+            // the code to run in order to verify the user's identity
+            'callback'         => function($username, $password){
+                $credentials = [
+                    'username'    => $username,
+                    'password' => $password,
+                ];
+
+                if (Auth::once($credentials)) {
+                    if(Auth::user()->type != "admin"){
+                        return false;
+                    }else {
+                        return Auth::user()->id;
+                    }
                 } else {
                     return false;
                 }
@@ -184,7 +210,7 @@ return [
     | This is useful to allow only trusted clients to access your API differently
     |
     */
-    'limit_clients_to_grants' => false,
+    'limit_clients_to_grants' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -206,7 +232,7 @@ return [
     | This is useful to allow certain scopes to be used only with certain grant types
     |
     */
-    'limit_scopes_to_grants' => false,
+    'limit_scopes_to_grants' => true,
 
     /*
     |--------------------------------------------------------------------------

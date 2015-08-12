@@ -1,4 +1,4 @@
-<?php namespace App;
+<?php namespace App\Models\Admin;
 
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
@@ -6,9 +6,7 @@ use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
-class User extends Model implements AuthenticatableContract, CanResetPasswordContract {
-
-	use Authenticatable, CanResetPassword;
+class User extends Model {
 
 	/**
 	 * The database table used by the model.
@@ -29,20 +27,20 @@ class User extends Model implements AuthenticatableContract, CanResetPasswordCon
 	 *
 	 * @var array
 	 */
-	protected $hidden = ['password', 'remember_token'];
+	protected $hidden = ['password'];
 
     public function uploads()
     {
-        return $this->hasMany('App\Upload');
+        return $this->hasMany('App\Models\Admin\Upload');
     }
 
     public function comics()
     {
-        return $this->hasMany('App\Comic');
+        return $this->hasMany('App\Models\Admin\Comic');
     }
 
     public function series(){
-        return $this->hasMany('App\Series');
+        return $this->hasMany('App\Models\Admin\Series');
     }
 
 }

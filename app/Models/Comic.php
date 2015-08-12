@@ -1,4 +1,4 @@
-<?php namespace App;
+<?php namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,14 +20,14 @@ class Comic extends Model {
 
     public function series()
     {
-        return $this->belongsTo('App\Series');
+        return $this->belongsTo('App\Models\Series');
     }
     public function user()
     {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\Models\User');
     }
     public function cba(){
-        return $this->belongsTo('App\ComicBookArchive',  'comic_book_archive_id', 'id');
+        return $this->belongsTo('App\Models\ComicBookArchive',  'comic_book_archive_id', 'id');
     }
     public function getComicBookArchiveContentsAttribute($json_array){
         if($json_array) {

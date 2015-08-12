@@ -6,8 +6,8 @@
  * Time: 18:16
  */
 
-use App\Comic;
-use App\User;
+use App\Models\Comic;
+use App\Models\User;
 use Laracasts\TestDummy\Factory;
 
 use GuzzleHttp\Client;
@@ -57,7 +57,7 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_fetches_all_comics(){//Retrieve all user comics
         //arrange
-        $mocked_comics = Factory::times(10)->create('App\Comic', ['user_id' => $this->user->id]);
+        $mocked_comics = Factory::times(10)->create('App\Models\Comic', ['user_id' => $this->user->id]);
 
         //act
         $response = $this->getRequest($this->comic_endpoint);
@@ -79,7 +79,7 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_fetches_comic(){//Retrieve single comic
         //arrange
-        $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
+        $comic = Factory::create('App\Models\Comic', ['user_id' => $this->user->id]);
 
         //act
         $response = $this->getRequest($this->comic_endpoint.$comic->id);
@@ -106,8 +106,8 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_fetches_user_comics_only(){//
         //arrange
-        $user_comics = Factory::times(5)->create('App\Comic', ['user_id' => $this->user->id]);
-        $other_user_comic = Factory::create('App\Comic', ['user_id' => 2]);
+        $user_comics = Factory::times(5)->create('App\Models\Comic', ['user_id' => $this->user->id]);
+        $other_user_comic = Factory::create('App\Models\Comic', ['user_id' => 2]);
 
         //act
         $response = $this->getRequest($this->comic_endpoint);
@@ -125,7 +125,7 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_fetches_user_comic_only(){//
         //arrange
-        $comic = Factory::create('App\Comic', ['user_id' => 2]);
+        $comic = Factory::create('App\Models\Comic', ['user_id' => 2]);
 
         //act
         $response = $this->getRequest($this->comic_endpoint.$comic->id);
@@ -139,7 +139,7 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_can_edit_a_comic_comic_writer(){//TODO:Multiple Asserts...
         //arrange
-        $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
+        $comic = Factory::create('App\Models\Comic', ['user_id' => $this->user->id]);
 
         //act
         $response = $this->patchRequest($this->comic_endpoint.$comic->id, [
@@ -162,7 +162,7 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_can_edit_a_comic_comic_issue(){
         //arrange
-        $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
+        $comic = Factory::create('App\Models\Comic', ['user_id' => $this->user->id]);
 
         //act
         $response = $this->patchRequest($this->comic_endpoint.$comic->id, [
@@ -183,11 +183,11 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_can_set_a_comic_series_id_to_one_that_exists(){
         //arrange
-        $comic_a = Factory::create('App\Comic', [
+        $comic_a = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
-        $comic_b = Factory::create('App\Comic', [
+        $comic_b = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -213,11 +213,11 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_cannot_set_a_comic_series_id_to_one_that_the_user_does_not_own(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
-        $other_user_comic = Factory::create('App\Comic');
+        $other_user_comic = Factory::create('App\Models\Comic');
 
         //act
         $response = $this->patchRequest($this->comic_endpoint.$comic->id, [
@@ -235,7 +235,7 @@ class ComicTest extends ApiTester {
 	public function test_it_cannot_set_a_comic_series_id_to_one_that_does_not_exist(){
 
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -255,7 +255,7 @@ class ComicTest extends ApiTester {
 	public function test_it_cannot_edit_another_users_comic(){
 
         //arrange
-        $otherusercomic = Factory::create('App\Comic', ['user_id' => 2]);
+        $otherusercomic = Factory::create('App\Models\Comic', ['user_id' => 2]);
 
         //act
         $response = $this->patchRequest($this->comic_endpoint.$otherusercomic->id, [
@@ -301,7 +301,7 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_returns_an_appropriate_message_when_no_edit_fields_are_entered(){
         //arrange
-        $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
+        $comic = Factory::create('App\Models\Comic', ['user_id' => $this->user->id]);
         //act
         $response = $this->patchRequest($this->comic_endpoint.$comic->id);
 
@@ -314,7 +314,7 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_can_delete_a_comic(){
         //arrange
-        $comic = Factory::create('App\Comic', ['user_id' => $this->user->id]);
+        $comic = Factory::create('App\Models\Comic', ['user_id' => $this->user->id]);
 
         //act
         $response = $this->deleteRequest($this->comic_endpoint.$comic->id);
@@ -348,7 +348,7 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_cannot_delete_another_users_comic(){
         //arrange
-        $otherusercomic = Factory::create('App\Comic', ['user_id' => 2]);
+        $otherusercomic = Factory::create('App\Models\Comic', ['user_id' => 2]);
 
         //act
         $response = $this->deleteRequest($this->comic_endpoint.$otherusercomic->id);
@@ -361,7 +361,7 @@ class ComicTest extends ApiTester {
 	* @group comic-test      
 	*/
 	public function test_it_will_delete_a_series_if_the_last_comic_has_been_deleted(){
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id
         ]);
@@ -394,7 +394,7 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_can_fetch_meta_data_for_a_comic_that_exists(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id,
             'series_id.series_title' => 'All Star Superman',
@@ -429,7 +429,7 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_can_set_a_comic_vine_comic_id_on_a_comic_that_exists(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id,
             'series_id.series_title' => 'All Star Superman',
@@ -484,7 +484,7 @@ class ComicTest extends ApiTester {
 	*/
 	public function test_it_cannot_query_meta_data_if_a_comic_vine_series_id_is_not_set_on_the_parent_series(){
         //arrange
-        $comic = Factory::create('App\Comic', [
+        $comic = Factory::create('App\Models\Comic', [
             'user_id' => $this->user->id,
             'series_id.user_id' => $this->user->id,
             'series_id.series_title' => 'All Star Superman',

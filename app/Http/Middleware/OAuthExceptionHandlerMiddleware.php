@@ -15,11 +15,8 @@ class OAuthExceptionHandlerMiddleware extends ApiController {
 	 */
 	public function handle($request, Closure $next)
 	{
-		//return $next($request);
         try {
-
             return $next($request);
-
         } catch (OAuthException $e) {
             //TODO: Find a cleaner way to do this. Probably overriding package stuff. Maybe //App::abort(401, 'Unauthorized action.');
             $error_message = $e->getMessage();
@@ -28,6 +25,7 @@ class OAuthExceptionHandlerMiddleware extends ApiController {
                  $error_message = "The resource owner or authorization server denied the request.";
                 $e->httpStatusCode = 401;
             }
+            //TODO: Catch Oauth scope, grant, client mismatch error
             return $this->setStatusCode($e->httpStatusCode)->respondWithError([[//TODO: Fix nested arrays for JSON standardisation :(
                 'title' => $e->errorType,
                 'detail' => str_replace('"', "", $error_message),//TODO: Maybe escape this appropriately
@@ -35,7 +33,6 @@ class OAuthExceptionHandlerMiddleware extends ApiController {
                 'code' => ''
             ]]);
         }
-
 	}
 
 }

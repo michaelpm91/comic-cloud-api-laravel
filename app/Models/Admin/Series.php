@@ -1,4 +1,4 @@
-<?php namespace App;
+<?php namespace App\Models\Admin;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,18 +10,18 @@ class Series extends Model {
 
     public $incrementing = false;
 
-    protected $hidden = ['created_at', 'updated_at', 'user_id'];
+    protected $hidden = [];
 
     protected $fillable = ['id', 'series_title', 'series_start_year', 'series_publisher'];
 
     protected $appends = ['series_cover_img'];
 
     public function comics(){
-        return $this->hasMany('App\Comic')->orderBy('comic_issue', 'ASC');
+        return $this->hasMany('App\Models\Admin\Comic')->orderBy('comic_issue', 'ASC');
     }
 
     public function user(){
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\Models\Admin\User');
     }
 
     public function getSeriesCoverImgAttribute(){

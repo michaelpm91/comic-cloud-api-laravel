@@ -205,21 +205,7 @@
                                 "sed -i \"s/upload_max_filesize = .*/upload_max_filesize = ${upload_max_filesize}/\" /etc/php.ini\n",
                                 "post_max_size=250M\n",
                                 "sed -i \"s/post_max_size = .*/post_max_size = ${post_max_size}/\" /etc/php.ini\n",
-                                "service httpd restart \n",
-                                "#Install Supervisor\n",
-                                "yum install -y python-pip\n",
-                                "pip install supervisor\n",
-                                "/usr/local/bin/echo_supervisord_conf > /etc/supervisord.conf\n",
-                                "mkdir /etc/supervisor\n",
-                                "mkdir /etc/supervisor/conf.d\n",
-                                "cat >>  /etc/supervisord.conf  <<EOF\n",
-                                "[include]\n",
-                                "files = /etc/supervisor/conf.d/*.conf\n",
-                                "EOF\n",
-                                "curl https://gist.githubusercontent.com/kidshenlong/561791200f017b146299/raw/e242b0f43021a63459f75344421ae39903344385/supervisord.sh > /etc/init.d/supervisord\n",
-                                "chmod +x /etc/init.d/supervisord\n",
-                                "chkconfig --add supervisord\n",
-                                "service supervisord start\n"
+                                "service httpd restart \n"
                             ]
                         ]
                     }
