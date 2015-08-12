@@ -75,10 +75,9 @@ class UsersController extends ApiController {
                 'code' => ''
             ]]);
 
-            if (isset($data['series_title'])) {
-                $user->email = $data['email'];
-                $user->save();
-            }
+            if (isset($data['email'])) $user->email = $data['email'];
+            $user->save();
+
             return $this->respondSuccessful([
                 'user' => [$user]
             ]);

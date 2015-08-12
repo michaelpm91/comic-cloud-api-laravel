@@ -132,6 +132,7 @@ class ComicsController extends ApiController {
             ]]);
 
             if(isset($data['comic_issue'])) $comic->comic_issue = $data['comic_issue'];
+            if(isset($data['comic_book_archive_contents'])) $comic->comic_book_archive_contents = $data['comic_book_archive_contents'];
             if(isset($data['comic_writer'])) $comic->comic_writer = $data['comic_writer'];
             if(isset($data['series_id'])) $comic->series_id = $data['series_id'];
             if(isset($data['comic_vine_issue_id'])) $comic->comic_vine_issue_id = $data['comic_vine_issue_id'];
