@@ -6,9 +6,6 @@
  * Time: 14:22
  */
 
-use Faker\Factory as Faker;
-
-use Laracasts\TestDummy\DbTestCase;
 
 class ApiTester extends DBTestCase {
 
