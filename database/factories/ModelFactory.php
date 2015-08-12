@@ -48,22 +48,16 @@ $factory->define(App\Models\Upload::class, function (Faker\Generator $faker) {
 });
 
 $factory->define(App\Models\Comic::class, function (Faker\Generator $faker) {
+    $cba = factory(App\Models\ComicBookArchive::class)->create();
     return [
         'id' => $faker->uuid,
         'comic_issue' => $faker->numberBetween(1,999),
         'comic_writer' => $faker->name,
-        'comic_book_archive_contents' => json_encode([
-            1 => $faker->uuid.".jpg",
-            2 => $faker->uuid.".jpg",
-            3 => $faker->uuid.".jpg",
-            4 => $faker->uuid.".jpg",
-            5 => $faker->uuid.".jpg",
-            6 => $faker->uuid.".jpg",
-        ]),
+        'comic_book_archive_contents' => $cba->comic_book_archive_contents,
         'user_id'  => factory(App\Models\User::class)->create()->id,
         'series_id' =>  factory(App\Models\Series::class)->create()->id,
         'comic_vine_issue_id' => $faker->randomNumber(),
-        'comic_book_archive_id' =>  factory(App\Models\ComicBookArchive::class)->create()->id,
+        'comic_book_archive_id' =>  $cba->id,
 
     ];
 });
@@ -80,17 +74,14 @@ $factory->define(App\Models\Series::class, function (Faker\Generator $faker) {
 });
 
 $factory->define(App\Models\ComicBookArchive::class, function (Faker\Generator $faker) {
+    $comic_book_archive_contents = [];
+    for($i = 1; $i <= rand(5,20); ++$i) {
+        $comic_book_archive_contents[$i] = factory(App\Models\ComicImage::class)->create()->image_slug;
+    }
     return [
         'upload_id' =>  factory(App\Models\Upload::class)->create()->id,
-        'comic_book_archive_contents' => '',
-        'comic_book_archive_hash' => json_encode([
-            1 => $faker->uuid.".jpg",
-            2 => $faker->uuid.".jpg",
-            3 => $faker->uuid.".jpg",
-            4 => $faker->uuid.".jpg",
-            5 => $faker->uuid.".jpg",
-            6 => $faker->uuid.".jpg",
-        ]),
+        'comic_book_archive_hash' => $faker->md5,
+        'comic_book_archive_contents' => json_encode($comic_book_archive_contents),
         'comic_book_archive_status' => 1
     ];
 });
@@ -100,6 +91,6 @@ $factory->define(App\Models\ComicImage::class, function (Faker\Generator $faker)
         'image_slug' => $faker->uuid,
         'image_size' => $faker->numberBetween(1000000, 50000000),
         'image_hash' => $faker->md5,
-        'image_url' => imageUrl(600, 960, 'cats')
+        'image_url' => $faker->imageUrl(600, 960, 'cats')
     ];
 });
