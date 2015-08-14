@@ -27,7 +27,7 @@ class RemoveComicStatusFromComicsTable extends Migration {
 	{
 		Schema::table('comics', function(Blueprint $table)
 		{
-            $table->integer('comic_status');
+            $table->integer('comic_status')->default(0);
         });
 	}
 
