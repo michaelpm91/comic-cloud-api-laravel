@@ -14,20 +14,14 @@ class OAuth2Seeder extends Seeder
         $datetime = Carbon::now();
 
         //1. Create Clients
-        $web_client_id = str_random(16);
-        $web_client_secret = str_random(32);
-        $web_client_access_token = str_random(40);
-        $web_client_refresh_token = str_random(40);
+        $web_client_id = "SBziat92Is6qqShG";
+        $web_client_secret = "dVPoCStWKNuAgsZagS21lqTKklpbVF8z";
 
-        $admin_web_client_id = str_random(16);
-        $admin_web_client_secret = str_random(32);
-        $admin_web_client_access_token = str_random(40);
-        $admin_web_client_refresh_token = str_random(40);
+        $admin_web_client_id = "PJQG0e3tOKWibQAS";
+        $admin_web_client_secret = "WDOMm55MIsz4DoExTEnpyuZ1Nq6khZLN";
 
-        $lambda_processor_client_id = str_random(16);
-        $lambda_processor_client_secret = str_random(32);
-        $lambda_processor_access_token = str_random(40);
-        $lambda_processor_refresh_token = str_random(40);
+        $lambda_processor_client_id = "r9kO96j16pDdmQf9";
+        $lambda_processor_client_secret = "jeeSHlMdKO1wHhVtGzCmUwMaH0CbzJRy";
 
         $clients = [
             [
@@ -201,104 +195,6 @@ class OAuth2Seeder extends Seeder
 
         DB::table('oauth_client_grants')->insert($oauth_client_grants);
 
-        //7. Create a session with access and refresh tokens for generated users and processor
-
-        $sessions = [
-            [
-                'id' => 1,
-                'client_id' => $web_client_id,
-                'owner_id'  => 1,
-                'owner_type' => 'user',
-                'created_at' => $datetime,
-                'updated_at' => $datetime,
-            ],
-            [
-                'id' => 2,
-                'client_id' => $admin_web_client_id,
-                'owner_id'  => 2,
-                'owner_type' => 'user',
-                'created_at' => $datetime,
-                'updated_at' => $datetime,
-            ],
-            [
-                'id' => 3,
-                'client_id' => $lambda_processor_client_id,
-                'owner_id'  => 0,
-                'owner_type' => 'client',
-                'created_at' => $datetime,
-                'updated_at' => $datetime,
-            ]
-        ];
-
-        DB::table('oauth_sessions')->insert($sessions);
-
-        $tokens = [
-            [
-                'id' => $web_client_access_token,
-                'session_id'  => 1,
-                'expire_time' => 9999999999,//Should be 60
-                'created_at' => $datetime,
-                'updated_at' => $datetime,
-            ],
-            [
-                'id' => $admin_web_client_access_token,
-                'session_id'  => 2,
-                'expire_time' => 9999999999,//Should be 60
-                'created_at' => $datetime,
-                'updated_at' => $datetime,
-            ],
-            [
-                'id' => $lambda_processor_access_token,
-                'session_id'  => 3,
-                'expire_time' => 9999999999,//Should be 60
-                'created_at' => $datetime,
-                'updated_at' => $datetime,
-            ]
-        ];
-
-        DB::table('oauth_access_tokens')->insert($tokens);
-
-        $refreshtokens = [
-            [
-                'id' => $web_client_refresh_token,
-                'access_token_id' => $web_client_access_token,
-                'expire_time' => 9999999999,
-                'created_at' => $datetime,
-                'updated_at' => $datetime,
-            ],
-            [
-                'id' => $admin_web_client_refresh_token,
-                'access_token_id' => $admin_web_client_access_token,
-                'expire_time' => 9999999999,
-                'created_at' => $datetime,
-                'updated_at' => $datetime,
-            ]
-        ];
-
-        DB::table('oauth_refresh_tokens')->insert($refreshtokens);
-
-        $token_scopes = [
-            [
-                'access_token_id' => $web_client_access_token,
-                'scope_id' => 'basic',
-                'created_at' => $datetime,
-                'updated_at' => $datetime,
-            ],
-            [
-                'access_token_id' => $admin_web_client_access_token,
-                'scope_id' => 'admin',
-                'created_at' => $datetime,
-                'updated_at' => $datetime,
-            ],
-            [
-                'access_token_id' => $lambda_processor_access_token,
-                'scope_id' => 'processor',
-                'created_at' => $datetime,
-                'updated_at' => $datetime,
-            ],
-        ];
-
-        DB::table('oauth_access_token_scopes')->insert($token_scopes);
 
     }
 }
