@@ -14,14 +14,17 @@ class UserTableSeeder extends Seeder
     public function run()
     {
         User::create([
-            'username' => 'kidshenlong',
-            'email' => 'test@comiccloud.io',
+            'id' => 1,
+            'username' => 'test_'.env('APP_ENV').'_user',
+            'email' => 'test_user@comiccloud.io',
             'password' => Hash::make(env('test_user_password'))
         ]);
 
         User::create([
-            'username' => 'test_'.env('APP_ENV').'_user',
-            'email' => 'test@comiccloud.io',
+            'id' => 2,
+            'username' => 'test_'.env('APP_ENV').'_admin',
+            'email' => 'test_admin@comiccloud.io',
+            'type' => 'admin',
             'password' => Hash::make(env('test_user_password'))
         ]);
     }
