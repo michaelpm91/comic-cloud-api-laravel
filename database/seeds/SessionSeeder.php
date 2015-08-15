@@ -63,6 +63,7 @@ class SessionSeeder extends Seeder {
             ]
         ];
         DB::table('oauth_sessions')->insert($sessions);
+
         $tokens = [
             [
                 'id' => $this->web_client_access_token,
