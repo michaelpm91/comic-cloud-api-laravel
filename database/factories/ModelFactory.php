@@ -38,8 +38,8 @@ $factory->define(App\Models\Upload::class, function (Faker\Generator $faker) {
         'file_random_upload_id' => $random_upload_id,
         'match_data' => json_encode([
             'exists' => false,
-            'series_id' =>  factory(App\Models\Series::class)->create()->id,
-            'comic_id' => factory(App\Models\Comic::class)->create()->id,
+            'series_id' =>  $faker->uuid,
+            'comic_id' => $faker->uuid,
             'series_title' => $faker->sentence,
             'series_start_year' => $faker->year,
             'comic_issue' => $faker->numberBetween(1,999)
@@ -49,11 +49,24 @@ $factory->define(App\Models\Upload::class, function (Faker\Generator $faker) {
 
 $factory->define(App\Models\Comic::class, function (Faker\Generator $faker) {
     $cba = factory(App\Models\ComicBookArchive::class)->create();
+
+    $comic_book_archive_contents = [];
+
+    $comic_image = factory(App\Models\ComicImage::class, rand(5,20))->create();
+    $comic_image->each(function($i, $k)use($cba, &$comic_book_archive_contents){
+        $i->comicBookArchives()->attach($cba->id);
+        $key = ($k + 1);
+        $comic_book_archive_contents[$key] = $i->image_slug;
+    });
+
+    $cba->comic_book_archive_contents = json_encode($comic_book_archive_contents);
+    $cba->save();
+
     return [
         'id' => $faker->uuid,
         'comic_issue' => $faker->numberBetween(1,999),
         'comic_writer' => $faker->name,
-        'comic_book_archive_contents' => $cba->comic_book_archive_contents,
+        'comic_book_archive_contents' => json_encode($comic_book_archive_contents),
         'user_id'  => factory(App\Models\User::class)->create()->id,
         'series_id' =>  factory(App\Models\Series::class)->create()->id,
         'comic_vine_issue_id' => $faker->randomNumber(),
@@ -74,15 +87,11 @@ $factory->define(App\Models\Series::class, function (Faker\Generator $faker) {
 });
 
 $factory->define(App\Models\ComicBookArchive::class, function (Faker\Generator $faker) {
-    $comic_book_archive_contents = [];
-    for($i = 1; $i <= rand(5,20); ++$i) {
-        $comic_book_archive_contents[$i] = factory(App\Models\ComicImage::class)->create()->image_slug;
-    }
     return [
-        'upload_id' =>  factory(App\Models\Upload::class)->create()->id,
+        'upload_id' => factory(App\Models\Upload::class)->create()->id,
         'comic_book_archive_hash' => $faker->md5,
-        'comic_book_archive_contents' => json_encode($comic_book_archive_contents),
-        'comic_book_archive_status' => 1
+        'comic_book_archive_contents' => null,
+        'comic_book_archive_status' => 0
     ];
 });
 
