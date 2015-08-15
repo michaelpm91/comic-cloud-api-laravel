@@ -13,6 +13,7 @@ class ComicImageTest extends TestCase{
     use DatabaseMigrations;
 
     protected $comic_image_endpoint = "/v0.1/images/";
+    protected $test_basic_access_token = "y2ZRXZridqzVZP0mIzlaWBoQmLJplvqCcXmKOt4j";
 
     /**
      * @group image-test
@@ -34,13 +35,49 @@ class ComicImageTest extends TestCase{
             'password' => Hash::make('1234'),
             'type' => 'basic'
         ]);
-        $comic = factory(App\Models\Comic::class)->create();
-        /*$comic = factory(App\Models\Comic::class)->create([
+
+        factory(App\Models\Comic::class)->create([
             'user_id' => $user->id
         ]);
 
-        dd($comic);*/
+        $img_slug = str_random(40);
 
+        $this->post($this->comic_image_endpoint.$img_slug)->seeJson();
+
+        $this->assertResponseStatus(405);
+
+        $this->patch($this->comic_image_endpoint.$img_slug)->seeJson();
+
+        $this->assertResponseStatus(405);
+
+        $this->delete($this->comic_image_endpoint.$img_slug)->seeJson();
+
+        $this->assertResponseStatus(405);
+
+
+    }
+
+    /**
+     * @group image-test
+     */
+    public function test_that_basic_clients_cannot_send_requests_the_image_base_route(){
+        $this->seed();
+
+        $this->post($this->comic_image_endpoint, [],['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])->seeJson();
+
+        $this->assertResponseStatus(400);
+
+        $this->patch($this->comic_image_endpoint, [],['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])->seeJson();
+
+        $this->assertResponseStatus(405);
+
+        $this->delete($this->comic_image_endpoint, [],['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])->seeJson();
+
+        $this->assertResponseStatus(405);
+
+        $this->get($this->comic_image_endpoint, [],['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])->seeJson();
+
+        $this->assertResponseStatus(405);
 
     }
 
