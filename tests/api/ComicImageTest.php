@@ -107,15 +107,23 @@ class ComicImageTest extends TestCase{
 
         $faker = Factory::create();
 
-        $thingy =  $faker->uuid;
         //TODO: This should be posted as json
-        $req = $this->post($this->comic_image_endpoint, ['body' => json_encode([
-            "image_slug" => $thingy,
+        //$req = $this->call('POST', $this->comic_image_endpoint, [json_encode([
+        $req = $this->post($this->comic_image_endpoint, [json_encode([
+            "image_slug" => $faker->uuid,
             "image_hash" => $faker->md5,
             "image_url" =>  $faker->imageUrl(600, 960, 'cats'),
             "image_size" => $faker->numberBetween(1000000, 50000000),
             "related_comic_book_archive_id" => $cba->id
-        ])], ['HTTP_Authorization' => 'Bearer ' . $this->test_processor_access_token])->seeJson();
+            ])
+        ],[
+            'HTTP_Authorization' => 'Bearer ' . $this->test_processor_access_token,
+            'HTTP_CONTENT_TYPE' => 'application/json'
+        ]);
+        /*])], [
+            'HTTP_Authorization' => 'Bearer ' . $this->test_processor_access_token,
+            'HTTP_CONTENT_TYPE' => 'application/json'
+        ]);//->seeJson();*/
         //$this->assertResponseStatus(201);
         dd($req);
         //dd(App\Models\ComicImage::all());
