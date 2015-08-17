@@ -78,8 +78,8 @@ class ComicImagesController extends ApiController {
     public function store(){
         //if(!Request::isJson()) dd('nooo');//Header Content Type Check
 
-        $request = Input::json()->all();
-
+        //$request = Input::json()->all();
+        $request = Request::json()->all();
 
         Validator::extend('valid_uuid', function($attribute, $value, $parameters) {
             if(preg_match("/^(\{)?[a-f\d]{8}(-[a-f\d]{4}){4}[a-f\d]{8}(?(1)\})$/i", $value)) {

@@ -106,29 +106,27 @@ class ComicImageTest extends TestCase{
         $cba = factory(App\Models\ComicBookArchive::class)->create();
 
         $faker = Factory::create();
-
-        //TODO: This should be posted as json
-        //$req = $this->call('POST', $this->comic_image_endpoint, [json_encode([
-        $req = $this->post($this->comic_image_endpoint, [json_encode([
-            "image_slug" => $faker->uuid,
+        $thingy = $faker->uuid;
+        $json = [
+            "image_slug" => $thingy,
             "image_hash" => $faker->md5,
             "image_url" =>  $faker->imageUrl(600, 960, 'cats'),
             "image_size" => $faker->numberBetween(1000000, 50000000),
             "related_comic_book_archive_id" => $cba->id
-            ])
-        ],[
+        ];
+
+        $headers = [
             'HTTP_Authorization' => 'Bearer ' . $this->test_processor_access_token,
             'HTTP_CONTENT_TYPE' => 'application/json'
-        ]);
-        /*])], [
-            'HTTP_Authorization' => 'Bearer ' . $this->test_processor_access_token,
-            'HTTP_CONTENT_TYPE' => 'application/json'
-        ]);//->seeJson();*/
-        //$this->assertResponseStatus(201);
-        dd($req);
-        //dd(App\Models\ComicImage::all());
-        //$this->seeInDatabase('comic_images', ["image_slug" => $thingy ]);
+        ];
+        $this->call('POST', $this->comic_image_endpoint, [], [], [], $headers,json_encode($json));//->seeJson();
+        //$this->post($this->comic_image_endpoint, json_encode($json), $headers, true);
+        $this->seeInDatabase('comic_images', ["image_slug" => $thingy ]);
+        $this->assertResponseStatus(201);
+
 
     }
+
+
 
 } 
