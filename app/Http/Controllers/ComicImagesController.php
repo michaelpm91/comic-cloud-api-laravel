@@ -17,8 +17,6 @@ class ComicImagesController extends ApiController {
      * Display the specified resource.
      *
      * @param $image_slug
-     * @param string $size
-     * @internal param int $id
      * @return Response
      */
 	public function show($image_slug){
