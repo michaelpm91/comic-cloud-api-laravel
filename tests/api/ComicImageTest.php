@@ -119,14 +119,12 @@ class ComicImageTest extends TestCase{
             'HTTP_Authorization' => 'Bearer ' . $this->test_processor_access_token,
             'HTTP_CONTENT_TYPE' => 'application/json'
         ];
-        $this->call('POST', $this->comic_image_endpoint, [], [], [], $headers,json_encode($json));//->seeJson();
-        //$this->post($this->comic_image_endpoint, json_encode($json), $headers, true);
-        $this->seeInDatabase('comic_images', ["image_slug" => $thingy ]);
+        $this->call('POST', $this->comic_image_endpoint, [], [], [], $headers,json_encode($json));//TODO: Replace with working postJson()
+        $this->assertJson($this->response->getContent());//TODO: chain onto postJson with seeJson()
+
         $this->assertResponseStatus(201);
 
 
     }
-
-
 
 } 
