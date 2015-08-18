@@ -21,6 +21,8 @@ use Rhumsaa\Uuid\Uuid;
 
 use Illuminate\Http\Response;
 
+use App\Http\Controllers\ApiController;
+
 
 class UploadsController extends ApiController {
 

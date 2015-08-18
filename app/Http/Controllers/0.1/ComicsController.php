@@ -13,6 +13,8 @@ use GuzzleHttp\Client as Guzzle;
 
 use LucaDegasperi\OAuth2Server\Authorizer;
 
+use App\Http\Controllers\ApiController;
+
 
 class ComicsController extends ApiController {
 

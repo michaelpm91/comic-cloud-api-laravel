@@ -30,7 +30,7 @@ Route::group(['namespace' => 'Auth'], function() {
 });
 
 //basic routes
-Route::group(['before' => 'oauth:basic', 'prefix' => 'v'.env('APP_API_VERSION')], function() {
+Route::group(['before' => 'oauth:basic', 'prefix' => 'v'.env('APP_API_VERSION'), 'namespace' => env('APP_API_VERSION')], function() {
     Route::resource('uploads','UploadsController', array('only' => array('index', 'store', 'show')));
     Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
     Route::resource('comics','ComicsController', array('only' => array('index', 'show', 'update', 'destroy')));
