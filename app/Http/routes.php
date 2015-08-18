@@ -29,7 +29,7 @@ Route::group(['namespace' => 'Auth'], function() {
     Route::post('oauth/access_token', 'AuthController@createToken');
 });
 
-
+//basic routes
 Route::group(['before' => 'oauth:basic', 'prefix' => 'v'.env('APP_API_VERSION')], function() {
     Route::resource('uploads','UploadsController', array('only' => array('index', 'store', 'show')));
     Route::resource('series','SeriesController', array('only' => array('index', 'store', 'show', 'update', 'destroy')));
@@ -41,13 +41,15 @@ Route::group(['before' => 'oauth:basic', 'prefix' => 'v'.env('APP_API_VERSION')]
     Route::get('comics/{comic_id}/meta', 'ComicsController@showMetaData');//TODO: Should these be filters?
 });
 
-Route::group(['before' => 'oauth:processor', 'prefix' => 'v'.env('APP_API_VERSION')], function() {
+//processor routes
+Route::group(['before' => 'oauth:processor', 'prefix' => 'processor', 'namespace' => 'Processor'], function() {
     Route::get('images', 'ComicImagesController@index');
     Route::post('images', 'ComicImagesController@store');
     Route::put('comicbookarchives/{cba_id}', 'ComicBookArchivesController@update');
     Route::get('comicbookarchives/{cba_id}', 'ComicBookArchivesController@show');
 });
 
+//admin routes
 Route::group(['before' => 'oauth:admin', 'prefix' => 'admin', 'namespace' => 'Admin'], function(){
     Route::resource('uploads','UploadsController', array('only' => array('index', 'show')));
     Route::resource('users','UsersController', array('only' => array('index', 'show', 'update', 'destroy')));
