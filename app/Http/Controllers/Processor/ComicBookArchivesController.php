@@ -11,6 +11,8 @@ use App\Models\Comic;
 
 use Input;
 
+use App\Http\Controllers\ApiController;
+
 
 class ComicBookArchivesController extends ApiController {
 
