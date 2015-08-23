@@ -25,6 +25,14 @@ class ComicImageTest extends TestCase{
         $this->get($this->comic_image_endpoint.str_random(32))->seeJson();
         $this->assertResponseStatus(401);
     }
+    public function test_admin_scoped_tokens_cannot_fetch_basic_scoped_images(){
+        $this->markTestIncomplete('Incomplete');
+
+    }
+    public function test_processor_scoped_tokens_cannot_fetch_basic_scoped_images(){
+        $this->markTestIncomplete('Incomplete');
+    }
+
 
     /**
      * @group image-test
@@ -74,6 +82,28 @@ class ComicImageTest extends TestCase{
 
         $this->delete($this->comic_image_endpoint,['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])->seeJson();
         $this->assertResponseStatus(404);
+    }
+
+    public function test_it_fetches_images(){
+
+        $user = factory(App\Models\User::class)->create([
+            'username' => 'auth_test_user',
+            'password' => Hash::make('1234'),
+            'type' => 'basic'
+        ]);
+
+        $comic = factory(App\Models\Comic::class)->create([
+            'user_id' => $user->id
+        ]);
+
+        $contents = $comic->comic_book_archive_contents;
+
+        $req = $this->get($contents[1],['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])->seeJson();
+
+        dd($req);
+
+
+
     }
 
 
