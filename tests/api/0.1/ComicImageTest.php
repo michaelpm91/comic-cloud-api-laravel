@@ -84,23 +84,22 @@ class ComicImageTest extends TestCase{
         $this->assertResponseStatus(404);
     }
 
+    /**
+     * @vcr image-bucket.yml
+     */
     public function test_it_fetches_images(){
-
-        $user = factory(App\Models\User::class)->create([
-            'username' => 'auth_test_user',
-            'password' => Hash::make('1234'),
-            'type' => 'basic'
-        ]);
+        $this->seed();
 
         $comic = factory(App\Models\Comic::class)->create([
-            'user_id' => $user->id
+            'user_id' => 1
         ]);
 
         $contents = $comic->comic_book_archive_contents;
+        $first_entry = head($contents);
+        $req = $this->get($first_entry,['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(200);
 
-        $req = $this->get($contents[1],['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])->seeJson();
-
-        dd($req);
+        //dd($req);
 
 
 

@@ -70,8 +70,7 @@ $factory->define(App\Models\Comic::class, function (Faker\Generator $faker) {
         'user_id'  => factory(App\Models\User::class)->create()->id,
         'series_id' =>  factory(App\Models\Series::class)->create()->id,
         'comic_vine_issue_id' => $faker->randomNumber(),
-        'comic_book_archive_id' =>  $cba->id,
-
+        'comic_book_archive_id' =>  $cba->id
     ];
 });
 
