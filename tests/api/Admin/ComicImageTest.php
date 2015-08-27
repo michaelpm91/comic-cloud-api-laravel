@@ -14,6 +14,7 @@ class AdminComicImageTest extends ApiTester {
 
 
     /**
+     * @group admin
      * @group image-test
      */
     public function test_it_must_be_authenticated(){
@@ -23,6 +24,7 @@ class AdminComicImageTest extends ApiTester {
 
 
     /**
+     * @group admin
      * @group image-test
      */
     public function test_that_admin_web_clients_cannot_send_post_requests_to_image_index(){

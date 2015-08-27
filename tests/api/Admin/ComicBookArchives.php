@@ -8,6 +8,7 @@ class AdminComicBookArchives extends ApiTester {
     use DatabaseMigrations;
 
     /**
+     * @group admin
      * @group image-test
      */
     public function test_it_must_be_authenticated(){

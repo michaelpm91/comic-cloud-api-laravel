@@ -8,7 +8,7 @@ class ProcessorComicBookArchives extends ApiTester {
 
     /**
      * @group processor
-     * @group image-test
+     * @group comic-book-archive-test
      */
     public function test_it_must_be_authenticated(){
         $this->get($this->processor_comic_book_archive_endpoint.str_random(32))->seeJson();

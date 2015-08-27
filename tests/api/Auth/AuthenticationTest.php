@@ -12,7 +12,6 @@ class AuthenticationTest extends ApiTester {
     use DatabaseMigrations;
 
     /**
-     * @group auth
      * @group auth-test
      */
     public function test_it_generates_access_tokens_via_the_password_grant_and_basic_scope(){
@@ -36,9 +35,7 @@ class AuthenticationTest extends ApiTester {
 
         $this->assertResponseOk();
     }
-
     /**
-     * @group auth
      * @group auth-test
      */
     public function test_it_generates_access_tokens_via_the_password_admin_grant_and_admin_scope(){
@@ -62,9 +59,7 @@ class AuthenticationTest extends ApiTester {
 
         $this->assertResponseOk();
     }
-
     /**
-     * @group auth
      * @group auth-test
      */
     public function test_it_generates_access_tokens_via_the_processor_grant_and_processor_scope(){
@@ -81,7 +76,6 @@ class AuthenticationTest extends ApiTester {
     }
 
     /**
-     * @group auth
      * @group auth-test
      */
     public function test_it_cannot_generate_access_tokens_if_the_grant_type_is_not_available_in_the_scope(){
@@ -97,8 +91,9 @@ class AuthenticationTest extends ApiTester {
         $this->assertResponseStatus(401);
     }
 
-    /* PORT BELOW */
-
+    /**
+     * @group auth-test
+     */
     public function test_it_cannot_generate_access_tokens_if_the_client_does_not_have_access_to_the_scope(){
         $this->seed();
 
@@ -120,7 +115,6 @@ class AuthenticationTest extends ApiTester {
         $this->assertResponseStatus(401);
     }
     /**
-     * @group auth
      * @group auth-test
      */
     public function test_it_cannot_generate_access_tokens_if_the_scope_is_not_available_to_the_grant_type(){
@@ -145,7 +139,6 @@ class AuthenticationTest extends ApiTester {
         $this->assertResponseStatus(400);
     }
     /**
-     * @group auth
      * @group auth-test
      */
     public function test_it_can_register_user(){

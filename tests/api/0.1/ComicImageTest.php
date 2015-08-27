@@ -13,6 +13,7 @@ class ComicImageTest extends ApiTester{
     use DatabaseMigrations;
 
     /**
+     * @group basic
      * @group image-test
      */
     public function test_it_must_be_authenticated(){
@@ -28,6 +29,7 @@ class ComicImageTest extends ApiTester{
     }
 
     /**
+     * @group basic
      * @group image-test
      */
     public function test_it_only_accepts_get_requests_to_a_specific_image(){
@@ -59,6 +61,7 @@ class ComicImageTest extends ApiTester{
     }
 
     /**
+     * @group basic
      * @group image-test
      */
     public function test_that_basic_web_clients_cannot_send_requests_to_image_index(){
@@ -78,6 +81,7 @@ class ComicImageTest extends ApiTester{
     }
 
     /**
+     * @group basic
      * @group image-test
      */
     public function test_it_fetches_images(){
@@ -91,10 +95,10 @@ class ComicImageTest extends ApiTester{
 
         $this->get(head($contents),['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
         $this->assertResponseStatus(200);
-
     }
 
     /**
+     * @group basic
      * @group image-test
      */
     public function test_it_cannot_fetch_images_that_do_not_exist(){
@@ -102,10 +106,10 @@ class ComicImageTest extends ApiTester{
 
         $this->get($this->basic_comic_image_endpoint."xyz",['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
         $this->assertResponseStatus(404);
-
     }
 
     /**
+     * @group basic
      * @group image-test
      */
     public function test_it_can_only_fetch_images_that_belong_to_the_user(){
@@ -117,9 +121,5 @@ class ComicImageTest extends ApiTester{
 
         $this->get(head($contents),['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
         $this->assertResponseStatus(404);
-
     }
-
-
-
 } 
