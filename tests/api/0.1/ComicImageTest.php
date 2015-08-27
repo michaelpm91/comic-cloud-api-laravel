@@ -20,14 +20,26 @@ class ComicImageTest extends ApiTester{
         $this->get($this->basic_comic_image_endpoint.str_random(32))->seeJson();
         $this->assertResponseStatus(401);
     }
+    /**
+     * @group basic
+     * @group image-test
+     */
     public function test_admin_scoped_tokens_cannot_fetch_basic_scoped_images(){
-        $this->markTestIncomplete('Incomplete');
+        $this->seed();
 
+        $this->get($this->admin_comic_image_endpoint,['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(400);//TODO: this should be a 401
     }
+    /**
+     * @group basic
+     * @group image-test
+     */
     public function test_processor_scoped_tokens_cannot_fetch_basic_scoped_images(){
-        $this->markTestIncomplete('Incomplete');
-    }
+        $this->seed();
 
+        $this->get($this->processor_comic_image_endpoint,['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(400);//TODO: this should be a 401
+    }
     /**
      * @group basic
      * @group image-test
@@ -79,7 +91,6 @@ class ComicImageTest extends ApiTester{
         $this->delete($this->basic_comic_image_endpoint,['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])->seeJson();
         $this->assertResponseStatus(404);
     }
-
     /**
      * @group basic
      * @group image-test
@@ -96,7 +107,6 @@ class ComicImageTest extends ApiTester{
         $this->get(head($contents),['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
         $this->assertResponseStatus(200);
     }
-
     /**
      * @group basic
      * @group image-test
@@ -107,7 +117,6 @@ class ComicImageTest extends ApiTester{
         $this->get($this->basic_comic_image_endpoint."xyz",['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
         $this->assertResponseStatus(404);
     }
-
     /**
      * @group basic
      * @group image-test

@@ -21,8 +21,6 @@ class AdminComicImageTest extends ApiTester {
         $this->get($this->admin_comic_image_endpoint.str_random(32))->seeJson();
         $this->assertResponseStatus(401);
     }
-
-
     /**
      * @group admin
      * @group image-test
@@ -32,7 +30,6 @@ class AdminComicImageTest extends ApiTester {
 
         $this->post($this->admin_comic_image_endpoint, [], ['HTTP_Authorization' => 'Bearer ' . $this->test_admin_access_token])->seeJson();
         $this->assertResponseStatus(405);
-
     }
 
 }
