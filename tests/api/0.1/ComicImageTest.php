@@ -85,7 +85,7 @@ class ComicImageTest extends TestCase{
     }
 
     /**
-     * @vcr image-bucket.yml
+     * @group image-test
      */
     public function test_it_fetches_images(){
         $this->seed();
@@ -95,14 +95,11 @@ class ComicImageTest extends TestCase{
         ]);
 
         $contents = $comic->comic_book_archive_contents;
-        $first_entry = head($contents);
-        $req = $this->get($first_entry,['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
-        $this->assertResponseStatus(200);
+        foreach($contents as $image_url){
+            $this->get($image_url,['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+            $this->assertResponseStatus(200);
 
-        //dd($req);
-
-
-
+        }
     }
 
 
