@@ -10,36 +10,35 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 use Faker\Factory;
 
-class ProcessorComicImageTest extends TestCase{
+class ProcessorComicImageTest extends ApiTester {
 
     use DatabaseMigrations;
 
-    protected $comic_image_endpoint = "/processor/images/";
-
-    protected $test_processor_access_token = "m7wQwuDdCq2FQvW2tjzALUnVc0KZe2YogLaxSOA6";
 
     /**
+     * @group processor
      * @group image-test
      */
     public function test_it_must_be_authenticated(){
-        //$this->markTestIncomplete('Prcoessor clients cannot ');
-        $this->get($this->comic_image_endpoint)->seeJson();
+        $this->get($this->processor_comic_image_endpoint)->seeJson();
         $this->assertResponseStatus(401);
     }
 
     /**
+     * @group processor
      * @group image-test
      */
     public function test_that_processor_clients_can_request_image_index(){
         $this->seed();
 
-        $this->get($this->comic_image_endpoint,['HTTP_Authorization' => 'Bearer '. $this->test_processor_access_token])->seeJson();
+        $this->get($this->processor_comic_image_endpoint,['HTTP_Authorization' => 'Bearer '. $this->test_processor_access_token])->seeJson();
 
         $this->assertResponseStatus(200);
 
     }
 
     /**
+     * @group processor
      * @group image-test
      */
     public function test_that_processor_clients_can_create_image_records(){
@@ -57,13 +56,7 @@ class ProcessorComicImageTest extends TestCase{
             "related_comic_book_archive_id" => $cba->id
         ];
 
-        $headers = [
-            'HTTP_Authorization' => 'Bearer ' . $this->test_processor_access_token,
-            'HTTP_CONTENT_TYPE' => 'application/json'
-        ];
-        $this->call('POST', $this->comic_image_endpoint, [], [], [], $headers,json_encode($json));//TODO: Replace with working postJson()
-        $this->assertJson($this->response->getContent());//TODO: chain onto postJson with seeJson()
-
+        $this->postJson($this->processor_comic_image_endpoint, $json, ['HTTP_Authorization' => 'Bearer '. $this->test_processor_access_token])->seeJson();
         $this->assertResponseStatus(201);
 
 

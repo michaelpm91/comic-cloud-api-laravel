@@ -8,21 +8,15 @@
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-use Faker\Factory;
-
-class ComicImageTest extends TestCase{
+class ComicImageTest extends ApiTester{
 
     use DatabaseMigrations;
-
-    protected $comic_image_endpoint = "/v0.1/images/";
-
-    protected $test_basic_access_token = "y2ZRXZridqzVZP0mIzlaWBoQmLJplvqCcXmKOt4j";
 
     /**
      * @group image-test
      */
     public function test_it_must_be_authenticated(){
-        $this->get($this->comic_image_endpoint.str_random(32))->seeJson();
+        $this->get($this->basic_comic_image_endpoint.str_random(32))->seeJson();
         $this->assertResponseStatus(401);
     }
     public function test_admin_scoped_tokens_cannot_fetch_basic_scoped_images(){
@@ -32,7 +26,6 @@ class ComicImageTest extends TestCase{
     public function test_processor_scoped_tokens_cannot_fetch_basic_scoped_images(){
         $this->markTestIncomplete('Incomplete');
     }
-
 
     /**
      * @group image-test
@@ -52,15 +45,15 @@ class ComicImageTest extends TestCase{
 
         $img_slug = str_random(40);
 
-        $this->post($this->comic_image_endpoint.$img_slug)->seeJson();
+        $this->post($this->basic_comic_image_endpoint.$img_slug)->seeJson();
 
         $this->assertResponseStatus(405);
 
-        $this->patch($this->comic_image_endpoint.$img_slug)->seeJson();
+        $this->patch($this->basic_comic_image_endpoint.$img_slug)->seeJson();
 
         $this->assertResponseStatus(405);
 
-        $this->delete($this->comic_image_endpoint.$img_slug)->seeJson();
+        $this->delete($this->basic_comic_image_endpoint.$img_slug)->seeJson();
 
         $this->assertResponseStatus(405);
     }
@@ -71,16 +64,16 @@ class ComicImageTest extends TestCase{
     public function test_that_basic_web_clients_cannot_send_requests_to_image_index(){
         $this->seed();
 
-        $this->post($this->comic_image_endpoint, [], ['HTTP_Authorization' => 'Bearer ' . $this->test_basic_access_token])->seeJson();
+        $this->post($this->basic_comic_image_endpoint, [], ['HTTP_Authorization' => 'Bearer ' . $this->test_basic_access_token])->seeJson();
         $this->assertResponseStatus(404);
 
-        $this->get($this->comic_image_endpoint,['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])->seeJson();
+        $this->get($this->basic_comic_image_endpoint,['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])->seeJson();
         $this->assertResponseStatus(404);
 
-        $this->patch($this->comic_image_endpoint, [], ['HTTP_Authorization' => 'Bearer ' . $this->test_basic_access_token])->seeJson();
+        $this->patch($this->basic_comic_image_endpoint, [], ['HTTP_Authorization' => 'Bearer ' . $this->test_basic_access_token])->seeJson();
         $this->assertResponseStatus(404);
 
-        $this->delete($this->comic_image_endpoint,['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])->seeJson();
+        $this->delete($this->basic_comic_image_endpoint,['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])->seeJson();
         $this->assertResponseStatus(404);
     }
 
@@ -95,11 +88,36 @@ class ComicImageTest extends TestCase{
         ]);
 
         $contents = $comic->comic_book_archive_contents;
-        foreach($contents as $image_url){
-            $this->get($image_url,['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
-            $this->assertResponseStatus(200);
 
-        }
+        $this->get(head($contents),['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(200);
+
+    }
+
+    /**
+     * @group image-test
+     */
+    public function test_it_cannot_fetch_images_that_do_not_exist(){
+        $this->seed();
+
+        $this->get($this->basic_comic_image_endpoint."xyz",['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(404);
+
+    }
+
+    /**
+     * @group image-test
+     */
+    public function test_it_can_only_fetch_images_that_belong_to_the_user(){
+        $this->seed();
+
+        $comic = factory(App\Models\Comic::class)->create();
+
+        $contents = $comic->comic_book_archive_contents;
+
+        $this->get(head($contents),['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(404);
+
     }
 
 

@@ -7,24 +7,12 @@
  */
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-class AuthenticationTest extends TestCase {
+class AuthenticationTest extends ApiTester {
 
     use DatabaseMigrations;
 
-    protected $oauth_endpoint = "/oauth/access_token/";
-    protected $register_endpoint = "/auth/register/";
-
-    protected $web_client_id = 'SBziat92Is6qqShG';
-    protected $web_client_secret = 'dVPoCStWKNuAgsZagS21lqTKklpbVF8z';
-
-    protected $admin_web_client_id = 'PJQG0e3tOKWibQAS';
-    protected $admin_web_client_secret = 'WDOMm55MIsz4DoExTEnpyuZ1Nq6khZLN';
-
-    protected $lambda_processor_client_id = 'r9kO96j16pDdmQf9';
-    protected $lambda_processor_client_secret = 'jeeSHlMdKO1wHhVtGzCmUwMaH0CbzJRy';
-
-
     /**
+     * @group auth
      * @group auth-test
      */
     public function test_it_generates_access_tokens_via_the_password_grant_and_basic_scope(){
@@ -50,6 +38,7 @@ class AuthenticationTest extends TestCase {
     }
 
     /**
+     * @group auth
      * @group auth-test
      */
     public function test_it_generates_access_tokens_via_the_password_admin_grant_and_admin_scope(){
@@ -75,6 +64,7 @@ class AuthenticationTest extends TestCase {
     }
 
     /**
+     * @group auth
      * @group auth-test
      */
     public function test_it_generates_access_tokens_via_the_processor_grant_and_processor_scope(){
@@ -91,6 +81,7 @@ class AuthenticationTest extends TestCase {
     }
 
     /**
+     * @group auth
      * @group auth-test
      */
     public function test_it_cannot_generate_access_tokens_if_the_grant_type_is_not_available_in_the_scope(){
@@ -129,6 +120,7 @@ class AuthenticationTest extends TestCase {
         $this->assertResponseStatus(401);
     }
     /**
+     * @group auth
      * @group auth-test
      */
     public function test_it_cannot_generate_access_tokens_if_the_scope_is_not_available_to_the_grant_type(){
@@ -153,6 +145,7 @@ class AuthenticationTest extends TestCase {
         $this->assertResponseStatus(400);
     }
     /**
+     * @group auth
      * @group auth-test
      */
     public function test_it_can_register_user(){
