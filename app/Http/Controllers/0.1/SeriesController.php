@@ -13,6 +13,9 @@ use App\Models\Comic;
 
 use GuzzleHttp\Client as Guzzle;
 
+use App\Http\Controllers\ApiController;
+
+
 class SeriesController extends ApiController {
 
 	/**
