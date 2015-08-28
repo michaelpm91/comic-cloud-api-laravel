@@ -32,6 +32,7 @@ class Comic extends Model {
     public function getComicBookArchiveContentsAttribute($json_array){
         if($json_array) {
             $json_array = json_decode($json_array);
+            if(!$json_array) return;
 
             array_walk($json_array, function (&$value, $key) {
                 $value = url('v'.env('APP_API_VERSION').env('image_url') . $value);
