@@ -53,7 +53,7 @@ Route::group(['before' => 'oauth:processor', 'prefix' => 'processor', 'namespace
 Route::group(['before' => 'oauth:admin', 'prefix' => 'admin', 'namespace' => 'Admin'], function(){
     Route::resource('uploads','UploadsController', array('only' => array('index', 'show')));
     Route::resource('users','UsersController', array('only' => array('index', 'show', 'update', 'destroy')));
-    Route::resource('images','ComicImagesController', array('only' => array('index', 'show')));
+    Route::resource('images','ComicImagesController', array('only' => array('index', 'show', 'update', 'destroy')));
     Route::resource('comics','ComicsController', array('only' => array('index', 'show')));
     Route::resource('series','SeriesController', array('only' => array('index', 'show')));
     Route::resource('comicbookarchives','ComicBookArchivesController', array('only' => array('index', 'show')));
