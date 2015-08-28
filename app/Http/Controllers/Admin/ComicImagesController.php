@@ -4,6 +4,9 @@ use App\Http\Controllers\ApiController;
 use App\Models\Admin\ComicImage;
 use Input;
 use Image;
+use Request;
+use Validator;
+
 
 class ComicImagesController extends ApiController {
 
@@ -85,9 +88,9 @@ class ComicImagesController extends ApiController {
      * @param  int  $id
      * @return Response
      */
-    public function update($id){
+    public function update($image_slug){
 
-        $comicImage = ComicImage::find($id);
+        $comicImage = ComicImage::where('image_slug', '=', $image_slug)->first();
 
         if($comicImage){
 
@@ -99,6 +102,40 @@ class ComicImagesController extends ApiController {
                 'status' => 400,
                 'code' => ''
             ]]);
+
+            //return preg_match('/^[a-f0-9]{32}$/', $md5);
+
+
+            Validator::extend('valid_md5', function($attribute, $value, $parameters) {
+                if(preg_match('/^[a-f0-9]{32}$/', $value)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+            $messages = [
+                'image_size.valid_md5' => 'Not a valid MD5 Hash',
+            ];
+
+            $validator = Validator::make($data = Request::all(), [
+                'image_size' => 'numeric',
+                //'image_url' => 'active_url',//TODO: Regex?
+                'image_hash' => 'valid_md5'
+            ], $messages);
+
+            if ($validator->fails()){
+                $pretty_errors = array_map(function($item){
+                    return [
+                        'title' => 'Malformed Field',
+                        'detail' => $item,
+                        'status' => 400,
+                        'code' => ''
+                    ];
+                }, $validator->errors()->all());
+
+                return $this->respondBadRequest($pretty_errors);
+            }
 
             if (isset($data['image_size'])) $comicImage->image_size = $data['image_size'];
             if (isset($data['image_url'])) $comicImage->image_url = $data['image_url'];

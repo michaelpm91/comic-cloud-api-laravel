@@ -88,7 +88,6 @@ class ApiController extends Controller {
     {
         return $this->setStatusCode(IlluminateResponse::HTTP_OK)->respond($message);
     }
-
     /**
      * @param $message
      * @return mixed
@@ -107,9 +106,9 @@ class ApiController extends Controller {
 
         return $this->setStatusCode(IlluminateResponse::HTTP_UNAUTHORIZED)->respond($message);
     }
-
     /**
-     * @param $message
+     * @param $errors_object
+     * @internal param $message
      * @return mixed
      */
     public function respondWithError($errors_object){
@@ -117,8 +116,6 @@ class ApiController extends Controller {
             'errors' => $errors_object
         ]);
     }
-
-
     /**
      * @param $data
      * @param array $headers
@@ -127,7 +124,4 @@ class ApiController extends Controller {
     public function respond($data = [], $headers = []){
         return response()->json($data, $this->getStatusCode(), $headers);
     }
-
-
-
 }

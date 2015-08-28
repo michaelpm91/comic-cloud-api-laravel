@@ -24,20 +24,11 @@ class AdminComicImageTest extends ApiTester {
      * @group admin
      * @group image-test
      */
-    public function test_admin_scoped_tokens_cannot_fetch_basic_scoped_images(){
+    public function test_admin_scoped_tokens_cannot_fetch_basic_scoped_images()
+    {
         $this->seed();
 
-        $this->get($this->basic_comic_image_endpoint."xyz",['HTTP_Authorization' => 'Bearer '. $this->test_admin_access_token]);
-        $this->assertResponseStatus(400);//TODO: this should be a 401
-    }
-    /**
-     * @group admin
-     * @group image-test
-     */
-    public function test_admin_scoped_tokens_cannot_fetch_processor_scoped_images(){
-        $this->seed();
-
-        $this->get($this->processor_comic_image_endpoint."xyz",['HTTP_Authorization' => 'Bearer '. $this->test_admin_access_token]);
+        $this->get($this->basic_comic_image_endpoint . "xyz", ['HTTP_Authorization' => 'Bearer ' . $this->test_admin_access_token]);
         $this->assertResponseStatus(400);//TODO: this should be a 401
     }
     /**
@@ -109,18 +100,63 @@ class AdminComicImageTest extends ApiTester {
 
         $contents = $comic->comic_book_archive_contents;
 
-        $json = [
-            //fields to update
+        $faker = Faker\Factory::create();
+
+        $request_body = [
+            'image_size' => $faker->numberBetween(1000000, 50000000),
+            'image_url' => $faker->imageUrl(600, 960, 'abstract'),
+            'image_hash' => $faker->md5
         ];
 
         $slug = last(explode("/", head($contents)));
 
-        $this->putJson($this->basic_admin_image_endpoint.$slug, $json,['HTTP_Authorization' => 'Bearer '. $this->test_admin_access_token])
-            ->seeJson([]);//TODO:check updates
-
-        $this->assertResponseStatus(202);
-
-
+        $this->put($this->admin_comic_image_endpoint.$slug, $request_body,['HTTP_Authorization' => 'Bearer '. $this->test_admin_access_token])
+            ->seeJson([
+                'image_size' => $request_body['image_size'],
+                'image_url' => $request_body['image_url'],
+                'image_hash' => $request_body['image_hash']
+            ]);
+        $this->assertResponseStatus(200);
     }
+    /**
+     * @group admin
+     * @group image-test
+     */
+    public function test_that_an_update_to_an_image_with_no_body_will_fail(){
+        $this->seed();
+
+        $comic = factory(App\Models\Comic::class)->create();
+
+        $contents = $comic->comic_book_archive_contents;
+
+        $slug = last(explode("/", head($contents)));
+
+        $this->put($this->admin_comic_image_endpoint.$slug, [],['HTTP_Authorization' => 'Bearer '. $this->test_admin_access_token])->seeJson();
+        $this->assertResponseStatus(400);
+    }
+    /**
+     * @group admin
+     * @group image-test
+     */
+    public function test_that_an_update_must_contain_valid_parameter(){
+        $this->seed();
+
+        $comic = factory(App\Models\Comic::class)->create();
+
+        $contents = $comic->comic_book_archive_contents;
+
+        $request_body = [
+            'image_size' => 'q',
+            'image_url' => 'xyz',
+            'image_hash' => 'zyx'
+        ];
+
+        $slug = last(explode("/", head($contents)));
+
+        $this->put($this->admin_comic_image_endpoint.$slug, $request_body,['HTTP_Authorization' => 'Bearer '. $this->test_admin_access_token])->seeJson();
+
+        $this->assertResponseStatus(400);
+    }
+
 
 }
