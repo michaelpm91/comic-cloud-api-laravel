@@ -138,7 +138,8 @@ class AdminComicImageTest extends ApiTester {
      * @group admin
      * @group image-test
      */
-    public function test_that_an_update_must_contain_valid_parameter(){
+    public function test_that_an_update_must_contain_valid_parameter()
+    {
         $this->seed();
 
         $comic = factory(App\Models\Comic::class)->create();
@@ -153,10 +154,8 @@ class AdminComicImageTest extends ApiTester {
 
         $slug = last(explode("/", head($contents)));
 
-        $this->put($this->admin_comic_image_endpoint.$slug, $request_body,['HTTP_Authorization' => 'Bearer '. $this->test_admin_access_token])->seeJson();
+        $this->put($this->admin_comic_image_endpoint . $slug, $request_body, ['HTTP_Authorization' => 'Bearer ' . $this->test_admin_access_token])->seeJson();
 
         $this->assertResponseStatus(400);
     }
-
-
 }
