@@ -2,16 +2,17 @@
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
-class ProcessorComicBookArchives extends ApiTester {
+
+class AdminComicBookArchiveTest extends ApiTester {
 
     use DatabaseMigrations;
 
     /**
-     * @group processor
-     * @group comic-book-archive-test
+     * @group admin
+     * @group image-test
      */
     public function test_it_must_be_authenticated(){
-        $this->get($this->processor_comic_book_archive_endpoint.str_random(32))->seeJson();
+        $this->get($this->admin_comic_book_archive_endpoint.str_random(32))->seeJson();
         $this->assertResponseStatus(401);
     }
 }

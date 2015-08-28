@@ -1,4 +1,4 @@
-<?php namespace App\Http\Controllers;
+<?php namespace App\Http\Controllers\Basic;
 
 use App\Models\Upload;
 use App\Models\User;
