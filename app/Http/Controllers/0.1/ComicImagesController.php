@@ -11,6 +11,8 @@ use Validator;
 
 use Illuminate\Pagination\LengthAwarePaginator;
 
+use App\Http\Controllers\ApiController;
+
 class ComicImagesController extends ApiController {
 
     /**
