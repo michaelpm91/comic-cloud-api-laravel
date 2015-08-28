@@ -99,40 +99,28 @@ class AdminComicImageTest extends ApiTester {
         $this->assertResponseStatus(404);
     }
     /**
-     * @group lolz
      * @group admin
      * @group image-test
      */
-    public function test_that_admins_can_delete_an_image(){
+    public function test_that_admins_can_update_an_image(){
         $this->seed();
 
-        $comic = factory(App\Models\Comic::class)->create([
-            'user_id' => 1
-        ]);
+        $comic = factory(App\Models\Comic::class)->create();
 
         $contents = $comic->comic_book_archive_contents;
 
+        $json = [
+            //fields to update
+        ];
+
         $slug = last(explode("/", head($contents)));
 
-        $req = $this->delete($this->admin_comic_image_endpoint.$slug,['HTTP_Authorization' => 'Bearer '. $this->test_admin_access_token]);
-        dd($req);
+        $this->putJson($this->basic_admin_image_endpoint.$slug, $json,['HTTP_Authorization' => 'Bearer '. $this->test_admin_access_token])
+            ->seeJson([]);//TODO:check updates
 
-        $this->assertResponseStatus(200);
+        $this->assertResponseStatus(202);
 
-        $this->get($this->admin_comic_image_endpoint.$slug,['HTTP_Authorization' => 'Bearer '. $this->test_admin_access_token]);
-        $this->assertResponseStatus(404);
+
     }
-    /**
-     * @group admin
-     * @group image-test
-     */
-    public function test_that_admins_cannot_delete_images_that_do_not_exist(){
-        $this->seed();
-
-        $this->delete($this->admin_comic_image_endpoint."xyz",['HTTP_Authorization' => 'Bearer '. $this->test_admin_access_token]);
-        $this->assertResponseStatus(404);
-    }
-
-
 
 }

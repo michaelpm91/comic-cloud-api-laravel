@@ -60,7 +60,7 @@ class ComicImagesController extends ApiController {
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id){
+    public function destroy($id){//DISABLED
 
         $comicImage = ComicImage::find($id);//TODO: Delete by ID or SLUG
 
