@@ -274,7 +274,7 @@ class ComicsController extends ApiController {
 
             array_walk($comic_vine_query, function(&$issue_entry){
                 $issue_entry = [
-                    'issue_description' => strip_tags($issue_entry['description']),
+                    'issue_description' => (isset($issue_entry['description']) ? strip_tags($issue_entry['description']) : ''),
                     'issue_name' => $issue_entry['name'],
                     'issue_number' => $issue_entry['issue_number'],
                     'comic_vine_issue_id' => $issue_entry['id']
@@ -292,6 +292,13 @@ class ComicsController extends ApiController {
             return $this->respond($meta);
 
         }
+
+        return $this->respondNotFound([[
+            'title' => 'Comic Not Found',
+            'detail' => 'Comic Not Found',
+            'status' => 404,
+            'code' => ''
+        ]]);
 
     }
 
