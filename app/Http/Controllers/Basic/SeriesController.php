@@ -14,6 +14,8 @@ use App\Models\Comic;
 use GuzzleHttp\Client as Guzzle;
 
 use App\Http\Controllers\ApiController;
+use Illuminate\Pagination\LengthAwarePaginator as Paginator;
+
 
 
 class SeriesController extends ApiController {
@@ -195,7 +197,7 @@ class SeriesController extends ApiController {
      * @param  int  $id
      * @return Response
      */
-    public function destroy($id){//Should this be possible?? It should only delete if a suitable replacement series is available to prevent orphan comics //TODO: Test this logic
+    public function destroy($id){
         $series = $this->currentUser->series()->find($id);
         if($series) {
             $series->delete();
@@ -253,9 +255,7 @@ class SeriesController extends ApiController {
                 //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
             }
 
-
             $last_page = ceil($response['number_of_total_results'] / $limit);
-            $current_page = ($page > $last_page ? $last_page : $page);
 
             if($page > $last_page) {
 
@@ -291,9 +291,8 @@ class SeriesController extends ApiController {
 
             $comic_vine_query = $response['results'];
 
-
-            $series_response = array_map(function($series_entry){
-                return [
+            array_walk($comic_vine_query, function(&$series_entry){
+                $series_entry =[
                     'series_title' => $series_entry['name'],
                     'series_issues' => $series_entry['count_of_issues'],
                     'series_cover_image' => $series_entry['image']['medium_url'],
@@ -301,28 +300,13 @@ class SeriesController extends ApiController {
                     'publisher' => $series_entry['publisher']['name'],
                     'comic_vine_series_id' => $series_entry['id']
                 ];
-            }, $comic_vine_query);
+            });
 
+            $meta = (New Paginator($comic_vine_query, $response['number_of_total_results'], $limit, $page, ['path' =>  url('v'.env('APP_API_VERSION').'/series/'. $id .'/meta')]))->toArray();
+            $meta['series'] = $meta['data'];
+            unset($meta['series']);
 
-            $series_meta_url = url('v'.env('APP_API_VERSION').'/series/'. $id .'/meta?page=');
-
-
-            $next_link = ($current_page + 1 > $last_page ? null : $series_meta_url.($current_page + 1));
-            $prev_link = ($current_page - 1 < 1 ? null : $series_meta_url.($current_page - 1));
-
-            $from = ($current_page - 1) * $limit + 1;
-
-            return $this->respond([
-                'total' =>  $response['number_of_total_results'],
-                'per_page' => $response['limit'],
-                'current_page' => (int)$current_page,
-                'last_page' => $last_page,
-                'next_page_url' => $next_link,
-                'prev_page_url' => $prev_link,
-                'from' => ($from < 0 ? 1 : $from),
-                'to' => (($current_page - 1)  * $limit) + $response['number_of_page_results'],
-                'series' => $series_response
-            ]);
+            return $this->respond($meta);
         }
         return $this->respondNotFound([[
             'title' => 'Series Not Found',
