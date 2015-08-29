@@ -7,7 +7,7 @@
  */
 
 
-class ApiTester extends TestCase {
+abstract class ApiTester extends TestCase {
 
 
     protected $web_client_id = 'SBziat92Is6qqShG';

@@ -64,12 +64,12 @@ $factory->define(App\Models\Comic::class, function (Faker\Generator $faker) {
 
     return [
         'id' => $faker->uuid,
-        'comic_issue' => $faker->numberBetween(1,999),
+        'comic_issue' => (string)$faker->numberBetween(1,999),
         'comic_writer' => $faker->name,
         'comic_book_archive_contents' => json_encode($comic_book_archive_contents),
         'user_id'  => factory(App\Models\User::class)->create()->id,
         'series_id' =>  factory(App\Models\Series::class)->create()->id,
-        'comic_vine_issue_id' => $faker->randomNumber(),
+        'comic_vine_issue_id' => (string)$faker->randomNumber(),
         'comic_book_archive_id' =>  $cba->id
     ];
 });
