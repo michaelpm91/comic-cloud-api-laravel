@@ -7,7 +7,6 @@
  */
 
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Pagination\LengthAwarePaginator;
 
 class ComicTest extends ApiTester{
 
@@ -20,6 +19,16 @@ class ComicTest extends ApiTester{
     public function test_it_must_be_authenticated(){
         $this->get($this->basic_comic_endpoint.str_random(32))->seeJson();
         $this->assertResponseStatus(401);
+    }
+    /**
+     * @group basic
+     * @group comic-test
+     */
+    public function test_basic_scoped_tokens_cannot_fetch_admin_scoped_comics(){
+        $this->seed();
+
+        $this->get($this->admin_comic_endpoint, ['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(400);//TODO: this should be a 401
     }
     /**
      * @group basic
