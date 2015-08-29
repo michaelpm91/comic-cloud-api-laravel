@@ -27,8 +27,8 @@
         <env name="COMIC_VINE_ISSUE_SEARCH_URL" value="http://localhost:3000/api/issues/"/>
     </php>
     <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">/app/Http/Controllers</directory>
+        <whitelist>
+            <directory suffix=".php">app/Http/Controllers</directory>
         </whitelist>
     </filter>
 </phpunit>

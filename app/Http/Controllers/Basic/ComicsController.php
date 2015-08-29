@@ -15,6 +15,8 @@ use LucaDegasperi\OAuth2Server\Authorizer;
 
 use App\Http\Controllers\ApiController;
 
+use Illuminate\Pagination\LengthAwarePaginator as Paginator;
+
 
 class ComicsController extends ApiController {
 
@@ -189,7 +191,7 @@ class ComicsController extends ApiController {
         $comic = $this->currentUser->comics()->with('series')->find($id);
 
         if($comic) {
-            if(!$comic->series->comic_vine_series_id){
+            if (!$comic->series->comic_vine_series_id) {
                 return $this->respondBadRequest([//TODO: Detailed api error response
                     'title' => 'Bad Request',
                     'detail' => 'No Comic Vine Series ID set on parent series',
@@ -198,14 +200,14 @@ class ComicsController extends ApiController {
                 ]);
             }
 
-            $guzzle = $this->guzzle;//New Guzzle;
+            $guzzle = $this->guzzle;
 
             $comic_vine_api_url = env('COMIC_VINE_ISSUE_SEARCH_URL');
 
-            $limit = 20; //max is 100
+            $limit = 20;
             $page = (int)(Input::get('page') ? Input::get('page') : 1);
             $offset = $limit * ($page ? ($page - 1) : 0);
-            $issue = (Input::get('issue') ? Input::get('issue') : '');//Should use issue data from db somehow//($comic->issue ? $comic->issue : ''));
+            $issue = (Input::get('issue') ? Input::get('issue') : '');//TODO: Should use issue data from db somehow//($comic->issue ? $comic->issue : ''));
             $comic_vine_volume_id = $comic->series->comic_vine_series_id;
 
             $response = Cache::remember('_comic_vine_issue_query_'.$comic_vine_volume_id.'_offset_'.$offset.= ($issue ? '_issue_'.$issue : ''), 10, function() use($guzzle, $comic_vine_api_url, $limit, $offset, $issue, $comic_vine_volume_id) {//TODO:Consider Cache time
@@ -233,17 +235,15 @@ class ComicsController extends ApiController {
                 ]);
                 //TODO: Notify Admin //json_decode($response->getBody(), true)['error']
             }
-            $comic_vine_query = $response['results'];
 
             $last_page = ceil($response['number_of_total_results'] / $limit);
-            $current_page = ($page > $last_page ? $last_page : $page);
 
-            if($page > $last_page) {//If requested page is greater than the last known page, retrieve last page and return that
+            if($page > $last_page) {
 
                 Cache::forget('_comic_vine_issue_query_'.$comic_vine_volume_id.'_offset_'.$offset.= ($issue ? '_issue_'.$issue : ''));
-                $guzzle = New Guzzle;//New guzzle instance because of chunking bug
-                $new_offset = ($current_page - 1) * $limit;
-                $response = Cache::remember('_comic_vine_issue_query_' . $comic_vine_volume_id . '_offset_' . $new_offset .= ($issue ? '_issue_' . $issue : ''), 10, function () use ($guzzle, $comic_vine_api_url, $limit, $offset, $issue, $comic_vine_volume_id, $new_offset) {//TODO:Consider Cache time
+                $guzzle = New Guzzle;
+                $new_offset = intval($limit * ($last_page - 1));
+                $response = Cache::remember('_comic_vine_issue_query_' . $comic_vine_volume_id . '_offset_'.$new_offset.= ($issue ? '_issue_'.$issue : ''), 10, function () use ($guzzle, $comic_vine_api_url, $limit, $new_offset, $issue, $comic_vine_volume_id) {//TODO:Consider Cache time
                     //TODO: Support filtering and ordering
                     $guzzle_response = $guzzle->get($comic_vine_api_url, [
                         'query' => [
@@ -259,7 +259,6 @@ class ComicsController extends ApiController {
                     return (json_decode($guzzle_response, true));
                 });
 
-                //dd($response);
                 if($response['status_code'] != 1) {
                     return $this->respondInternalError([[
                         'title' => 'Comic Vine API Error',
@@ -271,46 +270,28 @@ class ComicsController extends ApiController {
                 }
             }
 
+            $comic_vine_query = $response['results'];
 
-            $issues = array_map(function($issue_entry){
-                return [
+            array_walk($comic_vine_query, function(&$issue_entry){
+                $issue_entry = [
                     'issue_description' => strip_tags($issue_entry['description']),
                     'issue_name' => $issue_entry['name'],
                     'issue_number' => $issue_entry['issue_number'],
                     'comic_vine_issue_id' => $issue_entry['id']
                 ];
-            }, $comic_vine_query);
+            });
 
-            usort($issues, function($a, $b) {
+            usort($comic_vine_query, function($a, $b) {
                 return $a['issue_number'] - $b['issue_number'];
             });
 
-            $comic_meta_url = url('v'.env('APP_API_VERSION').'/comic/'. $id .'/meta?page=');
+            $meta = (New Paginator($comic_vine_query, $response['number_of_total_results'], $limit, $page, ['path' =>  url('v'.env('APP_API_VERSION').'/comic/'. $id .'/meta')]))->toArray();
+            $meta['issue'] = $meta['data'];
+            unset($meta['issue']);
 
+            return $this->respond($meta);
 
-            $next_link = (($current_page + 1) > $last_page ? null : $comic_meta_url.($current_page + 1));
-            $prev_link = (($current_page - 1) < 1 ? null : $comic_meta_url.($current_page - 1));
-
-            $from = ($current_page - 1) * $limit + 1;
-
-            return $this->respond([ //TODO: Consider using Laravel's manual pagination. Paginator::make($items, $totalItems, $perPage);
-                'total' => $response['number_of_total_results'],
-                'per_page' => $response['limit'],
-                'current_page' => (int)$current_page,
-                'last_page' => $last_page,
-                'next_page_url' => $next_link,
-                'prev_page_url' => $prev_link,
-                'from' => ($from < 0 ? 1 : $from),
-                'to' => (($current_page - 1)  * $limit) + $response['number_of_page_results'],
-                'issue' => $issues
-            ]);
         }
-        return $this->respondNotFound([[
-            'title' => 'Comic Not Found',
-            'detail' => 'Comic Not Found',
-            'status' => 404,
-            'code' => ''
-        ]]);
 
     }
 
