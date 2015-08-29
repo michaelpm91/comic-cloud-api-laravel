@@ -319,7 +319,7 @@ class ComicsController extends ApiController {
 
         $comic = $currentUser->comics()->find($comic_id);
 
-        if(!$comic_id){
+        if(!$comic){
             return $this->respondNotFound([[
                 'title' => 'Comic Not Found',
                 'detail' => 'Comic Not Found',
@@ -331,14 +331,15 @@ class ComicsController extends ApiController {
 
         $series = $currentUser->series()->find($series_id);
 
-        if(!$series){
+        //TODO: See if below logic is possible
+        /*if(!$series){
             return $this->respondNotFound([[
                 'title' => 'Series Not Found',
                 'detail' => 'Series Not Found',
                 'status' => 404,
                 'code' => ''
             ]]);
-        }
+        }*/
 
         return $this->respond([
             'series' => [$series]

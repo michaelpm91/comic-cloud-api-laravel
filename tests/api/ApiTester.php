@@ -31,6 +31,9 @@ abstract class ApiTester extends TestCase {
     protected $basic_comic_endpoint = "/v0.1/comics/";
     protected $admin_comic_endpoint = "/admin/comics/";
 
+    protected $basic_series_endpoint = "/v0.1/series/";
+    protected $admin_series_endpoint = "/admin/series/";
+
     protected $admin_comic_book_archive_endpoint = "/admin/comicbookarchives/";
     protected $processor_comic_book_archive_endpoint = "/processor/comicbookarchives/";
 

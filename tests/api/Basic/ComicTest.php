@@ -202,7 +202,6 @@ class ComicTest extends ApiTester{
     }
 
     /**
-     * @group lolz
      * @group basic
      * @group comic-test
      */
@@ -217,5 +216,136 @@ class ComicTest extends ApiTester{
         $this->assertResponseStatus(400);
     }
 
+    /**
+     * @group basic
+     * @group comic-test
+     */
+    public function test_a_user_can_delete_a_comic(){
+        $this->seed();
 
+        $comic = factory(App\Models\Comic::class)->create([
+            'user_id' => 1
+        ]);
+
+        $this->delete($this->basic_comic_endpoint.$comic->id, [], ['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseOk();
+        $this->get($this->basic_comic_endpoint.$comic->id, ['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(404);
+    }
+    /**
+     * @group basic
+     * @group comic-test
+     */
+    public function test_a_user_cannot_delete_a_comic_of_another_user(){
+        $this->seed();
+
+        $comic = factory(App\Models\Comic::class)->create();
+
+        $this->delete($this->basic_comic_endpoint.$comic->id, [], ['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(404);
+    }
+
+    /**
+     * @group basic
+     * @group comic-test
+     */
+    public function test_a_user_cannot_delete_a_comic_that_does_not_exist(){
+        $this->seed();
+
+        $this->delete($this->basic_comic_endpoint."xyz", [], ['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(404);
+    }
+
+    /**
+     * @group basic
+     * @group comic-test
+     */
+    public function test_it_will_delete_a_series_if_the_last_comic_has_been_deleted(){
+        $this->seed();
+
+        $comic = factory(App\Models\Comic::class)->create([
+            'user_id' => 1,
+            'series_id' => factory(App\Models\Series::class)->create(['user_id' => 1])->id
+        ]);
+        $series_id = $comic->series->id;
+
+        $this->get($this->basic_series_endpoint.$series_id, ['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseOk();
+        $this->delete($this->basic_comic_endpoint.$comic->id, [], ['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseOk();
+        $this->get($this->basic_series_endpoint.$series_id, ['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(404);
+    }
+    /**
+     * @group basic
+     * @group comic-test
+     */
+    public function test_it_can_fetch_meta_data_for_a_comic_that_exists(){
+        $this->seed();
+
+        $comic = factory(App\Models\Comic::class)->create([
+            'user_id' => 1,
+            'series_id' => factory(App\Models\Series::class)->create([
+                'user_id' => 1,
+                'series_title' => 'All Star Superman',
+                'comic_vine_series_id' => '18139'
+            ])->id
+        ]);
+        $this->get($this->basic_comic_endpoint.$comic->id."/meta", ['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseOk();
+    }
+    /**
+     * @group basic
+     * @group comic-test
+     */
+    public function test_it_cannot_fetch_meta_data_for_a_comic_that_does_not_exist(){
+        $this->seed();
+
+        $this->get($this->basic_comic_endpoint."xyz/meta", ['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(404);
+    }
+    /**
+     * @group basic
+     * @group comic-test
+     */
+    public function test_it_cannot_query_meta_data_if_a_comic_vine_series_id_is_not_set_on_the_parent_series(){
+        $this->seed();
+
+        $comic = factory(App\Models\Comic::class)->create([
+            'user_id' => 1,
+            'series_id' => factory(App\Models\Series::class)->create([
+                'user_id' => 1,
+                'series_title' => 'All Star Superman',
+                'comic_vine_series_id' => ''
+            ])->id
+        ]);
+
+        $this->get($this->basic_comic_endpoint.$comic->id."/meta", ['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(400);
+    }
+    /**
+     * @group basic
+     * @group comic-test
+     */
+    public function test_it_fetch_a_related_series_for_a_specific_comic(){
+        $this->seed();
+
+        $comic = factory(App\Models\Comic::class)->create([
+            'user_id' => 1,
+            'series_id' => factory(App\Models\Series::class)->create(['user_id' => 1])->id
+        ]);
+
+        $this->get($this->basic_comic_endpoint.$comic->id."/series",['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])
+            ->seeJson(['id' => $comic->series->id]);
+        $this->assertResponseStatus(200);
+    }
+    /**
+     * @group basic
+     * @group comic-test
+     */
+    public function test_it_cannot_fetch_a_related_series_for_a_comic_that_does_not_exist(){
+        $this->seed();
+        $this->get($this->basic_comic_endpoint."xyz/series",['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token])->seeJson();
+        $this->assertResponseStatus(404);
+    }
 }
