@@ -223,7 +223,7 @@ class SeriesController extends ApiController {
 
             $guzzle = New Guzzle;
 
-            $comic_vine_api_url = 'http://www.comicvine.com/api/search/';
+            $comic_vine_api_url = env('COMIC_VINE_API_SEARCH_URL');
 
             $limit = 20; //max is 100
             $page = (Input::get('page') ? Input::get('page') : 1);
@@ -307,8 +307,8 @@ class SeriesController extends ApiController {
             $series_meta_url = url('v'.env('APP_API_VERSION').'/series/'. $id .'/meta?page=');
 
 
-            $next_link = ($current_page + 1 >= $last_page ? null : $series_meta_url.($current_page + 1));
-            $prev_link = ($current_page - 1 <= 1 ? null : $series_meta_url.($current_page - 1));
+            $next_link = ($current_page + 1 > $last_page ? null : $series_meta_url.($current_page + 1));
+            $prev_link = ($current_page - 1 < 1 ? null : $series_meta_url.($current_page - 1));
 
             $from = ($current_page - 1) * $limit + 1;
 

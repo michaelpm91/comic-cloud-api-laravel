@@ -191,7 +191,7 @@ class ComicsController extends ApiController {
         if($comic) {
             if(!$comic->series->comic_vine_series_id){
                 return $this->respondBadRequest([//TODO: Detailed api error response
-                    'title' => 'Comic Vine API Error',
+                    'title' => 'Bad Request',
                     'detail' => 'No Comic Vine Series ID set on parent series',
                     'status' => 400,
                     'code' => ''
@@ -200,7 +200,7 @@ class ComicsController extends ApiController {
 
             $guzzle = $this->guzzle;//New Guzzle;
 
-            $comic_vine_api_url = 'http://comicvine.com/api/issues/';
+            $comic_vine_api_url = env('COMIC_VINE_ISSUE_SEARCH_URL');
 
             $limit = 20; //max is 100
             $page = (int)(Input::get('page') ? Input::get('page') : 1);
@@ -210,16 +210,16 @@ class ComicsController extends ApiController {
 
             $response = Cache::remember('_comic_vine_issue_query_'.$comic_vine_volume_id.'_offset_'.$offset.= ($issue ? '_issue_'.$issue : ''), 10, function() use($guzzle, $comic_vine_api_url, $limit, $offset, $issue, $comic_vine_volume_id) {//TODO:Consider Cache time
                 //TODO: Support filtering and ordering
-                $guzzle_response = $guzzle->get($comic_vine_api_url, [
-                    'query' => [
-                        'api_key' => env('comic_vine_api_key'),
-                        'format' => 'json',
-                        'filter' => 'volume:' . $comic_vine_volume_id .= ($issue ? ',' . 'issue_number:' . $issue : ''),
-                        'limit' => $limit,
-                        'offset' => $offset,
-                        'field_list' => 'name,description,issue_number,volume,id,image',
-                    ]
-                ])->getBody();
+                $queries = ['query' => [
+                    'api_key' => env('comic_vine_api_key'),
+                    'format' => 'json',
+                    'filter' => 'volume:' . $comic_vine_volume_id .= ($issue ? ',' . 'issue_number:' . $issue : ''),
+                    'limit' => $limit,
+                    'offset' => $offset,
+                    'field_list' => 'name,description,issue_number,volume,id,image',
+                ]];
+                if(env('APP_ENV') == 'testing' && Input::get('force')) $queries['query']['force'] = Input::get('force');
+                $guzzle_response = $guzzle->get($comic_vine_api_url, $queries)->getBody();
 
                 return (json_decode($guzzle_response, true));
             });
@@ -238,7 +238,7 @@ class ComicsController extends ApiController {
             $last_page = ceil($response['number_of_total_results'] / $limit);
             $current_page = ($page > $last_page ? $last_page : $page);
 
-            if($page > $last_page) {
+            if($page > $last_page) {//If requested page is greater than the last known page, retrieve last page and return that
 
                 Cache::forget('_comic_vine_issue_query_'.$comic_vine_volume_id.'_offset_'.$offset.= ($issue ? '_issue_'.$issue : ''));
                 $guzzle = New Guzzle;//New guzzle instance because of chunking bug
@@ -288,8 +288,8 @@ class ComicsController extends ApiController {
             $comic_meta_url = url('v'.env('APP_API_VERSION').'/comic/'. $id .'/meta?page=');
 
 
-            $next_link = ($current_page + 1 >= $last_page ? null : $comic_meta_url.($current_page + 1));
-            $prev_link = ($current_page - 1 <= 1 ? null : $comic_meta_url.($current_page - 1));
+            $next_link = (($current_page + 1) > $last_page ? null : $comic_meta_url.($current_page + 1));
+            $prev_link = (($current_page - 1) < 1 ? null : $comic_meta_url.($current_page - 1));
 
             $from = ($current_page - 1) * $limit + 1;
 

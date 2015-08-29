@@ -324,6 +324,25 @@ class ComicTest extends ApiTester{
         $this->assertResponseStatus(400);
     }
     /**
+     * @group lolz
+     * @group basic
+     * @group comic-test
+     */
+    public function test_it_will_fail_gracefully_if_comic_vine_is_unavailable(){
+        $this->seed();
+
+        $comic = factory(App\Models\Comic::class)->create([
+            'user_id' => 1,
+            'series_id' => factory(App\Models\Series::class)->create([
+                'user_id' => 1,
+                'series_title' => 'All Star Superman',
+                'comic_vine_series_id' => '18139'
+            ])->id
+        ]);
+        $this->get($this->basic_comic_endpoint.$comic->id."/meta?force=comic_vine_error", ['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
+        $this->assertResponseStatus(500);
+    }
+    /**
      * @group basic
      * @group comic-test
      */

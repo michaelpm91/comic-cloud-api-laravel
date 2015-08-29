@@ -23,6 +23,8 @@
         <env name="SESSION_DRIVER" value="array"/>
         <env name="QUEUE_DRIVER" value="test_sync"/>
         <env name="DB_DRIVER" value="sqlite_in_memory"/>
+        <env name="COMIC_VINE_API_SEARCH_URL" value="http://localhost:3000/api/search/"/>
+        <env name="COMIC_VINE_ISSUE_SEARCH_URL" value="http://localhost:3000/api/issues/"/>
     </php>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
