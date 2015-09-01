@@ -28,7 +28,6 @@ class ApiController extends Controller {
             }
         }
 
-        //if(env('DB_DRIVER') == 'sqlite_in_memory') DB::statement('PRAGMA foreign_keys = ON');//TODO: For testing/local comic cloud perhaps
 
     }
 

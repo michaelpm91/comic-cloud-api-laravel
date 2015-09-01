@@ -80,7 +80,7 @@ $factory->define(App\Models\Series::class, function (Faker\Generator $faker) {
         'series_title' => $faker->sentence(),
         'series_start_year' => $faker->year,
         'series_publisher' => 'Unknown',
-        'comic_vine_series_id' => $faker->randomNumber(),
+        'comic_vine_series_id' => (string)$faker->randomNumber(),
         'user_id'  => factory(App\Models\User::class)->create()->id,
     ];
 });
