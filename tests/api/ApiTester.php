@@ -6,8 +6,9 @@
  * Time: 23:40
  */
 
-
 abstract class ApiTester extends TestCase {
+
+    use \InterNations\Component\HttpMock\PHPUnit\HttpMockTrait;
 
 
     protected $web_client_id = 'SBziat92Is6qqShG';

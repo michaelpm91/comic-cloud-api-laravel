@@ -300,6 +300,7 @@ class ComicTest extends ApiTester{
                 'comic_vine_series_id' => '18139'
             ])->id
         ]);
+
         $this->get($this->basic_comic_endpoint.$comic->id."/meta", ['HTTP_Authorization' => 'Bearer '. $this->test_basic_access_token]);
         $this->assertResponseOk();
     }
